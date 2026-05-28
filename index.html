@@ -367,18 +367,89 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 .a-chip-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:.5;}
 .a-chip.sel .a-chip-dot{opacity:1;}
 
-/* ── SETTINGS ── */
-.settings-wrap{max-width:520px;margin:0 auto;}
-.settings-av-section{display:flex;flex-direction:column;align-items:center;gap:12px;padding:28px 20px;background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;margin-bottom:14px;}
-.settings-av{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;border:3px solid var(--ac3);background:var(--ac2);color:var(--accent);cursor:pointer;overflow:hidden;flex-shrink:0;transition:opacity .18s;}
-.settings-av:hover{opacity:.85;}
+/* ── SETTINGS MODAL AVATAR ── */
+.settings-av{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;border:3px solid var(--ac3);background:var(--ac2);color:var(--accent);cursor:pointer;overflow:hidden;flex-shrink:0;transition:opacity .18s;}
+.settings-av:hover{opacity:.82;}
 .settings-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.settings-av-name{font-family:var(--font-display);font-size:20px;letter-spacing:.04em;line-height:1;}
-.settings-av-role{font-size:11px;color:var(--tx3);letter-spacing:.02em;}
-.settings-av-btns{display:flex;gap:8px;}
-.settings-panel{background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;padding:20px;margin-bottom:14px;}
-.settings-panel-ttl{font-family:var(--font-display);font-size:12px;letter-spacing:.1em;color:var(--tx3);margin-bottom:14px;text-transform:uppercase;}
 .proj-locked-display{padding:10px 13px;background:var(--bg4);border:1px solid var(--bd2);border-radius:12px;font-size:13px;color:var(--tx2);font-weight:500;}
+
+/* ── NAV ICON BUTTONS ── */
+.nav-icon-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0;}
+.nav-icon-btn:hover{background:var(--bg4);color:var(--tx);}
+.nav-icon-btn.danger{color:var(--red);}
+.nav-icon-btn.danger:hover{background:var(--red2);border-color:var(--red3);}
+
+/* ── THEME BUTTONS ── */
+.theme-pair{display:flex;gap:6px;}
+.theme-pair button{flex:1;padding:8px 0;border-radius:10px;font-family:var(--font-body);font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;letter-spacing:.02em;}
+
+/* ── HOME DASHBOARD ── */
+.home-greeting{display:flex;align-items:center;gap:14px;padding:10px 0 14px;}
+.home-greeting-av{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;overflow:hidden;flex-shrink:0;}
+.home-greeting-av img{width:100%;height:100%;object-fit:cover;border-radius:12px;}
+.greeting-name{font-family:var(--font-display);font-size:22px;letter-spacing:.04em;line-height:1;}
+.greeting-sub{font-size:11px;color:var(--tx3);margin-top:2px;}
+
+.home-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+@media(max-width:520px){.home-stats{grid-template-columns:repeat(2,1fr);}}
+.hstat{background:var(--bg2);border:1px solid var(--bd2);border-radius:12px;padding:12px 14px;}
+.hstat-num{font-family:var(--font-display);font-size:30px;letter-spacing:.02em;line-height:1;}
+.hstat-lbl{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
+
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+@media(max-width:660px){.home-grid{grid-template-columns:1fr;}}
+.hcard{background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;overflow:hidden;}
+.hcard.urgent{border-color:var(--red3);}
+.hcard-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 9px;border-bottom:1px solid var(--bd);}
+.hcard.urgent .hcard-hdr{background:var(--red2);}
+.hcard-ttl{font-family:var(--font-display);font-size:12px;letter-spacing:.07em;color:var(--tx2);}
+.hcard.urgent .hcard-ttl{color:var(--red);}
+.hcard-body{padding:8px;}
+.hcard-empty{padding:16px;text-align:center;color:var(--tx3);font-size:12px;}
+
+.task-ticket{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:9px;background:var(--card);border:1px solid var(--bd2);margin-bottom:5px;cursor:pointer;transition:all .15s;}
+.task-ticket:hover{border-color:var(--orange);transform:translateX(2px);}
+.task-ticket:last-child{margin-bottom:0;}
+.tt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.tt-info{flex:1;min-width:0;}
+.tt-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;}
+.tt-sub{font-size:10px;color:var(--tx3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tt-chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--bd3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer;}
+.tt-chk.done{background:var(--grn);border-color:var(--grn);}
+.tt-chk svg{width:9px;height:9px;stroke:#fff;opacity:0;transition:opacity .15s;}
+.tt-chk.done svg{opacity:1;}
+
+.ppr-row{display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:9px;background:var(--card);border:1px solid var(--bd2);margin-bottom:5px;cursor:pointer;transition:all .15s;}
+.ppr-row:hover{border-color:var(--orange);}
+.ppr-row:last-child{margin-bottom:0;}
+.ppr-icon{font-size:20px;flex-shrink:0;line-height:1;}
+.ppr-info{flex:1;min-width:0;}
+.ppr-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ppr-bar{height:4px;background:var(--bg5);border-radius:4px;margin-top:5px;overflow:hidden;}
+.ppr-fill{height:100%;border-radius:4px;transition:width .4s;}
+.ppr-pct{font-family:var(--font-display);font-size:17px;letter-spacing:.02em;flex-shrink:0;min-width:38px;text-align:right;}
+
+.team-row{display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:9px;background:var(--card);border:1px solid var(--bd2);margin-bottom:5px;}
+.team-row:last-child{margin-bottom:0;}
+.team-av{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;overflow:hidden;flex-shrink:0;}
+.team-av img{width:100%;height:100%;object-fit:cover;border-radius:10px;}
+.team-info{flex:1;}
+.team-name{font-size:12px;font-weight:600;}
+.team-sub{font-size:10px;color:var(--tx3);}
+.online-pip{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.online-pip.on{background:var(--grn);box-shadow:0 0 5px var(--grn);}
+.online-pip.off{background:var(--tx3);}
+
+/* ── EVENTS ── */
+.event-row{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--bd2);margin-bottom:8px;cursor:pointer;transition:all .18s;}
+.event-row:hover{border-color:var(--orange);transform:translateY(-1px);}
+.event-date-box{text-align:center;min-width:40px;flex-shrink:0;padding-top:2px;}
+.edb-day{font-family:var(--font-display);font-size:24px;letter-spacing:.02em;line-height:1;}
+.edb-month{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;margin-top:1px;}
+.event-info{flex:1;min-width:0;}
+.event-title{font-size:13px;font-weight:600;margin-bottom:5px;}
+.event-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.event-actions{display:flex;gap:4px;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -411,18 +482,18 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <div class="nav-brand">FC<em>NOISE.</em></div>
     <div class="nav-links" id="nav-links"></div>
     <div class="nav-right">
-      <div class="sync-dot" id="sync-dot" onclick="toggleLive()" title="Clic para conectar / desconectar en tiempo real" style="cursor:pointer;">Off Live</div>
-      <div class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Modo claro / oscuro"></div>
-      <div class="user-av" id="nav-av" title="Configuraciones" style="overflow:hidden;padding:0;"></div>
+      <div class="sync-dot" id="sync-dot" onclick="toggleLive()" title="Conectar / desconectar en tiempo real" style="cursor:pointer;">Off Live</div>
+      <button class="nav-icon-btn" onclick="openSettingsModal()" title="Configuraciones">⚙️</button>
+      <button class="nav-icon-btn danger" onclick="logout()" title="Cerrar sesión">🚪</button>
+      <div class="user-av" id="nav-av" title="Perfil" style="overflow:hidden;padding:0;" onclick="openSettingsModal()"></div>
     </div>
   </nav>
 
   <div class="app-body">
 
-    <!-- ── MIS TAREAS (Dashboard) ── -->
+    <!-- ── HOME DASHBOARD ── -->
     <div id="view-tasks" class="hidden">
-      <div class="dash-top" id="dash-top"></div>
-      <div id="task-board"></div>
+      <div id="home-content"></div>
     </div>
 
     <!-- ── PROYECTOS ── -->
@@ -444,56 +515,21 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
       <div id="meth-content"></div>
     </div>
 
-    <!-- ── GESTIÓN CEO ── -->
+    <!-- ── GESTIÓN (Admin) ── -->
     <div id="view-gestion" class="hidden">
-      <div class="page-hdr"><div class="page-title">Gestión</div></div>
-      <div class="panel">
-        <div class="panel-hdr"><span class="panel-ttl">Nueva Tarea</span></div>
-        <div class="fi"><label>Proyecto</label><select id="g-proj" onchange="updateGestionStates(this.value)"></select></div>
-        <div class="fi"><label>Nombre</label><input type="text" id="g-name" placeholder="Ej. Publicación IG Lunes"></div>
-        <div class="fi"><label>Descripción</label><textarea id="g-desc" placeholder="Detalles, links, referencias…"></textarea></div>
-        <div class="form-row">
-          <div class="fi"><label>Área</label>
-            <select id="g-area">
-              <option value="marketing">📣 Marketing</option>
-              <option value="estrategia">📊 Estrategia</option>
-              <option value="operaciones">⚡ Operaciones</option>
-              <option value="diseno">🎨 Diseño</option>
-              <option value="admin">🗂 Admin</option>
-              <option value="ventas">💰 Ventas</option>
-              <option value="edicion">✂️ Edición</option>
-              <option value="general">💼 General</option>
-            </select>
-          </div>
-          <div class="fi"><label>Prioridad</label>
-            <select id="g-prio">
-              <option value="alta">🔴 Alta</option>
-              <option value="media">🟡 Media</option>
-              <option value="baja">🟢 Baja</option>
-            </select>
-          </div>
+      <div class="page-hdr">
+        <div class="page-title">Gestión de Tareas</div>
+        <div class="ml-auto">
+          <button class="btn btn-p btn-sm" onclick="_taskFromProjId=null;openTaskForm(null)">+ Nueva Tarea</button>
         </div>
-        <div class="fi"><label>Asignar a</label>
-          <div class="assign-grid" id="g-assign">
-            <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>Leonardo</div>
-            <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>Verónica</div>
-            <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>Laura</div>
-            <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>Editor</div>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="fi"><label>Fecha inicio</label><input type="date" id="g-start"></div>
-          <div class="fi"><label>Fecha fin</label><input type="date" id="g-end"></div>
-        </div>
-        <div class="fi"><label id="g-state-lbl">Estado</label>
-          <select id="g-kstatus"></select>
-        </div>
-        <button class="btn btn-p w-full" onclick="createTask()">Crear Tarea</button>
       </div>
       <div class="panel">
         <div class="panel-hdr">
           <span class="panel-ttl">Todas las Tareas</span>
           <div class="flex gap-6">
+            <select id="ft-proj" onchange="renderGTaskList()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:'Inter',sans-serif;">
+              <option value="all">Todos los proyectos</option>
+            </select>
             <select id="ft-user" onchange="renderGTaskList()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:'Inter',sans-serif;">
               <option value="all">Todos</option>
               <option value="leonardo">Leonardo</option>
@@ -526,38 +562,13 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
       <div class="panel"><div class="panel-hdr"><span class="panel-ttl">Carga por Usuario</span></div><div id="rev-users"></div></div>
     </div>
 
-    <!-- ── CONFIGURACIONES ── -->
-    <div id="view-settings" class="hidden">
-      <div class="page-hdr"><div class="page-title">Configuraciones</div></div>
-      <div class="settings-wrap">
-        <!-- Avatar + info -->
-        <div class="settings-av-section">
-          <div class="settings-av" id="settings-av-preview" onclick="document.getElementById('settings-photo-input').click()" title="Clic para cambiar foto"></div>
-          <div class="settings-av-name" id="settings-av-name"></div>
-          <div class="settings-av-role" id="settings-av-role"></div>
-          <div class="settings-av-btns">
-            <label class="btn btn-g btn-sm" style="cursor:pointer;">
-              📷 Cambiar foto
-              <input type="file" id="settings-photo-input" accept="image/*" style="display:none;" onchange="uploadSettingsPhoto(this)">
-            </label>
-            <button class="btn btn-g btn-sm btn-del" onclick="removeSettingsPhoto()">🗑 Quitar</button>
-          </div>
-        </div>
-        <!-- Perfil -->
-        <div class="settings-panel">
-          <div class="settings-panel-ttl">Perfil</div>
-          <div class="fi"><label>Nombre</label><input type="text" id="settings-name" placeholder="Tu nombre"></div>
-          <div class="fi"><label>Nueva contraseña</label><input type="password" id="settings-pass" placeholder="Dejar vacío para no cambiar"></div>
-          <div class="fi"><label>Confirmar contraseña</label><input type="password" id="settings-pass2" placeholder="Repetir nueva contraseña"></div>
-          <div id="settings-err" class="login-err"></div>
-          <button class="btn btn-p w-full" onclick="saveSettingsProfile()">Guardar cambios</button>
-        </div>
-        <!-- Sesión -->
-        <div class="settings-panel">
-          <div class="settings-panel-ttl">Sesión</div>
-          <button class="btn btn-g w-full" onclick="logout()" style="color:var(--red);border-color:var(--red3);">🚪 Cerrar sesión</button>
-        </div>
+    <!-- ── EVENTOS ── -->
+    <div id="view-eventos" class="hidden">
+      <div class="page-hdr">
+        <div class="page-title">Eventos</div>
+        <div class="ml-auto" id="btn-new-event-wrap"></div>
       </div>
+      <div id="eventos-list"></div>
     </div>
 
   </div><!-- /app-body -->
@@ -740,12 +751,83 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
   </div>
 </div>
 
-<!-- ═══ MODAL PERFIL (reemplazado por view-settings) ═══ -->
+<!-- ═══ MODAL CONFIGURACIONES ═══ -->
+<div class="mov" id="m-settings">
+  <div class="modal" style="max-width:360px;">
+    <div class="mhdr"><span class="mttl">⚙️ Configuraciones</span><button class="mclose" onclick="closeMod('m-settings')">✕</button></div>
+
+    <!-- Avatar -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 0 18px;border-bottom:1px solid var(--bd);margin-bottom:16px;">
+      <div class="settings-av" id="smod-av" onclick="document.getElementById('smod-photo-input').click()" title="Cambiar foto"></div>
+      <div id="smod-name-lbl" style="font-family:var(--font-display);font-size:16px;letter-spacing:.04em;"></div>
+      <div id="smod-role-lbl" style="font-size:11px;color:var(--tx3);"></div>
+      <div style="display:flex;gap:7px;">
+        <label class="btn btn-g btn-sm" style="cursor:pointer;">📷 Cambiar foto<input type="file" id="smod-photo-input" accept="image/*" style="display:none;" onchange="uploadSettingsPhoto(this)"></label>
+        <button class="btn btn-g btn-sm btn-del" onclick="removeSettingsPhoto();renderSettingsModal()">🗑</button>
+      </div>
+    </div>
+
+    <!-- Apariencia -->
+    <div class="fi">
+      <label>Apariencia</label>
+      <div class="theme-pair">
+        <button id="smod-dark" class="btn btn-g" onclick="setTheme('dark')">🌙 Oscuro</button>
+        <button id="smod-light" class="btn btn-g" onclick="setTheme('light')">☀️ Claro</button>
+      </div>
+    </div>
+
+    <!-- Contraseña -->
+    <div class="fi"><label>Nueva contraseña</label><input type="password" id="smod-pass" placeholder="Dejar vacío para no cambiar"></div>
+    <div class="fi"><label>Confirmar contraseña</label><input type="password" id="smod-pass2" placeholder="Repetir"></div>
+    <div id="smod-err" class="login-err"></div>
+    <button class="btn btn-p w-full" onclick="saveSettingsModal()">Guardar cambios</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL EVENTO ═══ -->
+<div class="mov" id="m-event">
+  <div class="modal">
+    <div class="mhdr"><span class="mttl" id="mev-ttl">Nuevo Evento</span><button class="mclose" onclick="closeMod('m-event')">✕</button></div>
+    <input type="hidden" id="mev-id">
+    <div class="fi"><label>Nombre</label><input type="text" id="mev-name" placeholder="Ej. Partido vs. Rival FC"></div>
+    <div class="fi"><label>Descripción</label><textarea id="mev-desc" placeholder="Detalles del evento…" style="min-height:56px;"></textarea></div>
+    <div class="form-row">
+      <div class="fi"><label>Fecha</label><input type="date" id="mev-date"></div>
+      <div class="fi"><label>Hora</label><input type="time" id="mev-time" placeholder="18:00"></div>
+    </div>
+    <div class="form-row">
+      <div class="fi"><label>Tipo</label>
+        <select id="mev-type">
+          <option value="partido">⚽ Partido</option>
+          <option value="entrenamiento">🏃 Entrenamiento</option>
+          <option value="reunion">📋 Reunión</option>
+          <option value="lanzamiento">🚀 Lanzamiento</option>
+          <option value="otro">📅 Otro</option>
+        </select>
+      </div>
+      <div class="fi"><label>Lugar</label><input type="text" id="mev-loc" placeholder="Estadio / dirección"></div>
+    </div>
+    <div class="fi"><label>Participantes</label>
+      <div class="assign-grid" id="mev-assign">
+        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>Leonardo</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>Verónica</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>Laura</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>Editor</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-event')">Cancelar</button>
+      <button class="btn btn-p btn-sm" onclick="saveEvent()">Guardar</button>
+    </div>
+  </div>
+</div>
 
 <script src="seed-data.js"></script>
 <script type="module">
-import { firebaseInit, isConnected, listenProjects, listenTasks,
+import { firebaseInit, isConnected,
+         listenProjects, listenTasks, listenEvents, listenPresence,
          fbSaveProject, fbDeleteProject, fbSaveTask, fbDeleteTask,
+         fbSaveEvent, fbDeleteEvent, fbSetPresence,
          fbStopListening } from './firebase.js';
 
 /* ═══════════════════════════════════════
@@ -796,6 +878,13 @@ const TASK_STATES = [
   {id:'revision',   label:'Revisión',   icon:'🟡', cls:'by', done:false},
   {id:'completada', label:'Completada', icon:'✅', cls:'bg', done:true },
 ];
+const EVENT_TYPES = [
+  {id:'partido',      label:'Partido',      icon:'⚽', cls:'br', color:'var(--red)'},
+  {id:'entrenamiento',label:'Entrenamiento',icon:'🏃', cls:'bo', color:'var(--org)'},
+  {id:'reunion',      label:'Reunión',      icon:'📋', cls:'bb', color:'var(--blu)'},
+  {id:'lanzamiento',  label:'Lanzamiento',  icon:'🚀', cls:'bp', color:'var(--pur)'},
+  {id:'otro',         label:'Otro',         icon:'📅', cls:'bw', color:'var(--tx3)'},
+];
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAYS_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const DAYS_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -816,12 +905,14 @@ let currentView   = 'tasks';
 let currentProjId = null;
 let calYear  = new Date().getFullYear();
 let calMonth = new Date().getMonth();
-let _projects= [], _tasks= [], _fbOn= false;
+let _projects= [], _tasks= [], _events= [], _fbOn= false;
+let _presence= {}; // {userId: {online: bool, lastSeen: ...}}
 let dragId         = null;
 let _tdpId         = null; // task currently open in detail popup
 let _taskFromProjId= null; // when opening task form from inside a project, lock to that project
+let _editEventId   = null; // event currently being edited
 
-const LS = { proj:'fcn_projects', task:'fcn_tasks', user:'fcn_session', theme:'fcn_theme' };
+const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme' };
 
 /* ═══════════════════════════════════════
    DATA HELPERS
@@ -849,6 +940,15 @@ async function removeTask(id){
   saveTasks(_tasks.filter(t=>t.id!==id));
   if(_fbOn) await fbDeleteTask(id);
 }
+function saveEvents(d){ _events=d; localStorage.setItem(LS.events,JSON.stringify(d)); }
+async function persistEvent(ev){
+  saveEvents([..._events.filter(x=>x.id!==ev.id),ev].sort((a,b)=>(a.date||'').localeCompare(b.date||'')));
+  if(_fbOn) await fbSaveEvent(ev);
+}
+async function removeEvent(id){
+  saveEvents(_events.filter(e=>e.id!==id));
+  if(_fbOn) await fbDeleteEvent(id);
+}
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function todayStr(){ return new Date().toISOString().split('T')[0]; }
 
@@ -856,22 +956,24 @@ function todayStr(){ return new Date().toISOString().split('T')[0]; }
    FIREBASE
 ═══════════════════════════════════════ */
 async function initData(){
-  // Init Firebase SDK silently (no listeners yet — user must turn ON LIVE manually)
   firebaseInit();
   _fbOn=false;
   setSyncDot(false);
   _projects=JSON.parse(localStorage.getItem(LS.proj)||'[]');
   _tasks   =JSON.parse(localStorage.getItem(LS.task)||'[]');
+  _events  =JSON.parse(localStorage.getItem(LS.events)||'[]');
 }
 
 async function toggleLive(){
   if(_fbOn){
     // ── GO OFFLINE ──
     _fbOn=false;
+    if(currentUser) fbSetPresence(currentUser.id, false).catch(()=>{});
     fbStopListening();
     setSyncDot(false);
     _projects=JSON.parse(localStorage.getItem(LS.proj)||'[]');
     _tasks   =JSON.parse(localStorage.getItem(LS.task)||'[]');
+    _events  =JSON.parse(localStorage.getItem(LS.events)||'[]');
     onDataChange();
   } else {
     // ── GO LIVE ──
@@ -881,6 +983,10 @@ async function toggleLive(){
     }
     _fbOn=true;
     setSyncDot('connecting');
+    // Mark user as online
+    if(currentUser) fbSetPresence(currentUser.id, true).catch(()=>{});
+    // Listen to presence
+    listenPresence(data=>{ _presence=data; if(currentView==='tasks') renderDashboard(); });
     // First load — if Firebase is empty, upload local data (one-time sync-up)
     let projSynced=false, taskSynced=false;
     listenProjects(async docs=>{
@@ -902,8 +1008,17 @@ async function toggleLive(){
       }
       _tasks=docs; onDataChange(); setSyncDot(true);
     });
+    listenEvents(docs=>{
+      _events=docs;
+      localStorage.setItem(LS.events, JSON.stringify(docs));
+      onDataChange();
+    });
   }
 }
+// Mark offline on page close
+window.addEventListener('beforeunload',()=>{
+  if(_fbOn && currentUser) fbSetPresence(currentUser.id, false).catch(()=>{});
+});
 function setSyncDot(state){
   const d=document.getElementById('sync-dot'); if(!d) return;
   if(state===true){
@@ -926,7 +1041,7 @@ function onDataChange(){
   if(currentView==='proj-detail') renderProjDetail(currentProjId);
   if(currentView==='gestion')     renderGTaskList();
   if(currentView==='revision')    renderRevision();
-  if(currentView==='settings')    renderSettings();
+  if(currentView==='eventos')     renderEventos();
   // refresh open detail popup if needed
   if(_tdpId) refreshDetailPopup();
 }
@@ -935,10 +1050,8 @@ function onDataChange(){
    THEME
 ═══════════════════════════════════════ */
 function toggleTheme(){
-  document.body.classList.toggle('light');
   const isL=document.body.classList.contains('light');
-  localStorage.setItem(LS.theme, isL?'light':'dark');
-  // CSS handles the visual state via body.light — no JS needed
+  setTheme(isL?'dark':'light');
 }
 function applyTheme(){
   const t=localStorage.getItem(LS.theme);
@@ -988,12 +1101,11 @@ function renderNav(){
     av.style.color=rm.color;
   }
   av.style.borderColor=rm.brd;
-  av.title=`${u.name} — Configuraciones`;
-  av.onclick=()=>navigate('settings');
   const admin=isAdmin();
   document.getElementById('nav-links').innerHTML=`
-    <button class="nav-link" onclick="navigate('tasks')">Mis Tareas</button>
+    <button class="nav-link" onclick="navigate('tasks')">Inicio</button>
     <button class="nav-link" onclick="navigate('projs')">Proyectos</button>
+    <button class="nav-link" onclick="navigate('eventos')">Eventos</button>
     ${admin?`<button class="nav-link" onclick="navigate('gestion')">Gestión</button>
              <button class="nav-link" onclick="navigate('revision')">Revisión</button>`:''}`;
 }
@@ -1001,25 +1113,26 @@ function renderNav(){
 function navigate(view, projId){
   currentView=view;
   if(projId) currentProjId=projId;
-  ['tasks','projs','proj-detail','gestion','revision','settings'].forEach(v=>
+  ['tasks','projs','proj-detail','gestion','revision','eventos'].forEach(v=>
     document.getElementById('view-'+v)?.classList.add('hidden'));
   document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('on'));
   document.getElementById('view-'+view)?.classList.remove('hidden');
-  const map={'tasks':0,'projs':1,'gestion':2,'revision':3};
+  // nav link index: 0=Inicio 1=Proyectos 2=Eventos 3=Gestión(admin) 4=Revisión(admin)
+  const map={'tasks':0,'projs':1,'eventos':2,'gestion':3,'revision':4};
   const links=document.querySelectorAll('.nav-link');
   const idx=map[view]; if(idx!==undefined && links[idx]) links[idx].classList.add('on');
 
   if(view==='tasks')       renderDashboard();
   if(view==='projs')       renderProjGrid();
   if(view==='proj-detail') renderProjDetail(currentProjId);
-  if(view==='gestion')     { populateProjSels('g-proj'); const fp=visibleProjects()[0]?.id; updateGestionStates(fp||''); renderGTaskList(); }
+  if(view==='gestion')     { populateGestionFilters(); renderGTaskList(); }
   if(view==='revision')    renderRevision();
-  if(view==='settings')    renderSettings();
+  if(view==='eventos')     renderEventos();
 }
 function goBack(){ navigate('projs'); }
 
 /* ═══════════════════════════════════════
-   DASHBOARD — single board view
+   DASHBOARD — home view
 ═══════════════════════════════════════ */
 function myTasks(){
   if(isAdmin()) return _tasks;
@@ -1028,54 +1141,168 @@ function myTasks(){
 
 function renderDashboard(){
   const rm=ROLES[currentUser.role];
-  // update accent
   document.documentElement.style.setProperty('--accent',rm.color);
   document.documentElement.style.setProperty('--ac2',rm.bg);
   document.documentElement.style.setProperty('--ac3',rm.brd);
 
   const all=myTasks();
-  const pend=all.filter(t=>t.status!=='done').length;
+  const today=todayStr();
+  const todayTasks=all.filter(t=>t.status!=='done'&&(tEnd(t)===today||tStart(t)===today));
+  const overdue   =all.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today);
+  const done      =all.filter(t=>t.status==='done');
+  const myProjs   =visibleProjects();
 
-  const dashPhoto=getUserPhoto(currentUser.id);
-  const dashAvInner=dashPhoto
-    ?`<img src="${dashPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" alt="">`
-    :currentUser.name.charAt(0).toUpperCase();
-  document.getElementById('dash-top').innerHTML=`
-    <div class="dash-user">
-      <div class="dash-av" style="background:${dashPhoto?'transparent':rm.bg};color:${rm.color};overflow:hidden;">${dashAvInner}</div>
-      <div>
-        <div class="dash-name" style="color:${rm.color};">${currentUser.name}</div>
-        <div class="dash-role">${rm.label}</div>
+  // Greeting
+  const hr=new Date().getHours();
+  const greeting=hr<12?'Buenos días':hr<18?'Buenas tardes':'Buenas noches';
+  const photo=getUserPhoto(currentUser.id);
+  const avIn=photo?`<img src="${photo}" alt="">`:`<span>${currentUser.name.charAt(0).toUpperCase()}</span>`;
+
+  // Upcoming events (next 7 days)
+  const weekEnd=new Date(); weekEnd.setDate(weekEnd.getDate()+7);
+  const weekStr=weekEnd.toISOString().split('T')[0];
+  const upcomingEvts=_events.filter(e=>e.date>=today&&e.date<=weekStr).slice(0,3);
+
+  let h=`
+  <div class="home-greeting">
+    <div class="home-greeting-av" style="background:${photo?'transparent':rm.bg};color:${rm.color};">${avIn}</div>
+    <div>
+      <div class="greeting-name" style="color:${rm.color};">${greeting}, ${currentUser.name}</div>
+      <div class="greeting-sub">${rm.label} · ${today}</div>
+    </div>
+  </div>
+
+  <div class="home-stats">
+    <div class="hstat">
+      <div class="hstat-num" style="color:${rm.color};">${todayTasks.length}</div>
+      <div class="hstat-lbl">📅 Para hoy</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num" style="color:var(--red);">${overdue.length}</div>
+      <div class="hstat-lbl">⚠️ Urgentes</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num" style="color:var(--grn);">${done.length}</div>
+      <div class="hstat-lbl">✅ Completadas</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num" style="color:var(--blu);">${myProjs.length}</div>
+      <div class="hstat-lbl">📊 Proyectos</div>
+    </div>
+  </div>
+
+  <div class="home-grid">
+    <div class="hcard">
+      <div class="hcard-hdr">
+        <span class="hcard-ttl">📅 TAREAS DE HOY</span>
+        <span class="bscnt">${todayTasks.length}</span>
+      </div>
+      <div class="hcard-body">
+        ${todayTasks.length?todayTasks.map(t=>taskTicketHTML(t)).join('')
+          :'<div class="hcard-empty">🎉 Sin tareas para hoy</div>'}
       </div>
     </div>
-    <div class="dash-stats">
-      <div class="dash-count" style="color:${rm.color};">${pend}</div>
-      <div class="dash-clbl">pendientes</div>
+    <div class="hcard">
+      <div class="hcard-hdr">
+        <span class="hcard-ttl">📊 MIS PROYECTOS</span>
+        <span class="bscnt">${myProjs.length}</span>
+      </div>
+      <div class="hcard-body">
+        ${myProjs.length?myProjs.map(p=>projProgressHTML(p)).join('')
+          :'<div class="hcard-empty">Sin proyectos asignados</div>'}
+      </div>
+    </div>
+  </div>
+
+  <div class="home-grid">
+    <div class="hcard ${overdue.length?'urgent':''}">
+      <div class="hcard-hdr">
+        <span class="hcard-ttl">⚠️ TAREAS URGENTES</span>
+        <span class="bscnt">${overdue.length}</span>
+      </div>
+      <div class="hcard-body">
+        ${overdue.length?overdue.slice(0,6).map(t=>taskTicketHTML(t)).join('')
+          :'<div class="hcard-empty">✅ Sin tareas vencidas</div>'}
+      </div>
+    </div>
+    <div class="hcard">
+      <div class="hcard-hdr">
+        <span class="hcard-ttl">👥 EQUIPO</span>
+        ${_fbOn?'<span class="bdg bg" style="font-size:9px;">● En vivo</span>':''}
+      </div>
+      <div class="hcard-body" id="dash-team-body">
+        ${renderTeamHTML()}
+      </div>
+    </div>
+  </div>
+
+  ${upcomingEvts.length?`
+  <div class="hcard" style="margin-bottom:14px;">
+    <div class="hcard-hdr">
+      <span class="hcard-ttl">📆 PRÓXIMOS EVENTOS</span>
+      <button class="btn btn-g btn-xs" onclick="navigate('eventos')">Ver todos →</button>
+    </div>
+    <div class="hcard-body">
+      ${upcomingEvts.map(e=>eventRowHTML(e,false)).join('')}
+    </div>
+  </div>`:''}`;
+
+  document.getElementById('home-content').innerHTML=h;
+}
+
+function taskTicketHTML(t){
+  const proj=_projects.find(p=>p.id===t.projectId);
+  const am=AREAS[t.area]||AREAS.general;
+  const ttype=t.taskType||'tarea';
+  const stateColorMap={pendiente:'var(--tx3)','en-proceso':'var(--blu)',revision:'var(--yel)',completada:'var(--grn)'};
+  const calColorMap={idea:'var(--blu)',edicion:'var(--yel)',ajuste:'var(--org)',aprobado:'var(--grn)',publicado:'var(--pur)'};
+  const dotColor=ttype==='contenido'?(calColorMap[t.calStatus||'idea']||'var(--tx3)'):(stateColorMap[t.taskStatus||'pendiente']||'var(--tx3)');
+  const done=t.status==='done';
+  return `<div class="task-ticket" onclick="openTaskDetail('${t.id}')">
+    <div class="tt-dot" style="background:${dotColor};"></div>
+    <div class="tt-info">
+      <div class="tt-name">${esc(t.name)}</div>
+      <div class="tt-sub">${proj?(proj.icon||'📁')+' '+esc(proj.name):'Sin proyecto'} · <span class="bdg ${am.cls}" style="padding:1px 5px;font-size:8px;">${am.icon}</span></div>
+    </div>
+    <div class="tt-chk ${done?'done':''}" onclick="event.stopPropagation();toggleTask('${t.id}')">
+      <svg viewBox="0 0 12 10" fill="none" stroke-width="2.5"><polyline points="1,5 4.5,8.5 11,1"/></svg>
+    </div>
+  </div>`;
+}
+
+function projProgressHTML(p){
+  const pt=_tasks.filter(t=>t.projectId===p.id);
+  const dn=pt.filter(t=>t.status==='done').length;
+  const pct=pt.length?Math.round(dn/pt.length*100):0;
+  const am=AREAS[p.area]||AREAS.general;
+  const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
+  const color=fillMap[am.cls]||'var(--tx3)';
+  return `<div class="ppr-row" onclick="navigate('proj-detail','${p.id}')">
+    <div class="ppr-icon">${p.icon||'📁'}</div>
+    <div class="ppr-info">
+      <div class="ppr-name">${esc(p.name)}</div>
+      <div class="ppr-bar"><div class="ppr-fill" style="width:${pct}%;background:${color};"></div></div>
+    </div>
+    <div class="ppr-pct" style="color:${color};">${pct}%</div>
+  </div>`;
+}
+
+function renderTeamHTML(){
+  return Object.values(USERS).map(u=>{
+    const rm=ROLES[u.role];
+    const photo=getUserPhoto(u.id);
+    const avIn=photo?`<img src="${photo}" alt="">`:`<span>${u.name.charAt(0).toUpperCase()}</span>`;
+    const online=_presence[u.id]?.online===true;
+    return `<div class="team-row">
+      <div class="team-av" style="background:${photo?'transparent':rm.bg};color:${rm.color};">${avIn}</div>
+      <div class="team-info">
+        <div class="team-name">${u.name}</div>
+        <div class="team-sub">${rm.label}</div>
+      </div>
+      <div class="online-pip ${online?'on':'off'}"></div>
+      <span style="font-size:10px;color:var(--tx3);margin-left:4px;">${online?'En línea':'Desconectado'}</span>
     </div>`;
-
-  const today=todayStr();
-  const now=new Date(today);
-  // week end = today + 7 days
-  const weekEnd=new Date(now); weekEnd.setDate(now.getDate()+7);
-  const weekEndStr=weekEnd.toISOString().split('T')[0];
-
-  const overdue = all.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today);
-  const todayT  = all.filter(t=>t.status!=='done'&&tEnd(t)===today);
-  const weekT   = all.filter(t=>t.status!=='done'&&tEnd(t)>today&&tEnd(t)<=weekEndStr);
-  const later   = all.filter(t=>t.status!=='done'&&tEnd(t)>weekEndStr);
-  const noDate  = all.filter(t=>t.status!=='done'&&!tEnd(t));
-  const doneT   = all.filter(t=>t.status==='done');
-
-  let h='';
-  if(overdue.length) h+=boardSection('⚠️ Vencidas','red',overdue);
-  if(todayT.length)  h+=boardSection('📅 Para hoy','today',todayT);
-  if(weekT.length)   h+=boardSection('📆 Esta semana','',weekT);
-  if(later.length)   h+=boardSection('🗓 Más adelante','',later);
-  if(noDate.length)  h+=boardSection('🗂 Sin fecha','',noDate);
-  if(doneT.length)   h+=boardSection('✅ Completadas','',doneT);
-  if(!h) h='<div class="empty"><div class="empty-ico">🎉</div><p>Sin tareas asignadas</p></div>';
-
-  document.getElementById('task-board').innerHTML=h;
+  }).join('');
 }
 
 function boardSection(label, cls, tasks){
@@ -1575,16 +1802,25 @@ function showAlerts(){
 }
 
 /* ═══════════════════════════════════════
-   GESTIÓN CEO
+   GESTIÓN (Admin)
 ═══════════════════════════════════════ */
+function populateGestionFilters(){
+  // populate project filter
+  const sel=document.getElementById('ft-proj'); if(!sel) return;
+  sel.innerHTML=`<option value="all">Todos los proyectos</option>`+
+    _projects.map(p=>`<option value="${p.id}">${p.icon||'📁'} ${esc(p.name)}</option>`).join('');
+}
+
 function renderGTaskList(){
+  const fp=document.getElementById('ft-proj')?.value||'all';
   const fu=document.getElementById('ft-user')?.value||'all';
   const fa=document.getElementById('ft-area')?.value||'all';
   let ts=[..._tasks];
+  if(fp!=='all') ts=ts.filter(t=>t.projectId===fp);
   if(fu!=='all') ts=ts.filter(t=>(t.assignedUsers||[]).includes(fu));
   if(fa!=='all') ts=ts.filter(t=>t.area===fa);
   const el=document.getElementById('g-task-list');
-  if(!ts.length){ el.innerHTML='<div class="empty"><p>Sin tareas.</p></div>'; return; }
+  if(!ts.length){ el.innerHTML='<div class="empty"><p>Sin tareas con estos filtros.</p></div>'; return; }
   const byP={};
   ts.forEach(t=>{ if(!byP[t.projectId]) byP[t.projectId]=[]; byP[t.projectId].push(t); });
   el.innerHTML=Object.entries(byP).map(([pid,arr])=>{
@@ -1770,22 +2006,7 @@ function updateTaskFormStates(projId, currentVal){
   const cv=currentVal||'pendiente';
   sel.innerHTML=TASK_STATES.map(c=>`<option value="${c.id}" ${cv===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
 }
-function updateGestionStates(projId, currentVal){
-  const p=_projects.find(x=>x.id===projId);
-  const meth=p?.meth||'lista';
-  const lbl=document.getElementById('g-state-lbl');
-  const sel=document.getElementById('g-kstatus');
-  if(meth==='calendario'){
-    lbl.textContent='Estado contenido';
-    sel.innerHTML=CAL_COLS.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
-  } else if(meth==='kanban'){
-    lbl.textContent='Estado kanban';
-    sel.innerHTML=KB_COLS.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
-  } else {
-    lbl.textContent='Estado';
-    sel.innerHTML=TASK_STATES.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
-  }
-}
+function updateGestionStates(){ /* no-op: gestión inline form removed */ }
 
 // openTaskForm(taskId, projId, prefilledStartDate)
 function openTaskForm(taskId, projId, preDate){
@@ -1891,50 +2112,8 @@ async function saveTaskForm(){
   if(!_fbOn) onDataChange();
 }
 
-// Legacy: quick create from gestión panel
-async function createTask(){
-  const projId=document.getElementById('g-proj').value;
-  const name=document.getElementById('g-name').value.trim();
-  if(!projId) return alert('Selecciona proyecto.');
-  if(!name)   return alert('Nombre requerido.');
-  const proj=_projects.find(p=>p.id===projId);
-  const meth=proj?.meth||'lista';
-  const assigned=[...document.querySelectorAll('#g-assign .a-chip.sel')].map(c=>c.dataset.value);
-  const startDate=document.getElementById('g-start').value;
-  const endDate  =document.getElementById('g-end').value;
-  const stateVal=document.getElementById('g-kstatus').value;
-
-  let kStatus='investigacion', calStatus='idea', taskStatus='pendiente', status='pending';
-  if(meth==='calendario'){
-    calStatus=stateVal||'idea';
-    const col=CAL_COLS.find(c=>c.id===calStatus);
-    status=col?.done?'done':'pending';
-  } else if(meth==='kanban'){
-    kStatus=stateVal||'investigacion';
-    status=kStatus==='cierre'?'done':'pending';
-    taskStatus='pendiente';
-  } else {
-    // lista — stateVal is TASK_STATES id
-    taskStatus=stateVal||'pendiente';
-    const ts=TASK_STATES.find(s=>s.id===taskStatus);
-    status=ts?.done?'done':'pending';
-  }
-
-  const t={
-    id:uid(), taskType:'tarea', projectId:projId, name,
-    desc:document.getElementById('g-desc').value.trim(),
-    area:document.getElementById('g-area').value,
-    priority:document.getElementById('g-prio').value,
-    startDate, endDate, dueDate:endDate,
-    assignedUsers:assigned,
-    kStatus, calStatus, taskStatus, status,
-    createdAt:Date.now(),
-  };
-  await persistTask(t);
-  ['g-name','g-desc','g-start','g-end'].forEach(i=>document.getElementById(i).value='');
-  document.querySelectorAll('#g-assign .a-chip').forEach(c=>c.classList.remove('sel'));
-  if(!_fbOn){ renderGTaskList(); onDataChange(); }
-}
+// createTask is no longer used (gestión inline form removed)
+function createTask(){ openTaskForm(null); }
 
 async function toggleTask(id){
   const t=_tasks.find(x=>x.id===id); if(!t) return;
@@ -1958,7 +2137,127 @@ async function toggleTask(id){
 }
 
 /* ═══════════════════════════════════════
-   PERFIL / SETTINGS
+   EVENTOS
+═══════════════════════════════════════ */
+function renderEventos(){
+  const wrap=document.getElementById('btn-new-event-wrap');
+  if(wrap) wrap.innerHTML=isAdmin()
+    ?`<button class="btn btn-p btn-sm" onclick="openNewEvent()">+ Evento</button>`:'';
+
+  const el=document.getElementById('eventos-list');
+  const today=todayStr();
+  const upcoming=_events.filter(e=>e.date>=today).sort((a,b)=>a.date.localeCompare(b.date));
+  const past=_events.filter(e=>e.date<today).sort((a,b)=>b.date.localeCompare(a.date));
+
+  let h='';
+  if(!_events.length){
+    h='<div class="empty"><div class="empty-ico">📅</div><p>Sin eventos todavía</p></div>';
+  } else {
+    if(upcoming.length){
+      h+=`<div class="sec-lbl">Próximos</div>${upcoming.map(e=>eventRowHTML(e,true)).join('')}`;
+    }
+    if(past.length){
+      h+=`<div class="sec-lbl" style="margin-top:18px;">Pasados</div>
+          <div style="opacity:.6;">${past.map(e=>eventRowHTML(e,true)).join('')}</div>`;
+    }
+  }
+  el.innerHTML=h;
+}
+
+function eventRowHTML(ev, showActions){
+  const et=EVENT_TYPES.find(t=>t.id===ev.type)||EVENT_TYPES[4];
+  const dateParts=(ev.date||'').split('-');
+  const day=dateParts[2]||'';
+  const mon=dateParts[1]?MONTHS[parseInt(dateParts[1],10)-1]?.slice(0,3)||'':'';
+  const participants=(ev.participants||[]).map(uid_=>{
+    const u=USERS[uid_]; if(!u) return '';
+    const rm=ROLES[u.role];
+    return `<div class="udot" style="width:20px;height:20px;font-size:8px;background:${rm.bg};color:${rm.color};" title="${u.name}">${u.name.charAt(0).toUpperCase()}</div>`;
+  }).join('');
+  const actions=showActions&&isAdmin()?`<div class="event-actions">
+    <button class="btn-icon" onclick="event.stopPropagation();openEditEvent('${ev.id}')" title="Editar">✏️</button>
+    <button class="btn-icon btn-del" onclick="event.stopPropagation();deleteEvent('${ev.id}')">✕</button>
+  </div>`:'';
+  return `<div class="event-row" onclick="${showActions?`openEditEvent('${ev.id}')`:''}" style="${!showActions?'cursor:default;':''}">
+    <div class="event-date-box">
+      <div class="edb-day" style="color:${et.color};">${day}</div>
+      <div class="edb-month">${mon}</div>
+    </div>
+    <div class="event-info">
+      <div class="event-title">${esc(ev.name)}</div>
+      <div class="event-meta">
+        <span class="bdg ${et.cls}">${et.icon} ${et.label}</span>
+        ${ev.time?`<span class="bdg bw">🕐 ${ev.time}</span>`:''}
+        ${ev.location?`<span class="bdg bw">📍 ${esc(ev.location)}</span>`:''}
+        <div class="flex" style="gap:2px;">${participants}</div>
+      </div>
+      ${ev.desc?`<div style="font-size:11px;color:var(--tx3);margin-top:5px;">${esc(ev.desc)}</div>`:''}
+    </div>
+    ${actions}
+  </div>`;
+}
+
+function openNewEvent(){
+  _editEventId=null;
+  document.getElementById('mev-id').value='';
+  document.getElementById('mev-name').value='';
+  document.getElementById('mev-desc').value='';
+  document.getElementById('mev-date').value=todayStr();
+  document.getElementById('mev-time').value='';
+  document.getElementById('mev-type').value='partido';
+  document.getElementById('mev-loc').value='';
+  document.querySelectorAll('#mev-assign .a-chip').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('mev-ttl').textContent='Nuevo Evento';
+  openMod('m-event');
+}
+
+function openEditEvent(id){
+  const ev=_events.find(x=>x.id===id); if(!ev) return;
+  _editEventId=id;
+  document.getElementById('mev-id').value=ev.id;
+  document.getElementById('mev-name').value=ev.name||'';
+  document.getElementById('mev-desc').value=ev.desc||'';
+  document.getElementById('mev-date').value=ev.date||'';
+  document.getElementById('mev-time').value=ev.time||'';
+  document.getElementById('mev-type').value=ev.type||'partido';
+  document.getElementById('mev-loc').value=ev.location||'';
+  const parts=ev.participants||[];
+  document.querySelectorAll('#mev-assign .a-chip').forEach(c=>{
+    c.classList.toggle('sel',parts.includes(c.dataset.value));
+  });
+  document.getElementById('mev-ttl').textContent='Editar Evento';
+  openMod('m-event');
+}
+
+async function saveEvent(){
+  const name=document.getElementById('mev-name').value.trim();
+  if(!name) return alert('Nombre requerido.');
+  const idVal=document.getElementById('mev-id').value||uid();
+  const participants=[...document.querySelectorAll('#mev-assign .a-chip.sel')].map(c=>c.dataset.value);
+  const ev={
+    id:idVal, name,
+    desc: document.getElementById('mev-desc').value.trim(),
+    date: document.getElementById('mev-date').value,
+    time: document.getElementById('mev-time').value,
+    type: document.getElementById('mev-type').value,
+    location: document.getElementById('mev-loc').value.trim(),
+    participants,
+    createdBy: currentUser.id,
+    createdAt: _events.find(e=>e.id===idVal)?.createdAt||Date.now(),
+  };
+  await persistEvent(ev);
+  closeMod('m-event');
+  if(!_fbOn) renderEventos();
+}
+
+async function deleteEvent(id){
+  if(!confirm('¿Eliminar este evento?')) return;
+  await removeEvent(id);
+  if(!_fbOn) renderEventos();
+}
+
+/* ═══════════════════════════════════════
+   PERFIL / SETTINGS MODAL
 ═══════════════════════════════════════ */
 const LS_UOVER ='fcn_user_overrides';
 const LS_PHOTOS='fcn_user_photos';
@@ -1980,34 +2279,48 @@ function getUserPhoto(userId){
   catch(e){ return null; }
 }
 
-// Alias kept in case something calls openProfile
-function openProfile(){ navigate('settings'); }
+function setTheme(mode){
+  if(mode==='light') document.body.classList.add('light');
+  else document.body.classList.remove('light');
+  localStorage.setItem(LS.theme, mode);
+  _updateThemeBtns();
+}
+function _updateThemeBtns(){
+  const isL=document.body.classList.contains('light');
+  const dark=document.getElementById('smod-dark');
+  const light=document.getElementById('smod-light');
+  if(!dark||!light) return;
+  dark.className='btn '+(isL?'btn-g':'btn-p');
+  light.className='btn '+(isL?'btn-p':'btn-g');
+}
 
-function renderSettings(){
+function openSettingsModal(){
+  if(!currentUser) return;
+  renderSettingsModal();
+  document.getElementById('smod-pass').value='';
+  document.getElementById('smod-pass2').value='';
+  document.getElementById('smod-err').classList.remove('show');
+  openMod('m-settings');
+}
+
+function renderSettingsModal(){
   if(!currentUser) return;
   const rm=ROLES[currentUser.role];
-  // Big avatar
-  const avEl=document.getElementById('settings-av-preview');
+  const avEl=document.getElementById('smod-av');
   if(!avEl) return;
   const photo=getUserPhoto(currentUser.id);
   if(photo){
     avEl.innerHTML=`<img src="${photo}" alt="">`;
     avEl.style.background='transparent';
-    avEl.style.color='inherit';
   } else {
-    avEl.innerHTML=`<span>${currentUser.name.charAt(0).toUpperCase()}</span>`;
+    avEl.innerHTML=currentUser.name.charAt(0).toUpperCase();
     avEl.style.background=rm.bg;
     avEl.style.color=rm.color;
     avEl.style.borderColor=rm.brd;
   }
-  document.getElementById('settings-av-name').textContent=currentUser.name;
-  document.getElementById('settings-av-role').textContent=rm.label;
-  // Reset form fields
-  document.getElementById('settings-name').value=currentUser.name;
-  document.getElementById('settings-pass').value='';
-  document.getElementById('settings-pass2').value='';
-  const errEl=document.getElementById('settings-err');
-  if(errEl){ errEl.textContent=''; errEl.classList.remove('show'); }
+  document.getElementById('smod-name-lbl').textContent=currentUser.name;
+  document.getElementById('smod-role-lbl').textContent=rm.label;
+  _updateThemeBtns();
 }
 
 function uploadSettingsPhoto(input){
@@ -2016,7 +2329,6 @@ function uploadSettingsPhoto(input){
   reader.onload=e=>{
     const img=new Image();
     img.onload=()=>{
-      // Center-crop to 128×128
       const canvas=document.createElement('canvas');
       const size=128; canvas.width=size; canvas.height=size;
       const ctx=canvas.getContext('2d');
@@ -2027,50 +2339,52 @@ function uploadSettingsPhoto(input){
       const photos=JSON.parse(localStorage.getItem(LS_PHOTOS)||'{}');
       photos[currentUser.id]=dataUrl;
       localStorage.setItem(LS_PHOTOS,JSON.stringify(photos));
-      renderSettings();
+      renderSettingsModal();
       renderNav();
+      if(currentView==='tasks') renderDashboard();
     };
     img.src=e.target.result;
   };
   reader.readAsDataURL(file);
-  input.value=''; // reset so same file can be re-selected
+  input.value='';
 }
 
 function removeSettingsPhoto(){
   const photos=JSON.parse(localStorage.getItem(LS_PHOTOS)||'{}');
   delete photos[currentUser.id];
   localStorage.setItem(LS_PHOTOS,JSON.stringify(photos));
-  renderSettings();
+  renderSettingsModal();
   renderNav();
+  if(currentView==='tasks') renderDashboard();
 }
 
-function saveSettingsProfile(){
-  const name=document.getElementById('settings-name').value.trim();
-  const pass=document.getElementById('settings-pass').value;
-  const pass2=document.getElementById('settings-pass2').value;
-  const errEl=document.getElementById('settings-err');
+function saveSettingsModal(){
+  const pass=document.getElementById('smod-pass').value;
+  const pass2=document.getElementById('smod-pass2').value;
+  const errEl=document.getElementById('smod-err');
   const showErr=msg=>{ errEl.textContent=msg; errEl.classList.add('show'); };
   errEl.classList.remove('show');
-  if(!name) return showErr('El nombre no puede estar vacío.');
   if(pass&&pass!==pass2) return showErr('Las contraseñas no coinciden.');
-  // Update in-memory
-  currentUser.name=name;
-  if(pass) currentUser.pass=pass;
-  // Persist overrides
-  const saved=JSON.parse(localStorage.getItem(LS_UOVER)||'{}');
-  if(!saved[currentUser.id]) saved[currentUser.id]={};
-  saved[currentUser.id].name=name;
-  if(pass) saved[currentUser.id].pass=pass;
-  localStorage.setItem(LS_UOVER,JSON.stringify(saved));
-  renderSettings();
-  renderNav();
-  // Show feedback
-  const btn=document.querySelector('#view-settings .btn-p');
+  if(pass){ currentUser.pass=pass; }
+  // Persist
+  if(pass){
+    const saved=JSON.parse(localStorage.getItem(LS_UOVER)||'{}');
+    if(!saved[currentUser.id]) saved[currentUser.id]={};
+    saved[currentUser.id].pass=pass;
+    localStorage.setItem(LS_UOVER,JSON.stringify(saved));
+  }
+  document.getElementById('smod-pass').value='';
+  document.getElementById('smod-pass2').value='';
+  const btn=document.querySelector('#m-settings .btn-p');
   if(btn){ const orig=btn.textContent; btn.textContent='✓ Guardado'; setTimeout(()=>btn.textContent=orig,1800); }
 }
 
-// Legacy stub — profile modal gone, redirect to settings
-function saveProfile(){ saveSettingsProfile(); }
+// Legacy stubs
+function openProfile(){ openSettingsModal(); }
+function renderSettings(){ renderSettingsModal(); }
+function saveProfile(){ saveSettingsModal(); }
+function saveSettingsProfile(){ saveSettingsModal(); }
+function uploadSettingsPhoto2(input){ uploadSettingsPhoto(input); }
 
 /* ═══════════════════════════════════════
    HELPERS
@@ -2078,7 +2392,7 @@ function saveProfile(){ saveSettingsProfile(); }
 function toggleChip(chip){ chip.classList.toggle('sel'); chip.blur(); }
 
 function populateProjSels(targetId, selectedId){
-  const ids=targetId?[targetId]:['g-proj','tf-proj'];
+  const ids=targetId?[targetId]:['tf-proj'];
   const projs=visibleProjects();
   ids.forEach(sid=>{
     const sel=document.getElementById(sid); if(!sel) return;
@@ -2108,19 +2422,20 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
    WINDOW EXPORTS
 ═══════════════════════════════════════ */
 Object.assign(window,{
-  login, logout, navigate, goBack, toggleTheme,
+  login, logout, navigate, goBack, toggleTheme, setTheme,
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openTaskForm, saveTaskForm, toggleTask,
-  openNewTaskForProj, renderGTaskList,
+  openNewTaskForProj, renderGTaskList, populateGestionFilters,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
   toggleChip,
   updateTaskFormStates, updateGestionStates,
   switchTaskType,
-  openProfile, saveProfile,
-  renderSettings, uploadSettingsPhoto, removeSettingsPhoto, saveSettingsProfile,
+  openProfile, saveProfile, openSettingsModal, renderSettingsModal,
+  saveSettingsModal, uploadSettingsPhoto, removeSettingsPhoto,
+  openNewEvent, openEditEvent, saveEvent, deleteEvent,
   selectCalPill, toggleLive,
 });
 

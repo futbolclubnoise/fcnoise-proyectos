@@ -9,7 +9,7 @@ import { getFirestore,
          onSnapshot, query, orderBy,
          serverTimestamp }       from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-/* ── CONFIG — reemplazar con el config de tu proyecto Firebase ── */
+/* ── CONFIG ── */
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyAMgsbJ2rOqLDofRMl6porBY7yczcJgZTA",
   authDomain:        "fcnoise-proyectos.firebaseapp.com",
@@ -20,12 +20,16 @@ const FIREBASE_CONFIG = {
 };
 
 /* ── COLECCIONES ── */
-const COL_PROJ  = "fcn_projects";
-const COL_TASKS = "fcn_tasks";
+const COL_PROJ     = "fcn_projects";
+const COL_TASKS    = "fcn_tasks";
+const COL_EVENTS   = "fcn_events";
+const COL_PRESENCE = "fcn_presence";
 
 let db = null;
-let _projUnsub  = null;
-let _taskUnsub  = null;
+let _projUnsub     = null;
+let _taskUnsub     = null;
+let _eventsUnsub   = null;
+let _presenceUnsub = null;
 
 /* ── INIT ── */
 export function firebaseInit() {
@@ -34,22 +38,23 @@ export function firebaseInit() {
       console.warn("[FCN] Firebase no configurado — usando localStorage");
       return false;
     }
-    if (db) return true; // already initialized — idempotent
+    if (db) return true;
     const app = initializeApp(FIREBASE_CONFIG, "fcnoise-proyectos");
     db = getFirestore(app);
     console.log("[FCN] Firebase SDK listo ✓");
     return true;
   } catch (e) {
-    // App may already exist from a previous init — db is still valid
     console.warn("[FCN] Firebase init:", e.message||e);
     return db !== null;
   }
 }
 
-/* ── STOP LISTENERS ── */
+/* ── STOP ALL LISTENERS ── */
 export function fbStopListening() {
-  if (_projUnsub) { _projUnsub(); _projUnsub = null; }
-  if (_taskUnsub) { _taskUnsub(); _taskUnsub = null; }
+  if (_projUnsub)     { _projUnsub();     _projUnsub     = null; }
+  if (_taskUnsub)     { _taskUnsub();     _taskUnsub     = null; }
+  if (_eventsUnsub)   { _eventsUnsub();   _eventsUnsub   = null; }
+  if (_presenceUnsub) { _presenceUnsub(); _presenceUnsub = null; }
   console.log("[FCN] Firebase listeners detenidos");
 }
 
@@ -74,14 +79,33 @@ export function listenTasks(callback) {
   });
 }
 
+export function listenEvents(callback) {
+  if (!db) return;
+  if (_eventsUnsub) _eventsUnsub();
+  const q = query(collection(db, COL_EVENTS), orderBy("date", "asc"));
+  _eventsUnsub = onSnapshot(q, snap => {
+    const docs = snap.docs.map(d => ({ ...d.data(), _fbId: d.id }));
+    callback(docs);
+  });
+}
+
+export function listenPresence(callback) {
+  if (!db) return;
+  if (_presenceUnsub) _presenceUnsub();
+  _presenceUnsub = onSnapshot(collection(db, COL_PRESENCE), snap => {
+    const data = {};
+    snap.docs.forEach(d => { data[d.id] = d.data(); });
+    callback(data);
+  });
+}
+
 /* ── WRITE: Proyectos ── */
 export async function fbSaveProject(proj) {
   if (!db) return;
   try {
     const { id, ...data } = proj;
     await setDoc(doc(db, COL_PROJ, id), {
-      ...data,
-      id,
+      ...data, id,
       createdAt: data.createdAt || serverTimestamp()
     });
   } catch (e) { console.error("[FCN] saveProject:", e); }
@@ -99,8 +123,7 @@ export async function fbSaveTask(task) {
   try {
     const { id, ...data } = task;
     await setDoc(doc(db, COL_TASKS, id), {
-      ...data,
-      id,
+      ...data, id,
       createdAt: data.createdAt || serverTimestamp()
     });
   } catch (e) { console.error("[FCN] saveTask:", e); }
@@ -110,6 +133,34 @@ export async function fbDeleteTask(id) {
   if (!db) return;
   try { await deleteDoc(doc(db, COL_TASKS, id)); }
   catch (e) { console.error("[FCN] deleteTask:", e); }
+}
+
+/* ── WRITE: Eventos ── */
+export async function fbSaveEvent(event) {
+  if (!db) return;
+  try {
+    const { id, ...data } = event;
+    await setDoc(doc(db, COL_EVENTS, id), {
+      ...data, id,
+      createdAt: data.createdAt || serverTimestamp()
+    });
+  } catch (e) { console.error("[FCN] saveEvent:", e); }
+}
+
+export async function fbDeleteEvent(id) {
+  if (!db) return;
+  try { await deleteDoc(doc(db, COL_EVENTS, id)); }
+  catch (e) { console.error("[FCN] deleteEvent:", e); }
+}
+
+/* ── WRITE: Presence ── */
+export async function fbSetPresence(userId, online) {
+  if (!db) return;
+  try {
+    await setDoc(doc(db, COL_PRESENCE, userId), {
+      userId, online, lastSeen: serverTimestamp()
+    });
+  } catch (e) { console.error("[FCN] presence:", e); }
 }
 
 export const isConnected = () => db !== null;
