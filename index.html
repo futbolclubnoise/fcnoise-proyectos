@@ -4,475 +4,525 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>FCNOISE — Proyectos</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── Design tokens (dark default, same as main app) ── */
 :root {
   --bg:#0c0c0c;--bg2:#111;--bg3:#181818;--bg4:#202020;--bg5:#2a2a2a;
   --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.13);--bd3:rgba(255,255,255,.22);
-  --tx:#ffffff;--tx2:#e8e8e8;--tx3:#d0d0d0;
-  --g0:#fff;--g1:#f0f0f0;--g2:#d0d0d0;--g3:#999;--g4:#555;
+  --tx:#fff;--tx2:#e8e8e8;--tx3:#aaa;
   --card:#161616;--inp:#1e1e1e;
-  --red:#e03c3c;--red2:rgba(224,60,60,.13);--red3:rgba(224,60,60,.28);
-  --grn:#3aaa6a;--grn2:rgba(58,170,106,.13);--grn3:rgba(58,170,106,.28);
-  --org:#e07c2a;--org2:rgba(224,124,42,.13);--org3:rgba(224,124,42,.28);
-  --blu:#4a9eff;--blu2:rgba(74,158,255,.13);--blu3:rgba(74,158,255,.28);
-  --pur:#a06ee0;--pur2:rgba(160,110,224,.13);--pur3:rgba(160,110,224,.28);
+  --red:#e03c3c;--red2:rgba(224,60,60,.15);--red3:rgba(224,60,60,.3);
+  --grn:#3aaa6a;--grn2:rgba(58,170,106,.15);--grn3:rgba(58,170,106,.3);
+  --org:#e07c2a;--org2:rgba(224,124,42,.15);--org3:rgba(224,124,42,.3);
+  --blu:#4a9eff;--blu2:rgba(74,158,255,.15);--blu3:rgba(74,158,255,.3);
+  --pur:#a06ee0;--pur2:rgba(160,110,224,.15);--pur3:rgba(160,110,224,.3);
+  --yel:#f0c040;--yel2:rgba(240,192,64,.15);--yel3:rgba(240,192,64,.3);
   --r:10px;
-  /* role accent (set by JS) */
-  --role:#e07c2a;--role2:rgba(224,124,42,.13);--role3:rgba(224,124,42,.28);
+  --accent:#e07c2a;--accent2:rgba(224,124,42,.15);--accent3:rgba(224,124,42,.3);
 }
-
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;}
 
 /* ── BAND ── */
-.band{height:30px;background:#000;border-bottom:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
-.band-mid{font-family:'Poppins',sans-serif;font-weight:700;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--tx3);}
+.band{height:28px;background:#000;border-bottom:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;}
+.band-txt{font-size:9px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:var(--tx3);}
 
-/* ── NAV ── */
-.nav{height:54px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100;}
-.nav-brand{font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--tx);}
-.nav-brand span{color:var(--org);}
-.nav-role-pill{display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:20px;border:1px solid var(--role);background:var(--role2);cursor:pointer;transition:all .2s;}
-.nav-role-pill svg{width:14px;height:14px;color:var(--role);}
-.nav-role-pill span{font-size:11px;font-weight:600;color:var(--role);letter-spacing:.5px;}
-.nav-right{display:flex;align-items:center;gap:10px;}
-
-/* ── ROLE SELECT SCREEN ── */
-#screen-role{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:var(--bg);}
-.role-header{text-align:center;margin-bottom:40px;}
-.role-header h1{font-size:26px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
-.role-header h1 span{color:var(--org);}
-.role-header p{color:var(--tx3);font-size:13px;margin-top:8px;}
-.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:500px;width:100%;}
-.role-card{background:var(--bg3);border:2px solid var(--bd2);border-radius:14px;padding:24px 20px;cursor:pointer;transition:all .25s;text-align:center;position:relative;overflow:hidden;}
-.role-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .25s;}
-.role-card:hover{transform:translateY(-2px);}
-.role-card:hover::before{opacity:1;}
-.role-card.ceo{--rc:var(--org);--rc2:var(--org2);--rc3:var(--org3);}
-.role-card.estratega{--rc:var(--blu);--rc2:var(--blu2);--rc3:var(--blu3);}
-.role-card.asistente{--rc:var(--grn);--rc2:var(--grn2);--rc3:var(--grn3);}
-.role-card.diseno{--rc:var(--pur);--rc2:var(--pur2);--rc3:var(--pur3);}
-.role-card:hover{border-color:var(--rc);}
-.role-card::before{background:var(--rc2);}
-.role-icon{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px;background:var(--rc2);border:1px solid var(--rc3);}
-.role-name{font-weight:700;font-size:15px;letter-spacing:1px;text-transform:uppercase;color:var(--rc);}
-.role-desc{font-size:11px;color:var(--tx3);margin-top:6px;line-height:1.5;}
-
-/* ── MAIN LAYOUT ── */
-#screen-app{display:none;}
-.app-body{padding:20px;max-width:880px;margin:0 auto;}
-
-/* ── TABS ── */
-.tabs-row{display:flex;gap:4px;background:var(--bg3);padding:4px;border-radius:var(--r);margin-bottom:20px;}
-.tab-btn{flex:1;padding:8px 0;border:none;background:transparent;color:var(--tx3);font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;transition:all .2s;letter-spacing:.3px;}
-.tab-btn.on{background:var(--tx);color:var(--bg);}
-
-/* ── CARDS / PANELS ── */
-.panel{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:12px;}
-.panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.panel-title{font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx2);}
-
-/* ── PROJECT CARDS ── */
-.proj-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative;}
-.proj-card:hover{border-color:var(--bd3);background:var(--bg4);}
-.proj-card.expanded{border-color:var(--role);background:var(--bg4);}
-.proj-top{display:flex;align-items:center;gap:12px;}
-.proj-icon{width:36px;height:36px;border-radius:8px;background:var(--role2);border:1px solid var(--role3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.proj-info{flex:1;min-width:0;}
-.proj-name{font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.proj-meta{font-size:10px;color:var(--tx3);margin-top:2px;}
-.proj-badges{display:flex;gap:6px;align-items:center;}
-.bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
-.bdg-cyclic{background:var(--blu2);color:var(--blu);border:1px solid var(--blu3);}
-.bdg-once{background:var(--bg5);color:var(--tx3);border:1px solid var(--bd2);}
-.bdg-active{background:var(--grn2);color:var(--grn);border:1px solid var(--grn3);}
-.bdg-paused{background:var(--org2);color:var(--org);border:1px solid var(--org3);}
-.bdg-done{background:var(--bg5);color:var(--tx3);border:1px solid var(--bd2);}
-.proj-progress{margin-top:10px;}
-.prog-bar-bg{height:4px;background:var(--bg5);border-radius:4px;overflow:hidden;margin-top:4px;}
-.prog-bar{height:100%;background:var(--role);border-radius:4px;transition:width .4s;}
-.prog-label{font-size:9px;color:var(--tx3);}
-
-/* ── TASK CARDS ── */
-.task-list{padding-top:10px;border-top:1px solid var(--bd);margin-top:10px;}
-.task-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);}
-.task-item:last-child{border-bottom:none;}
-.task-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--bd3);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
-.task-check.done{background:var(--grn);border-color:var(--grn);}
-.task-check svg{width:10px;height:10px;color:#fff;opacity:0;transition:opacity .2s;}
-.task-check.done svg{opacity:1;}
-.task-body{flex:1;min-width:0;}
-.task-name{font-size:12px;font-weight:500;color:var(--tx);transition:color .2s;}
-.task-name.done{color:var(--tx3);text-decoration:line-through;}
-.task-sub{font-size:10px;color:var(--tx3);margin-top:1px;}
-.task-badges{display:flex;gap:5px;flex-shrink:0;align-items:center;}
-.prio-hi{background:var(--red2);color:var(--red);border:1px solid var(--red3);}
-.prio-md{background:var(--org2);color:var(--org);border:1px solid var(--org3);}
-.prio-lo{background:var(--grn2);color:var(--grn);border:1px solid var(--grn3);}
-.role-tag{padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.3px;}
-.rt-estratega{background:var(--blu2);color:var(--blu);border:1px solid var(--blu3);}
-.rt-asistente{background:var(--grn2);color:var(--grn);border:1px solid var(--grn3);}
-.rt-diseno{background:var(--pur2);color:var(--pur);border:1px solid var(--pur3);}
-.rt-ceo{background:var(--org2);color:var(--org);border:1px solid var(--org3);}
-
-/* ── FORMS ── */
-.form-group{margin-bottom:14px;}
-label{display:block;font-size:11px;font-weight:600;color:var(--tx3);margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase;}
-input[type=text],input[type=date],select,textarea{width:100%;padding:10px 13px;background:var(--inp);border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-family:'Poppins',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
-input[type=text]:focus,input[type=date]:focus,select:focus,textarea:focus{border-color:var(--role);}
-select option{background:var(--bg3);color:var(--tx);}
-textarea{resize:vertical;min-height:70px;}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+/* ── LOGIN ── */
+#screen-login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;background:var(--bg);}
+.login-logo{font-size:28px;font-weight:700;letter-spacing:2px;margin-bottom:6px;}
+.login-logo span{color:var(--org);}
+.login-sub{font-size:12px;color:var(--tx3);margin-bottom:36px;letter-spacing:.5px;}
+.login-box{width:100%;max-width:360px;background:var(--bg3);border:1px solid var(--bd2);border-radius:16px;padding:28px 24px;}
+.login-box h2{font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;color:var(--tx2);}
+.fi{margin-bottom:14px;}
+.fi label{display:block;font-size:10px;font-weight:700;color:var(--tx3);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;}
+.fi input,.fi select,.fi textarea{width:100%;padding:10px 13px;background:var(--inp);border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-family:'Poppins',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:var(--accent);}
+.fi select option{background:var(--bg3);}
+.fi textarea{resize:vertical;min-height:68px;}
+.login-err{font-size:11px;color:var(--red);margin-bottom:12px;padding:8px 12px;background:var(--red2);border-radius:8px;display:none;}
+.login-err.show{display:block;}
 .btn{padding:10px 18px;border:none;border-radius:8px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
-.btn-primary{background:var(--role);color:#fff;}
-.btn-primary:hover{opacity:.88;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{opacity:.85;}
 .btn-ghost{background:var(--bg4);color:var(--tx2);border:1px solid var(--bd2);}
 .btn-ghost:hover{background:var(--bg5);}
 .btn-sm{padding:6px 13px;font-size:11px;}
-.btn-icon{width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--bg4);border:1px solid var(--bd2);color:var(--tx3);cursor:pointer;transition:all .2s;}
+.btn-xs{padding:4px 10px;font-size:10px;}
+.btn-icon{width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:7px;background:var(--bg4);border:1px solid var(--bd2);color:var(--tx3);cursor:pointer;font-size:12px;transition:all .2s;flex-shrink:0;}
 .btn-icon:hover{background:var(--bg5);color:var(--tx);}
+.btn-danger{background:var(--red2);color:var(--red);border:1px solid var(--red3);}
+.w-full{width:100%;}
 
-/* ── STATS (CEO review) ── */
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+/* ── NAV ── */
+.nav{height:52px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:100;}
+.nav-brand{font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;}
+.nav-brand span{color:var(--org);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.sync-badge{font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--tx3);letter-spacing:.3px;}
+.user-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid var(--accent3);background:var(--accent2);color:var(--accent);cursor:pointer;flex-shrink:0;}
+.role-pill{padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+
+/* ── TABS ── */
+.tabs-row{display:flex;gap:3px;background:var(--bg3);padding:3px;border-radius:var(--r);margin-bottom:18px;}
+.tab-btn{flex:1;padding:7px 0;border:none;background:transparent;color:var(--tx3);font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;transition:all .2s;white-space:nowrap;}
+.tab-btn.on{background:var(--tx);color:var(--bg);}
+.sub-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.sub-tab{padding:5px 14px;border:1px solid var(--bd2);border-radius:20px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;background:transparent;transition:all .2s;font-family:'Poppins',sans-serif;}
+.sub-tab.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* ── BODY ── */
+.app-body{padding:18px;max-width:860px;margin:0 auto;}
+
+/* ── USER BANNER ── */
+.user-banner{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--r);margin-bottom:18px;border:1px solid;}
+.ub-av{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;}
+.ub-name{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.ub-role{font-size:10px;margin-top:2px;}
+.ub-stat{margin-left:auto;text-align:right;}
+.ub-num{font-size:20px;font-weight:700;}
+.ub-lbl{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;}
+
+/* ── SECTION LABEL ── */
+.sec-lbl{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin:18px 0 8px;padding-left:2px;}
+.sec-lbl:first-child{margin-top:0;}
+
+/* ── TASK CARD ── */
+.task-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin-bottom:7px;transition:all .2s;}
+.task-card:hover{border-color:var(--bd2);background:var(--bg4);}
+.task-card.done-card{opacity:.55;}
+.tc-top{display:flex;align-items:flex-start;gap:10px;}
+.tc-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--bd3);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:1px;}
+.tc-check.done{background:var(--grn);border-color:var(--grn);}
+.tc-check svg{width:10px;height:10px;color:#fff;opacity:0;transition:opacity .2s;}
+.tc-check.done svg{opacity:1;}
+.tc-body{flex:1;min-width:0;}
+.tc-name{font-size:13px;font-weight:600;color:var(--tx);}
+.tc-name.done{text-decoration:line-through;color:var(--tx3);}
+.tc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px;}
+.tc-proj{font-size:10px;color:var(--tx3);}
+.tc-actions{display:flex;gap:5px;align-items:flex-start;flex-shrink:0;}
+.bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;}
+.bdg-red{background:var(--red2);color:var(--red);border:1px solid var(--red3);}
+.bdg-org{background:var(--org2);color:var(--org);border:1px solid var(--org3);}
+.bdg-grn{background:var(--grn2);color:var(--grn);border:1px solid var(--grn3);}
+.bdg-blu{background:var(--blu2);color:var(--blu);border:1px solid var(--blu3);}
+.bdg-pur{background:var(--pur2);color:var(--pur);border:1px solid var(--pur3);}
+.bdg-yel{background:var(--yel2);color:var(--yel);border:1px solid var(--yel3);}
+.bdg-grey{background:var(--bg5);color:var(--tx3);border:1px solid var(--bd2);}
+.user-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;border:1px solid var(--bd2);flex-shrink:0;}
+.overdue{border-left:3px solid var(--red);}
+.due-today{border-left:3px solid var(--org);}
+
+/* ── PROJECT CARD ── */
+.proj-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .2s;}
+.proj-card:hover{border-color:var(--bd2);background:var(--bg4);}
+.proj-card.expanded{border-color:var(--accent);background:var(--bg4);}
+.pc-top{display:flex;align-items:center;gap:12px;}
+.pc-icon{width:36px;height:36px;border-radius:8px;background:var(--accent2);border:1px solid var(--accent3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.pc-info{flex:1;min-width:0;}
+.pc-name{font-size:13px;font-weight:700;}
+.pc-desc{font-size:10px;color:var(--tx3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prog-bg{height:5px;background:var(--bg5);border-radius:4px;overflow:hidden;margin-top:8px;}
+.prog-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .4s;}
+.task-inlist{padding-top:10px;border-top:1px solid var(--bd);margin-top:10px;}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
 .stat-box{background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r);padding:14px;text-align:center;}
-.stat-num{font-size:24px;font-weight:700;color:var(--role);}
-.stat-lbl{font-size:10px;color:var(--tx3);margin-top:2px;letter-spacing:.3px;text-transform:uppercase;}
+.stat-n{font-size:22px;font-weight:700;color:var(--accent);}
+.stat-l{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
 
-/* ── ROLE VIEWS ── */
-.role-banner{display:flex;align-items:center;gap:14px;padding:16px;background:var(--role2);border:1px solid var(--role3);border-radius:var(--r);margin-bottom:20px;}
-.role-banner-icon{width:42px;height:42px;border-radius:10px;background:var(--role3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.role-banner-name{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--role);}
-.role-banner-desc{font-size:11px;color:var(--tx3);margin-top:2px;}
+/* ── PANEL ── */
+.panel{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:12px;}
+.panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.panel-title{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx2);}
 
-/* ── REVIEW TABLE (CEO) ── */
-.review-table{width:100%;border-collapse:collapse;}
-.review-table th{text-align:left;padding:8px 10px;font-size:10px;color:var(--tx3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--bd2);}
-.review-table td{padding:10px;border-bottom:1px solid var(--bd);font-size:12px;vertical-align:middle;}
-.review-table tr:last-child td{border-bottom:none;}
-.review-table tr:hover td{background:var(--bg4);}
+/* ── REVIEW TABLE ── */
+.rev-tbl{width:100%;border-collapse:collapse;}
+.rev-tbl th{text-align:left;padding:7px 10px;font-size:9px;color:var(--tx3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--bd2);}
+.rev-tbl td{padding:9px 10px;border-bottom:1px solid var(--bd);font-size:12px;vertical-align:middle;}
+.rev-tbl tr:last-child td{border-bottom:none;}
+.rev-tbl tr:hover td{background:var(--bg4);}
 
-/* ── EMPTY STATE ── */
-.empty{text-align:center;padding:40px 20px;color:var(--tx3);}
-.empty-icon{font-size:32px;margin-bottom:10px;}
-.empty p{font-size:12px;}
+/* ── MULTI-ASSIGN CHECKBOXES ── */
+.assign-grid{display:flex;flex-wrap:wrap;gap:7px;}
+.assign-chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid var(--bd2);background:var(--bg4);cursor:pointer;transition:all .2s;font-size:11px;font-weight:600;color:var(--tx2);user-select:none;}
+.assign-chip input{display:none;}
+.assign-chip.selected{border-color:var(--accent);background:var(--accent2);color:var(--accent);}
+
+/* ── FORM ROW ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
 /* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
-.modal-overlay.open{opacity:1;pointer-events:all;}
-.modal{background:var(--bg3);border:1px solid var(--bd2);border-radius:14px;padding:24px;width:100%;max-width:480px;transform:translateY(10px);transition:transform .2s;}
-.modal-overlay.open .modal{transform:translateY(0);}
-.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
-.modal-title{font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
-.modal-close{width:28px;height:28px;border:none;background:var(--bg5);border-radius:6px;color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-ov.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg3);border:1px solid var(--bd2);border-radius:14px;padding:22px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(8px);transition:transform .2s;}
+.modal-ov.open .modal{transform:translateY(0);}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.modal-title{font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.modal-close{width:26px;height:26px;border:none;background:var(--bg5);border-radius:6px;color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;}
 
-/* ── CYCLE BADGE ── */
-.cycle-info{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--blu);background:var(--blu2);border:1px solid var(--blu3);padding:4px 10px;border-radius:20px;margin-top:4px;width:fit-content;}
+/* ── ALERT POPUP ── */
+#modal-alert .modal{border-color:var(--org3);max-width:420px;}
+.alert-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);}
+.alert-item:last-child{border-bottom:none;}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
 
-/* ── SEPARADOR SECCIÓN ── */
-.sec-label{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;margin-top:18px;padding-left:2px;}
+/* ── EMPTY ── */
+.empty{text-align:center;padding:36px 20px;color:var(--tx3);}
+.empty-icon{font-size:30px;margin-bottom:8px;}
 
-/* ── UTIL ── */
-.flex{display:flex;align-items:center;}
-.gap-8{gap:8px;}
-.gap-12{gap:12px;}
-.mt-4{margin-top:4px;}
-.mt-8{margin-top:8px;}
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--bd);margin:14px 0;}
+.hidden{display:none!important;}
 .ml-auto{margin-left:auto;}
-.txt-sm{font-size:11px;}
+.flex{display:flex;align-items:center;}
+.gap-6{gap:6px;}
+.gap-10{gap:10px;}
 .txt-xs{font-size:10px;}
 .txt-muted{color:var(--tx3);}
-.txt-accent{color:var(--role);}
-.fw-700{font-weight:700;}
-.hidden{display:none!important;}
-.w-full{width:100%;}
-.divider{height:1px;background:var(--bd);margin:14px 0;}
 </style>
 </head>
 <body>
 
-<!-- BAND -->
-<div class="band">
-  <div class="band-mid">FCNOISE — GESTIÓN DE PROYECTOS</div>
-</div>
+<div class="band"><div class="band-txt">FCNOISE — GESTIÓN DE PROYECTOS</div></div>
 
-<!-- ROLE SELECT SCREEN -->
-<div id="screen-role">
-  <div class="role-header">
-    <h1>FC<span>NOISE</span></h1>
-    <p>Selecciona tu rol para continuar</p>
-  </div>
-  <div class="role-grid">
-    <div class="role-card ceo" onclick="selectRole('ceo')">
-      <div class="role-icon">🎯</div>
-      <div class="role-name">CEO</div>
-      <div class="role-desc">Crea proyectos, asigna tareas y revisa el avance de todo el equipo</div>
+<!-- ═══════════ LOGIN ═══════════ -->
+<div id="screen-login">
+  <div class="login-logo">FC<span>NOISE</span></div>
+  <div class="login-sub">Gestión de Proyectos Internos</div>
+  <div class="login-box">
+    <h2>Iniciar sesión</h2>
+    <div class="fi">
+      <label>Usuario</label>
+      <select id="login-user">
+        <option value="">Selecciona usuario…</option>
+        <option value="leonardo">Leonardo</option>
+        <option value="veronica">Verónica</option>
+        <option value="laura">Laura</option>
+        <option value="editor">Editor</option>
+      </select>
     </div>
-    <div class="role-card estratega" onclick="selectRole('estratega')">
-      <div class="role-icon">📊</div>
-      <div class="role-name">Estratega</div>
-      <div class="role-desc">Visualiza y gestiona tus tareas de estrategia y planificación</div>
+    <div class="fi">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••" onkeydown="if(event.key==='Enter')login()">
     </div>
-    <div class="role-card asistente" onclick="selectRole('asistente')">
-      <div class="role-icon">⚡</div>
-      <div class="role-name">Asistente</div>
-      <div class="role-desc">Tareas de soporte, coordinación y ejecución operativa</div>
-    </div>
-    <div class="role-card diseno" onclick="selectRole('diseno')">
-      <div class="role-icon">🎨</div>
-      <div class="role-name">Diseño</div>
-      <div class="role-desc">Piezas visuales, publicaciones y producción creativa</div>
-    </div>
+    <div class="login-err" id="login-err">Usuario o contraseña incorrectos</div>
+    <button class="btn btn-primary w-full" onclick="login()">Entrar</button>
   </div>
 </div>
 
-<!-- APP SCREEN -->
-<div id="screen-app">
+<!-- ═══════════ APP ═══════════ -->
+<div id="screen-app" class="hidden">
+
   <!-- NAV -->
   <nav class="nav">
     <div class="nav-brand">FC<span>NOISE</span></div>
     <div class="nav-right">
-      <div id="sync-badge" style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.07);color:#999;letter-spacing:.3px;">💾 Local</div>
-      <div class="nav-role-pill" onclick="showRoleSelect()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        <span id="nav-role-label">CEO</span>
-      </div>
+      <div class="sync-badge" id="sync-badge">💾 Local</div>
+      <div class="role-pill" id="nav-role-pill"></div>
+      <div class="user-av" id="nav-av" title="Cerrar sesión" onclick="logout()"></div>
     </div>
   </nav>
 
-  <!-- CEO VIEW -->
-  <div id="view-ceo" class="hidden">
-    <div class="app-body">
-      <div class="role-banner">
-        <div class="role-banner-icon">🎯</div>
-        <div>
-          <div class="role-banner-name">CEO</div>
-          <div class="role-banner-desc">Vista completa · Crear proyectos · Asignar tareas · Revisar avance</div>
-        </div>
+  <div class="app-body">
+
+    <!-- USER BANNER -->
+    <div class="user-banner" id="user-banner">
+      <div class="ub-av" id="ub-av"></div>
+      <div>
+        <div class="ub-name" id="ub-name"></div>
+        <div class="ub-role txt-muted" id="ub-role"></div>
       </div>
-
-      <div class="tabs-row" id="ceo-tabs">
-        <button class="tab-btn on" onclick="ceoTab('proyectos',this)">Proyectos</button>
-        <button class="tab-btn" onclick="ceoTab('tareas',this)">Tareas</button>
-        <button class="tab-btn" onclick="ceoTab('revision',this)">Revisión</button>
-      </div>
-
-      <!-- TAB: PROYECTOS -->
-      <div id="ceo-tab-proyectos">
-        <div class="panel">
-          <div class="panel-hdr">
-            <span class="panel-title">Proyectos</span>
-            <button class="btn btn-primary btn-sm" onclick="openModal('modal-proyecto')">+ Nuevo</button>
-          </div>
-          <div id="list-proyectos"></div>
-        </div>
-      </div>
-
-      <!-- TAB: TAREAS -->
-      <div id="ceo-tab-tareas" class="hidden">
-        <div class="panel">
-          <div class="panel-hdr">
-            <span class="panel-title">Nueva Tarea</span>
-          </div>
-          <div class="form-group">
-            <label>Proyecto</label>
-            <select id="task-proyecto-sel"></select>
-          </div>
-          <div class="form-group">
-            <label>Nombre de la tarea</label>
-            <input type="text" id="task-name" placeholder="Ej. Publicación semanal IG">
-          </div>
-          <div class="form-group">
-            <label>Descripción (opcional)</label>
-            <textarea id="task-desc" placeholder="Detalles, referencias, links…"></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Asignar a</label>
-              <select id="task-role">
-                <option value="estratega">Estratega</option>
-                <option value="asistente">Asistente</option>
-                <option value="diseno">Diseño</option>
-                <option value="ceo">CEO</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Prioridad</label>
-              <select id="task-prio">
-                <option value="media">Media</option>
-                <option value="alta">Alta</option>
-                <option value="baja">Baja</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Fecha límite</label>
-              <input type="date" id="task-due">
-            </div>
-            <div class="form-group" style="align-self:end;">
-              <button class="btn btn-primary w-full" onclick="createTask()">Crear Tarea</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-hdr">
-            <span class="panel-title">Todas las Tareas</span>
-            <select id="filter-role" onchange="renderAllTasks()" style="width:auto;padding:6px 10px;font-size:11px;">
-              <option value="all">Todos los roles</option>
-              <option value="estratega">Estratega</option>
-              <option value="asistente">Asistente</option>
-              <option value="diseno">Diseño</option>
-              <option value="ceo">CEO</option>
-            </select>
-          </div>
-          <div id="all-tasks-list"></div>
-        </div>
-      </div>
-
-      <!-- TAB: REVISIÓN -->
-      <div id="ceo-tab-revision" class="hidden">
-        <div class="stats-grid" id="ceo-stats"></div>
-        <div class="panel">
-          <div class="panel-hdr"><span class="panel-title">Estado por Proyecto</span></div>
-          <div id="review-table-wrap"></div>
-        </div>
-        <div class="panel">
-          <div class="panel-hdr"><span class="panel-title">Carga por Rol</span></div>
-          <div id="role-load-wrap"></div>
-        </div>
+      <div class="ub-stat ml-auto">
+        <div class="ub-num" id="ub-pending">0</div>
+        <div class="ub-lbl">pendientes</div>
       </div>
     </div>
-  </div>
 
-  <!-- ROLE VIEW (Estratega / Asistente / Diseño) -->
-  <div id="view-role" class="hidden">
-    <div class="app-body">
-      <div class="role-banner" id="role-banner-el">
-        <div class="role-banner-icon" id="role-banner-icon">📊</div>
-        <div>
-          <div class="role-banner-name" id="role-banner-name">Estratega</div>
-          <div class="role-banner-desc" id="role-banner-desc">Tus tareas asignadas</div>
-        </div>
-        <div class="ml-auto txt-xs txt-muted" id="role-task-count"></div>
+    <!-- TABS (CEO has extra tabs) -->
+    <div class="tabs-row" id="main-tabs"></div>
+
+    <!-- ── MIS TAREAS ── -->
+    <div id="view-tasks" class="hidden">
+      <div class="sub-tabs">
+        <button class="sub-tab on" onclick="subTab('hoy',this)">Hoy</button>
+        <button class="sub-tab" onclick="subTab('semana',this)">Semana</button>
+        <button class="sub-tab" onclick="subTab('prioridad',this)">Prioridad</button>
       </div>
-      <div id="role-tasks-by-project"></div>
+      <div id="view-hoy"></div>
+      <div id="view-semana" class="hidden"></div>
+      <div id="view-prioridad" class="hidden"></div>
+    </div>
+
+    <!-- ── GESTIÓN (CEO) ── -->
+    <div id="view-gestion" class="hidden">
+      <div class="panel">
+        <div class="panel-hdr">
+          <span class="panel-title">Proyectos</span>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-proj')">+ Proyecto</button>
+        </div>
+        <div id="gestion-proyectos"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr">
+          <span class="panel-title">Nueva Tarea</span>
+        </div>
+        <div class="fi">
+          <label>Proyecto</label>
+          <select id="t-proj"></select>
+        </div>
+        <div class="fi">
+          <label>Nombre</label>
+          <input type="text" id="t-name" placeholder="Ej. Publicación IG Lunes">
+        </div>
+        <div class="fi">
+          <label>Descripción</label>
+          <textarea id="t-desc" placeholder="Detalles, links, referencias…"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="fi">
+            <label>Área</label>
+            <select id="t-area">
+              <option value="marketing">📣 Marketing</option>
+              <option value="estrategia">📊 Estrategia</option>
+              <option value="operaciones">⚡ Operaciones</option>
+              <option value="diseno">🎨 Diseño</option>
+              <option value="general">💼 General</option>
+            </select>
+          </div>
+          <div class="fi">
+            <label>Prioridad</label>
+            <select id="t-prio">
+              <option value="alta">🔴 Alta</option>
+              <option value="media">🟡 Media</option>
+              <option value="baja">🟢 Baja</option>
+            </select>
+          </div>
+        </div>
+        <div class="fi">
+          <label>Asignar a</label>
+          <div class="assign-grid" id="assign-grid">
+            <label class="assign-chip" onclick="toggleAssign(this,'leonardo')"><input type="checkbox" value="leonardo">LE Leonardo</label>
+            <label class="assign-chip" onclick="toggleAssign(this,'veronica')"><input type="checkbox" value="veronica">VE Verónica</label>
+            <label class="assign-chip" onclick="toggleAssign(this,'laura')"><input type="checkbox" value="laura">LA Laura</label>
+            <label class="assign-chip" onclick="toggleAssign(this,'editor')"><input type="checkbox" value="editor">ED Editor</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fi">
+            <label>Fecha límite</label>
+            <input type="date" id="t-due">
+          </div>
+          <div class="fi" style="align-self:end;">
+            <button class="btn btn-primary w-full" onclick="createTask()">Crear Tarea</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr">
+          <span class="panel-title">Todas las Tareas</span>
+          <div class="flex gap-6">
+            <select id="filter-user" onchange="renderGestionTasks()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:Poppins,sans-serif;">
+              <option value="all">Todos</option>
+              <option value="leonardo">Leonardo</option>
+              <option value="veronica">Verónica</option>
+              <option value="laura">Laura</option>
+              <option value="editor">Editor</option>
+            </select>
+            <select id="filter-area" onchange="renderGestionTasks()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:Poppins,sans-serif;">
+              <option value="all">Todas las áreas</option>
+              <option value="marketing">Marketing</option>
+              <option value="estrategia">Estrategia</option>
+              <option value="operaciones">Operaciones</option>
+              <option value="diseno">Diseño</option>
+              <option value="general">General</option>
+            </select>
+          </div>
+        </div>
+        <div id="gestion-tasks"></div>
+      </div>
+    </div>
+
+    <!-- ── REVISIÓN (CEO) ── -->
+    <div id="view-revision" class="hidden">
+      <div class="stats-row" id="rev-stats"></div>
+      <div class="panel">
+        <div class="panel-hdr"><span class="panel-title">Proyectos vs Ejecución</span></div>
+        <div id="rev-table"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><span class="panel-title">Carga por Usuario</span></div>
+        <div id="rev-users"></div>
+      </div>
+    </div>
+
+  </div><!-- /app-body -->
+</div><!-- /screen-app -->
+
+<!-- ═══════════ MODAL: ALERT ═══════════ -->
+<div class="modal-ov" id="modal-alert">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">⚠️ Tareas Urgentes</span>
+      <button class="modal-close" onclick="closeModal('modal-alert')">✕</button>
+    </div>
+    <div id="alert-list"></div>
+    <div style="margin-top:14px;">
+      <button class="btn btn-primary w-full" onclick="closeModal('modal-alert')">Entendido</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL: NUEVO PROYECTO -->
-<div class="modal-overlay" id="modal-proyecto">
+<!-- ═══════════ MODAL: PROYECTO ═══════════ -->
+<div class="modal-ov" id="modal-proj">
   <div class="modal">
     <div class="modal-hdr">
-      <span class="modal-title">Nuevo Proyecto</span>
-      <button class="modal-close" onclick="closeModal('modal-proyecto')">✕</button>
+      <span class="modal-title" id="modal-proj-title">Nuevo Proyecto</span>
+      <button class="modal-close" onclick="closeModal('modal-proj')">✕</button>
     </div>
-    <div class="form-group">
-      <label>Nombre del proyecto</label>
-      <input type="text" id="proy-name" placeholder="Ej. Marketing Mayo 2026">
-    </div>
-    <div class="form-group">
-      <label>Descripción</label>
-      <textarea id="proy-desc" placeholder="Objetivo, contexto, entregables…" style="min-height:60px;"></textarea>
-    </div>
+    <input type="hidden" id="mp-id">
+    <div class="fi"><label>Nombre</label><input type="text" id="mp-name" placeholder="Ej. Marketing Mayo"></div>
+    <div class="fi"><label>Descripción</label><textarea id="mp-desc" placeholder="Objetivo, entregables…"></textarea></div>
     <div class="form-row">
-      <div class="form-group">
+      <div class="fi">
         <label>Tipo</label>
-        <select id="proy-type" onchange="toggleCyclePeriod()">
-          <option value="once">Único</option>
-          <option value="cyclic">Cíclico</option>
+        <select id="mp-type" onchange="document.getElementById('mp-cycle-wrap').style.display=this.value==='cyclic'?'block':'none'">
+          <option value="once">📌 Único</option>
+          <option value="cyclic">🔄 Cíclico</option>
         </select>
       </div>
-      <div class="form-group" id="cycle-period-wrap" style="display:none;">
+      <div class="fi" id="mp-cycle-wrap" style="display:none;">
         <label>Frecuencia</label>
-        <select id="proy-cycle">
+        <select id="mp-cycle">
           <option value="weekly">Semanal</option>
           <option value="biweekly">Quincenal</option>
           <option value="monthly">Mensual</option>
         </select>
       </div>
     </div>
-    <div class="form-group">
-      <label>Emoji / Icono</label>
-      <input type="text" id="proy-icon" placeholder="📣" maxlength="2" style="width:70px;">
+    <div class="fi"><label>Emoji / Icono</label><input type="text" id="mp-icon" placeholder="📁" maxlength="2" style="width:70px;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-proj')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="saveProject()">Guardar</button>
     </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-proyecto')">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="createProject()">Crear Proyecto</button>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: EDITAR TAREA ═══════════ -->
+<div class="modal-ov" id="modal-task-edit">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">Editar Tarea</span>
+      <button class="modal-close" onclick="closeModal('modal-task-edit')">✕</button>
+    </div>
+    <input type="hidden" id="et-id">
+    <div class="fi"><label>Nombre</label><input type="text" id="et-name"></div>
+    <div class="fi"><label>Descripción</label><textarea id="et-desc"></textarea></div>
+    <div class="form-row">
+      <div class="fi"><label>Área</label>
+        <select id="et-area">
+          <option value="marketing">📣 Marketing</option>
+          <option value="estrategia">📊 Estrategia</option>
+          <option value="operaciones">⚡ Operaciones</option>
+          <option value="diseno">🎨 Diseño</option>
+          <option value="general">💼 General</option>
+        </select>
+      </div>
+      <div class="fi"><label>Prioridad</label>
+        <select id="et-prio">
+          <option value="alta">🔴 Alta</option>
+          <option value="media">🟡 Media</option>
+          <option value="baja">🟢 Baja</option>
+        </select>
+      </div>
+    </div>
+    <div class="fi">
+      <label>Asignar a</label>
+      <div class="assign-grid" id="et-assign-grid">
+        <label class="assign-chip" onclick="toggleAssign(this,'leonardo')"><input type="checkbox" value="leonardo">LE Leonardo</label>
+        <label class="assign-chip" onclick="toggleAssign(this,'veronica')"><input type="checkbox" value="veronica">VE Verónica</label>
+        <label class="assign-chip" onclick="toggleAssign(this,'laura')"><input type="checkbox" value="laura">LA Laura</label>
+        <label class="assign-chip" onclick="toggleAssign(this,'editor')"><input type="checkbox" value="editor">ED Editor</label>
+      </div>
+    </div>
+    <div class="fi"><label>Proyecto</label><select id="et-proj"></select></div>
+    <div class="fi"><label>Fecha límite</label><input type="date" id="et-due"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-task-edit')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="saveTask()">Guardar</button>
     </div>
   </div>
 </div>
 
 <script type="module">
-/* ───────────────────────────────────────────────
-   DATA LAYER  — Firebase (primario) + localStorage (fallback)
-─────────────────────────────────────────────── */
-import {
-  firebaseInit, isConnected,
-  listenProjects, listenTasks,
-  fbSaveProject, fbDeleteProject,
-  fbSaveTask, fbDeleteTask
-} from './firebase.js';
+import { firebaseInit, isConnected, listenProjects, listenTasks, fbSaveProject, fbDeleteProject, fbSaveTask, fbDeleteTask } from './firebase.js';
 
-const LS_PROJ = 'fcn_projects';
-const LS_TASK = 'fcn_tasks';
+/* ═══════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════ */
+const USERS = {
+  leonardo: { id:'leonardo', name:'Leonardo', initials:'LE', pass:'123456', role:'ceo' },
+  veronica: { id:'veronica', name:'Verónica',  initials:'VE', pass:'123456', role:'estratega' },
+  laura:    { id:'laura',    name:'Laura',     initials:'LA', pass:'123456', role:'asistente' },
+  editor:   { id:'editor',   name:'Editor',    initials:'ED', pass:'123456', role:'diseno' },
+};
 
-/* Estado en memoria (sincronizado desde Firebase o localStorage) */
-let _projects = [];
-let _tasks    = [];
-let _fbOn     = false;
+const ROLE_META = {
+  ceo:       { label:'CEO',       color:'var(--org)',  bg:'var(--org2)',  border:'var(--org3)'  },
+  estratega: { label:'Estratega', color:'var(--blu)',  bg:'var(--blu2)',  border:'var(--blu3)'  },
+  asistente: { label:'Asistente', color:'var(--grn)',  bg:'var(--grn2)',  border:'var(--grn3)'  },
+  diseno:    { label:'Diseño',    color:'var(--pur)',  bg:'var(--pur2)',  border:'var(--pur3)'  },
+};
 
-/* ── Indicador de sync ── */
-function setSyncBadge(on){
-  const b = document.getElementById('sync-badge');
-  if(!b) return;
-  b.textContent = on ? '🔴 Live' : '💾 Local';
-  b.style.background = on ? 'rgba(58,170,106,.18)' : 'rgba(255,255,255,.07)';
-  b.style.color = on ? '#3aaa6a' : '#999';
-}
+const AREA_META = {
+  marketing:   { label:'Marketing',   icon:'📣', cls:'bdg-org' },
+  estrategia:  { label:'Estrategia',  icon:'📊', cls:'bdg-blu' },
+  operaciones: { label:'Operaciones', icon:'⚡', cls:'bdg-grn' },
+  diseno:      { label:'Diseño',      icon:'🎨', cls:'bdg-pur' },
+  general:     { label:'General',     icon:'💼', cls:'bdg-grey' },
+};
 
-/* ── Init Firebase ── */
-async function initData(){
-  _fbOn = firebaseInit();
-  setSyncBadge(_fbOn);
-  if(_fbOn){
-    listenProjects(docs => { _projects = docs; renderProjects(); renderRevision && currentRole==='ceo' && renderRevision(); renderRoleView && currentRole && currentRole!=='ceo' && renderRoleView(currentRole); });
-    listenTasks   (docs => { _tasks    = docs; renderProjects(); renderAllTasks(); renderRevision && currentRole==='ceo' && renderRevision(); renderRoleView && currentRole && currentRole!=='ceo' && renderRoleView(currentRole); });
-  } else {
-    _projects = JSON.parse(localStorage.getItem(LS_PROJ)||'[]');
-    _tasks    = JSON.parse(localStorage.getItem(LS_TASK)||'[]');
-  }
-}
+const PRIO_META = {
+  alta:  { label:'Alta',  cls:'bdg-red' },
+  media: { label:'Media', cls:'bdg-yel' },
+  baja:  { label:'Baja',  cls:'bdg-grn' },
+};
 
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let currentUser = null;
+let _projects   = [];
+let _tasks      = [];
+let _fbOn       = false;
+
+const LS_PROJ  = 'fcn_projects';
+const LS_TASK  = 'fcn_tasks';
+const LS_USER  = 'fcn_session';
+
+/* ═══════════════════════════════════════
+   DATA LAYER
+═══════════════════════════════════════ */
 function loadProjects(){ return _projects; }
 function loadTasks()   { return _tasks; }
 
-function saveProjects(d){
-  _projects = d;
-  localStorage.setItem(LS_PROJ, JSON.stringify(d));
-}
-function saveTasks(d){
-  _tasks = d;
-  localStorage.setItem(LS_TASK, JSON.stringify(d));
-}
+function saveProjects(d){ _projects = d; localStorage.setItem(LS_PROJ, JSON.stringify(d)); }
+function saveTasks(d)   { _tasks = d;    localStorage.setItem(LS_TASK, JSON.stringify(d)); }
 
-/* ── Wrappers Firebase-aware ── */
-async function persistProject(proj){
-  saveProjects([..._projects.filter(p=>p.id!==proj.id), proj].sort((a,b)=>a.createdAt-b.createdAt));
-  if(_fbOn) await fbSaveProject(proj);
+async function persistProject(p){
+  saveProjects([..._projects.filter(x=>x.id!==p.id), p].sort((a,b)=>a.createdAt-b.createdAt));
+  if(_fbOn) await fbSaveProject(p);
+}
+async function persistTask(t){
+  saveTasks([..._tasks.filter(x=>x.id!==t.id), t].sort((a,b)=>a.createdAt-b.createdAt));
+  if(_fbOn) await fbSaveTask(t);
 }
 async function removeProject(id){
   saveProjects(_projects.filter(p=>p.id!==id));
   saveTasks(_tasks.filter(t=>t.projectId!==id));
-  if(_fbOn){ await fbDeleteProject(id); _tasks.filter(t=>t.projectId===id).forEach(t=>fbDeleteTask(t.id)); }
-}
-async function persistTask(task){
-  saveTasks([..._tasks.filter(t=>t.id!==task.id), task].sort((a,b)=>a.createdAt-b.createdAt));
-  if(_fbOn) await fbSaveTask(task);
+  if(_fbOn){ await fbDeleteProject(id); }
 }
 async function removeTask(id){
   saveTasks(_tasks.filter(t=>t.id!==id));
@@ -481,434 +531,606 @@ async function removeTask(id){
 
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 
-/* ───────────────────────────────────────────────
-   ROLE SYSTEM
-─────────────────────────────────────────────── */
-const ROLES = {
-  ceo:       { label:'CEO',       icon:'🎯', desc:'Vista completa · Crear proyectos · Asignar tareas · Revisar avance', color:'var(--org)',  c2:'var(--org2)', c3:'var(--org3)' },
-  estratega: { label:'Estratega', icon:'📊', desc:'Tareas de estrategia y planificación asignadas a ti',                color:'var(--blu)',  c2:'var(--blu2)', c3:'var(--blu3)' },
-  asistente: { label:'Asistente', icon:'⚡', desc:'Tareas operativas y de coordinación asignadas a ti',                color:'var(--grn)',  c2:'var(--grn2)', c3:'var(--grn3)' },
-  diseno:    { label:'Diseño',    icon:'🎨', desc:'Piezas visuales y producción creativa asignadas a ti',               color:'var(--pur)',  c2:'var(--pur2)', c3:'var(--pur3)' },
-};
-
-let currentRole = null;
-
-function selectRole(role){
-  currentRole = role;
-  const r = ROLES[role];
-  // apply CSS vars
-  document.documentElement.style.setProperty('--role', r.color.replace('var(','').replace(')',''));
-  // quick inline override
-  document.documentElement.style.cssText += `;--role:${r.color};--role2:${r.c2};--role3:${r.c3}`;
-  document.getElementById('nav-role-label').textContent = r.label;
-  document.getElementById('screen-role').style.display = 'none';
-  document.getElementById('screen-app').style.display = 'block';
-
-  if(role === 'ceo'){
-    document.getElementById('view-ceo').classList.remove('hidden');
-    document.getElementById('view-role').classList.add('hidden');
-    populateProjectSelect();
-    renderProjects();
-    renderAllTasks();
+/* ═══════════════════════════════════════
+   FIREBASE INIT
+═══════════════════════════════════════ */
+async function initData(){
+  _fbOn = firebaseInit();
+  setSyncBadge(_fbOn);
+  if(_fbOn){
+    listenProjects(docs=>{ _projects = docs; refreshAll(); });
+    listenTasks(docs=>{ _tasks = docs; refreshAll(); });
   } else {
-    document.getElementById('view-ceo').classList.add('hidden');
-    document.getElementById('view-role').classList.remove('hidden');
-    document.getElementById('role-banner-icon').textContent = r.icon;
-    document.getElementById('role-banner-name').textContent = r.label;
-    document.getElementById('role-banner-desc').textContent = r.desc;
-    renderRoleView(role);
+    _projects = JSON.parse(localStorage.getItem(LS_PROJ)||'[]');
+    _tasks    = JSON.parse(localStorage.getItem(LS_TASK)||'[]');
   }
 }
 
-function showRoleSelect(){
-  document.getElementById('screen-role').style.display = 'flex';
-  document.getElementById('screen-app').style.display = 'none';
-  currentRole = null;
+function setSyncBadge(on){
+  const b = document.getElementById('sync-badge');
+  if(!b) return;
+  b.textContent = on ? '🔴 Live' : '💾 Local';
+  b.style.color = on ? 'var(--grn)' : 'var(--tx3)';
 }
 
-/* ───────────────────────────────────────────────
-   CEO TABS
-─────────────────────────────────────────────── */
-function ceoTab(tab, btn){
-  ['proyectos','tareas','revision'].forEach(t=>{
-    document.getElementById('ceo-tab-'+t).classList.add('hidden');
-  });
-  document.querySelectorAll('#ceo-tabs .tab-btn').forEach(b=>b.classList.remove('on'));
-  document.getElementById('ceo-tab-'+tab).classList.remove('hidden');
-  btn.classList.add('on');
-  if(tab==='revision') renderRevision();
-  if(tab==='tareas'){ populateProjectSelect(); renderAllTasks(); }
+function refreshAll(){
+  if(!currentUser) return;
+  renderDashboard();
 }
 
-/* ───────────────────────────────────────────────
-   MODAL
-─────────────────────────────────────────────── */
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-
-document.querySelectorAll('.modal-overlay').forEach(m=>{
-  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
-});
-
-function toggleCyclePeriod(){
-  const v = document.getElementById('proy-type').value;
-  document.getElementById('cycle-period-wrap').style.display = v==='cyclic'?'block':'none';
-}
-
-/* ───────────────────────────────────────────────
-   PROJECTS
-─────────────────────────────────────────────── */
-async function createProject(){
-  const name = document.getElementById('proy-name').value.trim();
-  if(!name) return alert('El proyecto necesita un nombre.');
-  const cyclic = document.getElementById('proy-type').value === 'cyclic';
-  const proj = {
-    id: uid(),
-    name,
-    desc: document.getElementById('proy-desc').value.trim(),
-    type: document.getElementById('proy-type').value,
-    cycle: cyclic ? document.getElementById('proy-cycle').value : null,
-    icon: document.getElementById('proy-icon').value || '📁',
-    status: 'active',
-    createdAt: Date.now(),
-  };
-  await persistProject(proj);
-  document.getElementById('proy-name').value='';
-  document.getElementById('proy-desc').value='';
-  document.getElementById('proy-icon').value='';
-  document.getElementById('proy-type').value='once';
-  toggleCyclePeriod();
-  closeModal('modal-proyecto');
-  populateProjectSelect();
-  if(!_fbOn) renderProjects();
-}
-
-async function deleteProject(id){
-  if(!confirm('¿Eliminar proyecto y todas sus tareas?')) return;
-  await removeProject(id);
-  if(!_fbOn){ renderProjects(); populateProjectSelect(); }
-  else populateProjectSelect();
-}
-
-async function toggleProjectStatus(id){
-  const p = loadProjects().find(x=>x.id===id);
-  if(!p) return;
-  const cycle = ['active','paused','done'];
-  p.status = cycle[(cycle.indexOf(p.status)+1)%cycle.length];
-  await persistProject(p);
-  if(!_fbOn) renderProjects();
-}
-
-let expandedProj = null;
-
-function renderProjects(){
-  const projects = loadProjects();
-  const tasks = loadTasks();
-  const el = document.getElementById('list-proyectos');
-  if(!projects.length){
-    el.innerHTML = '<div class="empty"><div class="empty-icon">📂</div><p>Aún no hay proyectos. Crea el primero.</p></div>';
+/* ═══════════════════════════════════════
+   AUTH
+═══════════════════════════════════════ */
+function login(){
+  const uid_sel = document.getElementById('login-user').value;
+  const pass    = document.getElementById('login-pass').value;
+  const user    = USERS[uid_sel];
+  if(!user || user.pass !== pass){
+    document.getElementById('login-err').classList.add('show');
     return;
   }
-  el.innerHTML = projects.map(p=>{
-    const ptasks = tasks.filter(t=>t.projectId===p.id);
-    const done = ptasks.filter(t=>t.status==='done').length;
-    const pct = ptasks.length ? Math.round(done/ptasks.length*100) : 0;
-    const exp = expandedProj === p.id;
-    const cycleLabel = {weekly:'Semanal',biweekly:'Quincenal',monthly:'Mensual'}[p.cycle]||'';
-    return `
-    <div class="proj-card ${exp?'expanded':''}" id="proj-${p.id}">
-      <div class="proj-top" onclick="toggleExpand('${p.id}')">
-        <div class="proj-icon">${p.icon}</div>
-        <div class="proj-info">
-          <div class="proj-name">${esc(p.name)}</div>
-          <div class="proj-meta">${esc(p.desc)||'Sin descripción'}</div>
-          <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;">
-            <span class="bdg ${p.type==='cyclic'?'bdg-cyclic':'bdg-once'}">${p.type==='cyclic'?'🔄 '+cycleLabel:'📌 Único'}</span>
-            <span class="bdg bdg-${p.status==='active'?'active':p.status==='paused'?'paused':'done'}">${{active:'Activo',paused:'Pausado',done:'Completado'}[p.status]}</span>
-          </div>
-        </div>
-        <div class="proj-badges" style="flex-direction:column;gap:4px;align-items:flex-end;">
-          <span class="txt-xs txt-muted">${ptasks.length} tareas</span>
-          <div style="display:flex;gap:5px;">
-            <button class="btn-icon" onclick="event.stopPropagation();toggleProjectStatus('${p.id}')" title="Cambiar estado">⚡</button>
-            <button class="btn-icon" style="color:var(--red);" onclick="event.stopPropagation();deleteProject('${p.id}')" title="Eliminar">✕</button>
-          </div>
-        </div>
-      </div>
-      <div class="proj-progress">
-        <div class="flex" style="justify-content:space-between;">
-          <span class="prog-label">${done}/${ptasks.length} completadas</span>
-          <span class="prog-label">${pct}%</span>
-        </div>
-        <div class="prog-bar-bg"><div class="prog-bar" style="width:${pct}%"></div></div>
-      </div>
-      ${exp ? renderTasksInline(p.id) : ''}
-    </div>`;
-  }).join('');
+  document.getElementById('login-err').classList.remove('show');
+  currentUser = user;
+  localStorage.setItem(LS_USER, uid_sel);
+  showApp();
 }
 
-function toggleExpand(id){
-  expandedProj = expandedProj===id ? null : id;
-  renderProjects();
+function logout(){
+  currentUser = null;
+  localStorage.removeItem(LS_USER);
+  document.getElementById('screen-app').classList.add('hidden');
+  document.getElementById('screen-login').style.display = 'flex';
+  document.getElementById('login-pass').value = '';
 }
 
-function renderTasksInline(projId){
-  const tasks = loadTasks().filter(t=>t.projectId===projId);
-  if(!tasks.length) return '<div class="task-list"><div class="txt-xs txt-muted" style="padding:10px 0;text-align:center;">Sin tareas — crea una desde la pestaña Tareas</div></div>';
-  return '<div class="task-list">'+tasks.map(t=>taskHTML(t,true)).join('')+'</div>';
+function showApp(){
+  document.getElementById('screen-login').style.display = 'none';
+  document.getElementById('screen-app').classList.remove('hidden');
+  renderNav();
+  renderTabs();
+  renderDashboard();
+  setTimeout(showAlerts, 600);
 }
 
-/* ───────────────────────────────────────────────
-   TASKS
-─────────────────────────────────────────────── */
-const PRIO_MAP  = {alta:'prio-hi',media:'prio-md',baja:'prio-lo'};
-const PRIO_LABEL= {alta:'Alta',media:'Media',baja:'Baja'};
-const ROLE_CLS  = {estratega:'rt-estratega',asistente:'rt-asistente',diseno:'rt-diseno',ceo:'rt-ceo'};
-const ROLE_LABEL= {estratega:'Estratega',asistente:'Asistente',diseno:'Diseño',ceo:'CEO'};
+/* ═══════════════════════════════════════
+   NAV + TABS
+═══════════════════════════════════════ */
+function renderNav(){
+  const u = currentUser;
+  const rm = ROLE_META[u.role];
+  document.getElementById('nav-av').textContent = u.initials;
+  document.getElementById('nav-av').style.cssText += `;border-color:${rm.border};background:${rm.bg};color:${rm.color};`;
+  document.getElementById('nav-role-pill').textContent = rm.label;
+  document.getElementById('nav-role-pill').style.cssText = `background:${rm.bg};color:${rm.color};border:1px solid ${rm.border};`;
+  // user banner
+  document.getElementById('ub-av').textContent = u.initials;
+  document.getElementById('ub-av').style.cssText = `background:${rm.bg};color:${rm.color};border:1px solid ${rm.border};`;
+  document.getElementById('ub-name').textContent = u.name;
+  document.getElementById('ub-name').style.color = rm.color;
+  document.getElementById('ub-role').textContent = rm.label;
+  const banner = document.getElementById('user-banner');
+  banner.style.background = rm.bg;
+  banner.style.borderColor = rm.border;
+  // CSS accent
+  document.documentElement.style.setProperty('--accent', rm.color);
+  document.documentElement.style.setProperty('--accent2', rm.bg);
+  document.documentElement.style.setProperty('--accent3', rm.border);
+}
 
-function taskHTML(t, showRole=false){
+function renderTabs(){
+  const isCeo = currentUser.role === 'ceo';
+  const tabs = document.getElementById('main-tabs');
+  if(isCeo){
+    tabs.innerHTML = `
+      <button class="tab-btn on" onclick="mainTab('tasks',this)">Mis Tareas</button>
+      <button class="tab-btn" onclick="mainTab('gestion',this)">Gestión</button>
+      <button class="tab-btn" onclick="mainTab('revision',this)">Revisión</button>`;
+  } else {
+    tabs.innerHTML = `<button class="tab-btn on" onclick="mainTab('tasks',this)">Mis Tareas</button>`;
+  }
+}
+
+function mainTab(tab, btn){
+  ['tasks','gestion','revision'].forEach(t=>{
+    document.getElementById('view-'+t)?.classList.add('hidden');
+  });
+  document.querySelectorAll('#main-tabs .tab-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('view-'+tab)?.classList.remove('hidden');
+  btn.classList.add('on');
+  if(tab==='tasks')    renderDashboard();
+  if(tab==='gestion')  renderGestion();
+  if(tab==='revision') renderRevision();
+}
+
+function subTab(tab, btn){
+  ['hoy','semana','prioridad'].forEach(t=>document.getElementById('view-'+t)?.classList.add('hidden'));
+  document.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('view-'+tab)?.classList.remove('hidden');
+  btn.classList.add('on');
+  if(tab==='hoy')       renderHoy();
+  if(tab==='semana')    renderSemana();
+  if(tab==='prioridad') renderPrioridad();
+}
+
+/* ═══════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════ */
+function myTasks(){
+  return _tasks.filter(t=>Array.isArray(t.assignedUsers) && t.assignedUsers.includes(currentUser.id));
+}
+
+function renderDashboard(){
+  if(!currentUser) return;
+  const pending = myTasks().filter(t=>t.status!=='done').length;
+  document.getElementById('ub-pending').textContent = pending;
+  const active = document.querySelector('.sub-tab.on');
+  const which = active ? active.getAttribute('onclick').match(/'(\w+)'/)?.[1] : 'hoy';
+  if(which==='semana')    renderSemana();
+  else if(which==='prioridad') renderPrioridad();
+  else renderHoy();
+}
+
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+
+function weekRange(){
+  const now = new Date();
+  const day = now.getDay();
+  const mon = new Date(now); mon.setDate(now.getDate() - (day===0?6:day-1));
+  const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+  return { start: mon.toISOString().split('T')[0], end: sun.toISOString().split('T')[0] };
+}
+
+function renderHoy(){
+  const today = todayStr();
+  const tasks = myTasks().filter(t=>t.dueDate===today || (!t.dueDate && t.status!=='done'));
+  const dueTasks   = tasks.filter(t=>t.dueDate===today);
+  const noDue      = tasks.filter(t=>!t.dueDate && t.status!=='done');
+  const overdue    = myTasks().filter(t=>t.dueDate && t.dueDate<today && t.status!=='done');
+  const el = document.getElementById('view-hoy');
+  let html = '';
+  if(overdue.length){
+    html += `<div class="sec-lbl" style="color:var(--red);">⚠️ Vencidas (${overdue.length})</div>`;
+    html += overdue.map(t=>taskCardHTML(t,'overdue')).join('');
+  }
+  if(dueTasks.length){
+    html += `<div class="sec-lbl">📅 Para Hoy</div>`;
+    html += dueTasks.map(t=>taskCardHTML(t,'due-today')).join('');
+  }
+  if(noDue.length){
+    html += `<div class="sec-lbl">🗂 Sin fecha</div>`;
+    html += noDue.map(t=>taskCardHTML(t,'')).join('');
+  }
+  if(!html) html = '<div class="empty"><div class="empty-icon">🎉</div><p>Sin tareas pendientes para hoy</p></div>';
+  el.innerHTML = html;
+}
+
+function renderSemana(){
+  const wr = weekRange();
+  const days = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  const today = todayStr();
+  const mon = new Date(wr.start);
+  const el = document.getElementById('view-semana');
+  let html = '';
+  for(let i=0;i<7;i++){
+    const d = new Date(mon); d.setDate(mon.getDate()+i);
+    const dStr = d.toISOString().split('T')[0];
+    const dt = myTasks().filter(t=>t.dueDate===dStr && t.status!=='done');
+    const isToday = dStr===today;
+    const label = `${days[i]} ${d.getDate()}/${d.getMonth()+1}`;
+    if(dt.length || isToday){
+      html += `<div class="sec-lbl" style="${isToday?'color:var(--accent);':''}">
+        ${isToday?'📍 ':''} ${label}${dt.length?` (${dt.length})`:''}
+      </div>`;
+      if(dt.length) html += dt.map(t=>taskCardHTML(t,dStr<today?'overdue':'')).join('');
+      else html += `<div class="txt-xs txt-muted" style="padding:6px 2px;margin-bottom:8px;">Sin tareas</div>`;
+    }
+  }
+  const noDate = myTasks().filter(t=>!t.dueDate && t.status!=='done');
+  if(noDate.length){
+    html += `<div class="sec-lbl">🗂 Sin fecha</div>`;
+    html += noDate.map(t=>taskCardHTML(t,'')).join('');
+  }
+  if(!html) html = '<div class="empty"><div class="empty-icon">✅</div><p>Sin tareas esta semana</p></div>';
+  el.innerHTML = html;
+}
+
+function renderPrioridad(){
+  const el = document.getElementById('view-prioridad');
+  let html = '';
+  ['alta','media','baja'].forEach(p=>{
+    const pts = myTasks().filter(t=>t.priority===p);
+    if(!pts.length) return;
+    const pm = PRIO_META[p];
+    html += `<div class="sec-lbl">${p==='alta'?'🔴':p==='media'?'🟡':'🟢'} ${pm.label} (${pts.length})</div>`;
+    html += pts.map(t=>taskCardHTML(t,'')).join('');
+  });
+  if(!html) html = '<div class="empty"><div class="empty-icon">🏖</div><p>Sin tareas asignadas</p></div>';
+  el.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════
+   TASK CARD HTML
+═══════════════════════════════════════ */
+function taskCardHTML(t, extraClass=''){
   const isDone = t.status==='done';
-  const due = t.dueDate ? ` · ${t.dueDate}` : '';
+  const proj = _projects.find(p=>p.id===t.projectId);
+  const am = AREA_META[t.area] || AREA_META.general;
+  const pm = PRIO_META[t.priority] || PRIO_META.media;
+  const assignees = (t.assignedUsers||[]).map(uid=>{
+    const u = USERS[uid];
+    if(!u) return '';
+    const rm = ROLE_META[u.role];
+    return `<div class="user-dot" style="background:${rm.bg};color:${rm.color};" title="${u.name}">${u.initials}</div>`;
+  }).join('');
+  const due = t.dueDate ? `<span class="txt-xs txt-muted">📅 ${t.dueDate}</span>` : '';
   return `
-  <div class="task-item" id="ti-${t.id}">
-    <div class="task-check ${isDone?'done':''}" onclick="toggleTask('${t.id}')">
-      <svg viewBox="0 0 12 10" fill="none" stroke="currentColor" stroke-width="2.5">
-        <polyline points="1,5 4.5,8.5 11,1"/>
-      </svg>
-    </div>
-    <div class="task-body">
-      <div class="task-name ${isDone?'done':''}">${esc(t.name)}</div>
-      <div class="task-sub">${esc(t.desc)||''} ${due}</div>
-    </div>
-    <div class="task-badges">
-      ${showRole ? `<span class="bdg ${ROLE_CLS[t.assignedRole]||''}">${ROLE_LABEL[t.assignedRole]||t.assignedRole}</span>`:''}
-      <span class="bdg ${PRIO_MAP[t.priority]||'prio-md'}">${PRIO_LABEL[t.priority]||t.priority}</span>
-      <button class="btn-icon" style="width:24px;height:24px;color:var(--red);" onclick="deleteTask('${t.id}')">✕</button>
+  <div class="task-card ${isDone?'done-card':''} ${extraClass}" id="tc-${t.id}">
+    <div class="tc-top">
+      <div class="tc-check ${isDone?'done':''}" onclick="toggleTask('${t.id}')">
+        <svg viewBox="0 0 12 10" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1,5 4.5,8.5 11,1"/></svg>
+      </div>
+      <div class="tc-body">
+        <div class="tc-name ${isDone?'done':''}">${esc(t.name)}</div>
+        <div class="tc-meta">
+          ${proj?`<span class="txt-xs txt-muted">${proj.icon||'📁'} ${esc(proj.name)}</span>`:''}
+          <span class="bdg ${am.cls}">${am.icon} ${am.label}</span>
+          <span class="bdg ${pm.cls}">${pm.label}</span>
+          ${due}
+          ${assignees}
+        </div>
+      </div>
+      <div class="tc-actions">
+        <button class="btn-icon" onclick="openEditTask('${t.id}')" title="Editar">✏️</button>
+        <button class="btn-icon btn-danger" onclick="deleteTask('${t.id}')" title="Eliminar">✕</button>
+      </div>
     </div>
   </div>`;
 }
 
+/* ═══════════════════════════════════════
+   ALERTS POPUP
+═══════════════════════════════════════ */
+function showAlerts(){
+  const today = todayStr();
+  const urgent = myTasks().filter(t=>t.status!=='done' && t.dueDate && t.dueDate<=today);
+  if(!urgent.length) return;
+  const list = document.getElementById('alert-list');
+  list.innerHTML = urgent.map(t=>{
+    const isOverdue = t.dueDate < today;
+    const proj = _projects.find(p=>p.id===t.projectId);
+    return `<div class="alert-item">
+      <div class="alert-dot" style="background:${isOverdue?'var(--red)':'var(--org)'}"></div>
+      <div>
+        <div style="font-size:12px;font-weight:600;">${esc(t.name)}</div>
+        <div class="txt-xs txt-muted">${proj?proj.name:''} · ${isOverdue?'Vencida':'Hoy'}: ${t.dueDate}</div>
+      </div>
+    </div>`;
+  }).join('');
+  openModal('modal-alert');
+}
+
+/* ═══════════════════════════════════════
+   GESTIÓN (CEO)
+═══════════════════════════════════════ */
+let expandedProj = null;
+
+function renderGestion(){
+  renderGestionProjects();
+  renderGestionTasks();
+  populateProjSelects();
+}
+
+function renderGestionProjects(){
+  const el = document.getElementById('gestion-proyectos');
+  if(!_projects.length){
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📂</div><p>Sin proyectos. Crea el primero.</p></div>';
+    return;
+  }
+  el.innerHTML = _projects.map(p=>{
+    const pt = _tasks.filter(t=>t.projectId===p.id);
+    const done = pt.filter(t=>t.status==='done').length;
+    const pct = pt.length ? Math.round(done/pt.length*100) : 0;
+    const exp = expandedProj===p.id;
+    const cycleLabel = {weekly:'Semanal',biweekly:'Quincenal',monthly:'Mensual'}[p.cycle]||'';
+    let taskList = '';
+    if(exp){
+      taskList = pt.length
+        ? `<div class="task-inlist">${pt.map(t=>taskCardHTML(t,'')).join('')}</div>`
+        : `<div class="task-inlist"><div class="txt-xs txt-muted" style="text-align:center;padding:8px 0;">Sin tareas — agrégalas desde el panel de abajo</div></div>`;
+    }
+    return `
+    <div class="proj-card ${exp?'expanded':''}" id="pc-${p.id}">
+      <div class="pc-top" onclick="toggleExpandProj('${p.id}')">
+        <div class="pc-icon">${p.icon||'📁'}</div>
+        <div class="pc-info">
+          <div class="pc-name">${esc(p.name)}</div>
+          <div class="pc-desc">${esc(p.desc)||'Sin descripción'}</div>
+          <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;">
+            ${p.type==='cyclic'?`<span class="bdg bdg-blu">🔄 ${cycleLabel}</span>`:'<span class="bdg bdg-grey">📌 Único</span>'}
+            <span class="bdg ${p.status==='active'?'bdg-grn':p.status==='paused'?'bdg-org':'bdg-grey'}">${{active:'Activo',paused:'Pausado',done:'Listo'}[p.status]||p.status}</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+          <span class="txt-xs txt-muted">${pt.length} tareas</span>
+          <div class="flex gap-6">
+            <button class="btn-icon" onclick="event.stopPropagation();openEditProject('${p.id}')" title="Editar">✏️</button>
+            <button class="btn-icon btn-danger" onclick="event.stopPropagation();deleteProject('${p.id}')" title="Eliminar">✕</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="flex" style="justify-content:space-between;margin-top:8px;">
+          <span class="txt-xs txt-muted">${done}/${pt.length} completadas</span>
+          <span class="txt-xs txt-muted">${pct}%</span>
+        </div>
+        <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+      </div>
+      ${taskList}
+    </div>`;
+  }).join('');
+}
+
+function toggleExpandProj(id){
+  expandedProj = expandedProj===id ? null : id;
+  renderGestionProjects();
+}
+
+function renderGestionTasks(){
+  const filterUser = document.getElementById('filter-user')?.value||'all';
+  const filterArea = document.getElementById('filter-area')?.value||'all';
+  let tasks = [..._tasks];
+  if(filterUser!=='all') tasks = tasks.filter(t=>(t.assignedUsers||[]).includes(filterUser));
+  if(filterArea!=='all') tasks = tasks.filter(t=>t.area===filterArea);
+  const el = document.getElementById('gestion-tasks');
+  if(!tasks.length){ el.innerHTML='<div class="empty"><p>Sin tareas.</p></div>'; return; }
+  // group by project
+  const byProj = {};
+  tasks.forEach(t=>{ if(!byProj[t.projectId]) byProj[t.projectId]=[]; byProj[t.projectId].push(t); });
+  el.innerHTML = Object.entries(byProj).map(([pid,ts])=>{
+    const p = _projects.find(x=>x.id===pid);
+    return `<div class="sec-lbl">${p?p.icon+' '+p.name:'Sin proyecto'}</div>
+    <div style="margin-bottom:10px;">${ts.map(t=>taskCardHTML(t,'')).join('')}</div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════
+   REVISIÓN (CEO)
+═══════════════════════════════════════ */
+function renderRevision(){
+  const done = _tasks.filter(t=>t.status==='done').length;
+  const pct  = _tasks.length ? Math.round(done/_tasks.length*100) : 0;
+  document.getElementById('rev-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-n">${_projects.length}</div><div class="stat-l">Proyectos</div></div>
+    <div class="stat-box"><div class="stat-n">${_tasks.length}</div><div class="stat-l">Tareas</div></div>
+    <div class="stat-box"><div class="stat-n">${pct}%</div><div class="stat-l">Ejecutado</div></div>`;
+  // project table
+  const rt = document.getElementById('rev-table');
+  if(!_projects.length){ rt.innerHTML='<div class="empty"><p>Sin proyectos.</p></div>'; }
+  else{
+    rt.innerHTML=`<table class="rev-tbl">
+      <thead><tr><th>Proyecto</th><th>Tipo</th><th>Tareas</th><th>Done</th><th>%</th><th>Estado</th></tr></thead>
+      <tbody>${_projects.map(p=>{
+        const pt=_tasks.filter(t=>t.projectId===p.id);
+        const pd=pt.filter(t=>t.status==='done').length;
+        const pp=pt.length?Math.round(pd/pt.length*100):0;
+        const cl={weekly:'Semanal',biweekly:'Quincenal',monthly:'Mensual'}[p.cycle]||'';
+        return `<tr>
+          <td>${p.icon||'📁'} ${esc(p.name)}</td>
+          <td>${p.type==='cyclic'?`<span class="bdg bdg-blu">🔄 ${cl}</span>`:'<span class="bdg bdg-grey">Único</span>'}</td>
+          <td>${pt.length}</td><td>${pd}</td>
+          <td><div class="prog-bg" style="width:80px;display:inline-block;vertical-align:middle;"><div class="prog-fill" style="width:${pp}%"></div></div> <span class="txt-xs">${pp}%</span></td>
+          <td><span class="bdg ${p.status==='active'?'bdg-grn':p.status==='paused'?'bdg-org':'bdg-grey'}">${{active:'Activo',paused:'Pausado',done:'Listo'}[p.status]||p.status}</span></td>
+        </tr>`;
+      }).join('')}</tbody></table>`;
+  }
+  // user load
+  const ru = document.getElementById('rev-users');
+  ru.innerHTML = Object.values(USERS).map(u=>{
+    const ut = _tasks.filter(t=>(t.assignedUsers||[]).includes(u.id));
+    const ud = ut.filter(t=>t.status==='done').length;
+    const up = ut.length-ud;
+    const uu = ut.length?Math.round(ud/ut.length*100):0;
+    const rm = ROLE_META[u.role];
+    return `<div class="flex gap-10" style="padding:10px 0;border-bottom:1px solid var(--bd);">
+      <div class="user-dot" style="width:28px;height:28px;font-size:10px;background:${rm.bg};color:${rm.color};">${u.initials}</div>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:600;">${u.name}</div>
+        <div class="txt-xs txt-muted">${up} pendiente${up!==1?'s':''} · ${ud} completada${ud!==1?'s':''}</div>
+      </div>
+      <div style="width:100px;text-align:right;">
+        <div class="prog-bg"><div class="prog-fill" style="width:${uu}%"></div></div>
+        <div class="txt-xs txt-muted" style="margin-top:2px;">${uu}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════
+   CRUD — PROJECTS
+═══════════════════════════════════════ */
+async function saveProject(){
+  const id   = document.getElementById('mp-id').value || uid();
+  const name = document.getElementById('mp-name').value.trim();
+  if(!name) return alert('El proyecto necesita nombre.');
+  const cyclic = document.getElementById('mp-type').value==='cyclic';
+  const proj = {
+    id, name,
+    desc:  document.getElementById('mp-desc').value.trim(),
+    type:  document.getElementById('mp-type').value,
+    cycle: cyclic ? document.getElementById('mp-cycle').value : null,
+    icon:  document.getElementById('mp-icon').value||'📁',
+    status: _projects.find(p=>p.id===id)?.status || 'active',
+    createdAt: _projects.find(p=>p.id===id)?.createdAt || Date.now(),
+  };
+  await persistProject(proj);
+  closeModal('modal-proj');
+  clearProjForm();
+  if(!_fbOn){ renderGestionProjects(); populateProjSelects(); }
+}
+
+function clearProjForm(){
+  ['mp-id','mp-name','mp-desc','mp-icon'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mp-type').value='once';
+  document.getElementById('mp-cycle').value='weekly';
+  document.getElementById('mp-cycle-wrap').style.display='none';
+  document.getElementById('modal-proj-title').textContent='Nuevo Proyecto';
+}
+
+function openEditProject(id){
+  const p = _projects.find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById('mp-id').value    = p.id;
+  document.getElementById('mp-name').value  = p.name;
+  document.getElementById('mp-desc').value  = p.desc||'';
+  document.getElementById('mp-icon').value  = p.icon||'';
+  document.getElementById('mp-type').value  = p.type||'once';
+  document.getElementById('mp-cycle').value = p.cycle||'weekly';
+  document.getElementById('mp-cycle-wrap').style.display = p.type==='cyclic'?'block':'none';
+  document.getElementById('modal-proj-title').textContent = 'Editar Proyecto';
+  openModal('modal-proj');
+}
+
+async function deleteProject(id){
+  if(!confirm('¿Eliminar proyecto y sus tareas?')) return;
+  await removeProject(id);
+  if(!_fbOn){ renderGestionProjects(); populateProjSelects(); }
+}
+
+/* ═══════════════════════════════════════
+   CRUD — TASKS
+═══════════════════════════════════════ */
 async function createTask(){
-  const projId = document.getElementById('task-proyecto-sel').value;
-  const name   = document.getElementById('task-name').value.trim();
+  const projId = document.getElementById('t-proj').value;
+  const name   = document.getElementById('t-name').value.trim();
   if(!projId) return alert('Selecciona un proyecto.');
-  if(!name)   return alert('La tarea necesita un nombre.');
+  if(!name)   return alert('La tarea necesita nombre.');
+  const assigned = [...document.querySelectorAll('#assign-grid .assign-chip.selected')].map(el=>el.querySelector('input').value);
   const task = {
-    id: uid(),
-    projectId: projId,
-    name,
-    desc:         document.getElementById('task-desc').value.trim(),
-    assignedRole: document.getElementById('task-role').value,
-    priority:     document.getElementById('task-prio').value,
-    dueDate:      document.getElementById('task-due').value,
-    status: 'pending',
-    createdAt: Date.now(),
+    id: uid(), projectId: projId, name,
+    desc:         document.getElementById('t-desc').value.trim(),
+    area:         document.getElementById('t-area').value,
+    priority:     document.getElementById('t-prio').value,
+    dueDate:      document.getElementById('t-due').value,
+    assignedUsers: assigned,
+    status: 'pending', createdAt: Date.now(),
   };
   await persistTask(task);
-  document.getElementById('task-name').value='';
-  document.getElementById('task-desc').value='';
-  document.getElementById('task-due').value='';
-  if(!_fbOn){ renderAllTasks(); renderProjects(); }
+  document.getElementById('t-name').value='';
+  document.getElementById('t-desc').value='';
+  document.getElementById('t-due').value='';
+  document.querySelectorAll('#assign-grid .assign-chip').forEach(c=>c.classList.remove('selected'));
+  if(!_fbOn){ renderGestionTasks(); renderGestionProjects(); }
+}
+
+function openEditTask(id){
+  const t = _tasks.find(x=>x.id===id);
+  if(!t) return;
+  document.getElementById('et-id').value   = t.id;
+  document.getElementById('et-name').value = t.name;
+  document.getElementById('et-desc').value = t.desc||'';
+  document.getElementById('et-area').value = t.area||'general';
+  document.getElementById('et-prio').value = t.priority||'media';
+  document.getElementById('et-due').value  = t.dueDate||'';
+  populateProjSelects('et-proj', t.projectId);
+  // set assignees
+  document.querySelectorAll('#et-assign-grid .assign-chip').forEach(chip=>{
+    const val = chip.querySelector('input').value;
+    chip.classList.toggle('selected', (t.assignedUsers||[]).includes(val));
+  });
+  openModal('modal-task-edit');
+}
+
+async function saveTask(){
+  const id = document.getElementById('et-id').value;
+  const t  = _tasks.find(x=>x.id===id);
+  if(!t) return;
+  const assigned = [...document.querySelectorAll('#et-assign-grid .assign-chip.selected')].map(el=>el.querySelector('input').value);
+  Object.assign(t, {
+    name:          document.getElementById('et-name').value.trim(),
+    desc:          document.getElementById('et-desc').value.trim(),
+    area:          document.getElementById('et-area').value,
+    priority:      document.getElementById('et-prio').value,
+    dueDate:       document.getElementById('et-due').value,
+    projectId:     document.getElementById('et-proj').value,
+    assignedUsers: assigned,
+  });
+  await persistTask(t);
+  closeModal('modal-task-edit');
+  if(!_fbOn) refreshAll();
 }
 
 async function toggleTask(id){
-  const t = loadTasks().find(x=>x.id===id);
+  const t = _tasks.find(x=>x.id===id);
   if(!t) return;
   t.status = t.status==='done' ? 'pending' : 'done';
   await persistTask(t);
-  if(!_fbOn){
-    if(currentRole==='ceo'){ renderAllTasks(); renderProjects(); }
-    else renderRoleView(currentRole);
-  }
+  if(!_fbOn) refreshAll();
 }
 
 async function deleteTask(id){
   await removeTask(id);
-  if(!_fbOn){
-    if(currentRole==='ceo'){ renderAllTasks(); renderProjects(); }
-    else renderRoleView(currentRole);
-  }
+  if(!_fbOn) refreshAll();
 }
 
-function populateProjectSelect(){
-  const sel = document.getElementById('task-proyecto-sel');
-  const projects = loadProjects();
-  sel.innerHTML = projects.length
-    ? projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')
-    : '<option value="">— Sin proyectos —</option>';
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function toggleAssign(chip, _uid){
+  chip.classList.toggle('selected');
 }
 
-function renderAllTasks(){
-  const filter = document.getElementById('filter-role')?.value || 'all';
-  let tasks = loadTasks();
-  if(filter!=='all') tasks = tasks.filter(t=>t.assignedRole===filter);
-  const el = document.getElementById('all-tasks-list');
-  if(!tasks.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">✅</div><p>Sin tareas que mostrar.</p></div>';
-    return;
-  }
-  const projects = loadProjects();
-  // group by project
-  const byProj = {};
-  tasks.forEach(t=>{
-    if(!byProj[t.projectId]) byProj[t.projectId]=[];
-    byProj[t.projectId].push(t);
+function populateProjSelects(targetId, selectedId){
+  const ids = targetId ? [targetId] : ['t-proj','et-proj'];
+  ids.forEach(sid=>{
+    const sel = document.getElementById(sid);
+    if(!sel) return;
+    sel.innerHTML = _projects.length
+      ? _projects.map(p=>`<option value="${p.id}" ${p.id===selectedId?'selected':''}>${p.icon||'📁'} ${esc(p.name)}</option>`).join('')
+      : '<option value="">— Sin proyectos —</option>';
   });
-  el.innerHTML = Object.entries(byProj).map(([pid,ts])=>{
-    const proj = projects.find(p=>p.id===pid);
-    const pname = proj ? proj.name : 'Proyecto eliminado';
-    return `<div class="sec-label">${esc(pname)}</div>
-    <div style="background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:0 12px;margin-bottom:10px;">
-      ${ts.map(t=>taskHTML(t,true)).join('')}
-    </div>`;
-  }).join('');
 }
 
-/* ───────────────────────────────────────────────
-   ROLE VIEW
-─────────────────────────────────────────────── */
-function renderRoleView(role){
-  const allTasks = loadTasks().filter(t=>t.assignedRole===role);
-  const projects = loadProjects();
-  const el = document.getElementById('role-tasks-by-project');
-  const countEl = document.getElementById('role-task-count');
+function openModal(id){ document.getElementById(id)?.classList.add('open'); }
+function closeModal(id){ document.getElementById(id)?.classList.remove('open'); }
 
-  const pending = allTasks.filter(t=>t.status!=='done').length;
-  const total   = allTasks.length;
-  countEl.textContent = `${pending} pendiente${pending!==1?'s':''} / ${total} total`;
+document.querySelectorAll('.modal-ov').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+});
 
-  if(!total){
-    el.innerHTML='<div class="empty"><div class="empty-icon">🌙</div><p>No tienes tareas asignadas aún.</p></div>';
-    return;
-  }
-
-  const byProj = {};
-  allTasks.forEach(t=>{
-    if(!byProj[t.projectId]) byProj[t.projectId]=[];
-    byProj[t.projectId].push(t);
-  });
-
-  el.innerHTML = Object.entries(byProj).map(([pid,ts])=>{
-    const proj = projects.find(p=>p.id===pid);
-    const pname = proj ? proj.name : 'Proyecto';
-    const picon = proj ? proj.icon : '📁';
-    const cyclic = proj && proj.type==='cyclic';
-    const cycleLabel = {weekly:'Semanal',biweekly:'Quincenal',monthly:'Mensual'}[proj?.cycle]||'';
-    const doneCount = ts.filter(t=>t.status==='done').length;
-    const pct = Math.round(doneCount/ts.length*100);
-    return `
-    <div class="panel" style="margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <span style="font-size:20px;">${picon}</span>
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:700;">${esc(pname)}</div>
-          <div style="display:flex;gap:5px;margin-top:3px;">
-            ${cyclic ? `<span class="bdg bdg-cyclic">🔄 ${cycleLabel}</span>` : '<span class="bdg bdg-once">📌 Único</span>'}
-          </div>
-        </div>
-        <span class="txt-xs txt-muted">${pct}%</span>
-      </div>
-      <div class="prog-bar-bg" style="margin-bottom:12px;"><div class="prog-bar" style="width:${pct}%"></div></div>
-      ${ts.map(t=>taskHTML(t,false)).join('')}
-    </div>`;
-  }).join('');
-}
-
-/* ───────────────────────────────────────────────
-   CEO REVISION
-─────────────────────────────────────────────── */
-function renderRevision(){
-  const projects = loadProjects();
-  const tasks    = loadTasks();
-  const done     = tasks.filter(t=>t.status==='done').length;
-  const pending  = tasks.length - done;
-
-  // stats
-  document.getElementById('ceo-stats').innerHTML = `
-    <div class="stat-box"><div class="stat-num">${projects.length}</div><div class="stat-lbl">Proyectos</div></div>
-    <div class="stat-box"><div class="stat-num">${tasks.length}</div><div class="stat-lbl">Tareas</div></div>
-    <div class="stat-box"><div class="stat-num">${tasks.length?Math.round(done/tasks.length*100):0}%</div><div class="stat-lbl">Completado</div></div>
-  `;
-
-  // project table
-  const wrap = document.getElementById('review-table-wrap');
-  if(!projects.length){
-    wrap.innerHTML='<div class="empty"><p>Sin proyectos todavía.</p></div>';
-  } else {
-    wrap.innerHTML = `
-    <table class="review-table">
-      <thead><tr>
-        <th>Proyecto</th><th>Tipo</th><th>Tareas</th><th>Done</th><th>%</th><th>Estado</th>
-      </tr></thead>
-      <tbody>${projects.map(p=>{
-        const pt = tasks.filter(t=>t.projectId===p.id);
-        const pd = pt.filter(t=>t.status==='done').length;
-        const pct= pt.length?Math.round(pd/pt.length*100):0;
-        const cLabel={weekly:'Semanal',biweekly:'Quincenal',monthly:'Mensual'}[p.cycle]||'';
-        return `<tr>
-          <td><span style="margin-right:6px;">${p.icon}</span>${esc(p.name)}</td>
-          <td>${p.type==='cyclic'?`<span class="bdg bdg-cyclic">🔄 ${cLabel}</span>`:'<span class="bdg bdg-once">Único</span>'}</td>
-          <td>${pt.length}</td>
-          <td>${pd}</td>
-          <td>
-            <div class="prog-bar-bg" style="width:80px;display:inline-block;vertical-align:middle;">
-              <div class="prog-bar" style="width:${pct}%"></div>
-            </div>
-            <span style="margin-left:6px;font-size:10px;">${pct}%</span>
-          </td>
-          <td><span class="bdg bdg-${p.status==='active'?'active':p.status==='paused'?'paused':'done'}">${{active:'Activo',paused:'Pausado',done:'Listo'}[p.status]}</span></td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table>`;
-  }
-
-  // role load
-  const roles = ['estratega','asistente','diseno','ceo'];
-  const roleWrap = document.getElementById('role-load-wrap');
-  roleWrap.innerHTML = roles.map(r=>{
-    const rt = tasks.filter(t=>t.assignedRole===r);
-    const rd = rt.filter(t=>t.status==='done').length;
-    const rp = rt.length-rd;
-    const pct= rt.length?Math.round(rd/rt.length*100):0;
-    const rinfo = ROLES[r];
-    return `
-    <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd);">
-      <span style="font-size:16px;width:24px;text-align:center;">${rinfo.icon}</span>
-      <div style="flex:1;">
-        <div style="font-size:12px;font-weight:600;">${rinfo.label}</div>
-        <div style="font-size:10px;color:var(--tx3);">${rp} pendiente${rp!==1?'s':''} · ${rd} completada${rd!==1?'s':''}</div>
-      </div>
-      <div style="text-align:right;width:100px;">
-        <div class="prog-bar-bg"><div class="prog-bar" style="width:${pct}%"></div></div>
-        <div style="font-size:10px;color:var(--tx3);margin-top:3px;">${pct}%</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-/* ───────────────────────────────────────────────
-   UTIL
-─────────────────────────────────────────────── */
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-/* ── Exponer funciones al HTML (onclick) desde módulo ES ── */
-window.selectRole        = selectRole;
-window.showRoleSelect    = showRoleSelect;
-window.ceoTab            = ceoTab;
-window.openModal         = openModal;
-window.closeModal        = closeModal;
-window.toggleCyclePeriod = toggleCyclePeriod;
-window.createProject     = createProject;
-window.deleteProject     = deleteProject;
-window.toggleProjectStatus = toggleProjectStatus;
-window.toggleExpand      = toggleExpand;
-window.createTask        = createTask;
-window.toggleTask        = toggleTask;
-window.deleteTask        = deleteTask;
-window.renderAllTasks    = renderAllTasks;
+/* ═══════════════════════════════════════
+   WINDOW EXPORTS
+═══════════════════════════════════════ */
+window.login            = login;
+window.logout           = logout;
+window.mainTab          = mainTab;
+window.subTab           = subTab;
+window.openModal        = openModal;
+window.closeModal       = closeModal;
+window.toggleTask       = toggleTask;
+window.deleteTask       = deleteTask;
+window.openEditTask     = openEditTask;
+window.saveTask         = saveTask;
+window.createTask       = createTask;
+window.saveProject      = saveProject;
+window.deleteProject    = deleteProject;
+window.openEditProject  = openEditProject;
+window.toggleExpandProj = toggleExpandProj;
+window.toggleAssign     = toggleAssign;
+window.renderGestionTasks = renderGestionTasks;
 
-/* ── Arranque ── */
-initData();
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+(async ()=>{
+  await initData();
+  const saved = localStorage.getItem(LS_USER);
+  if(saved && USERS[saved]){
+    currentUser = USERS[saved];
+    showApp();
+  }
+})();
 </script>
 </body>
 </html>
