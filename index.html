@@ -707,6 +707,7 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
   </div>
 </div>
 
+<script src="seed-data.js"></script>
 <script type="module">
 import { firebaseInit, isConnected, listenProjects, listenTasks,
          fbSaveProject, fbDeleteProject, fbSaveTask, fbDeleteTask,
@@ -827,7 +828,6 @@ async function toggleLive(){
     _fbOn=false;
     fbStopListening();
     setSyncDot(false);
-    // reload from localStorage (persisted on every write)
     _projects=JSON.parse(localStorage.getItem(LS.proj)||'[]');
     _tasks   =JSON.parse(localStorage.getItem(LS.task)||'[]');
     onDataChange();
@@ -838,19 +838,45 @@ async function toggleLive(){
       return;
     }
     _fbOn=true;
-    setSyncDot(true);
-    listenProjects(docs=>{ _projects=docs; onDataChange(); });
-    listenTasks(docs=>{ _tasks=docs; onDataChange(); });
+    setSyncDot('connecting');
+    // First load — if Firebase is empty, upload local data (one-time sync-up)
+    let projSynced=false, taskSynced=false;
+    listenProjects(async docs=>{
+      if(!projSynced){
+        projSynced=true;
+        if(docs.length===0 && _projects.length>0){
+          setSyncDot('uploading');
+          for(const p of _projects) await fbSaveProject(p);
+        }
+      }
+      _projects=docs; onDataChange(); setSyncDot(true);
+    });
+    listenTasks(async docs=>{
+      if(!taskSynced){
+        taskSynced=true;
+        if(docs.length===0 && _tasks.length>0){
+          for(const t of _tasks) await fbSaveTask(t);
+        }
+      }
+      _tasks=docs; onDataChange(); setSyncDot(true);
+    });
+  }
+}
+function setSyncDot(state){
+  const d=document.getElementById('sync-dot'); if(!d) return;
+  if(state===true){
+    d.textContent='On Live'; d.style.color='var(--grn)';
+    d.style.background='var(--grn2)'; d.style.borderColor='var(--grn3)';
+  } else if(state==='connecting'||state==='uploading'){
+    const lbl=state==='uploading'?'Subiendo…':'Conectando…';
+    d.textContent=lbl; d.style.color='var(--yel)';
+    d.style.background='var(--yel2)'; d.style.borderColor='var(--yel3)';
+  } else {
+    d.textContent='Off Live'; d.style.color='var(--tx3)';
+    d.style.background='var(--bg3)'; d.style.borderColor='var(--bd2)';
   }
 }
 
-function setSyncDot(on){
-  const d=document.getElementById('sync-dot'); if(!d) return;
-  d.textContent=on?'On Live':'Off Live';
-  d.style.color=on?'var(--grn)':'var(--tx3)';
-  d.style.background=on?'var(--grn2)':'var(--bg3)';
-  d.style.borderColor=on?'var(--grn3)':'var(--bd2)';
-}
 function onDataChange(){
   if(!currentUser) return;
   if(currentView==='tasks')       renderDashboard();
