@@ -338,7 +338,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-hei
       <div class="page-hdr"><div class="page-title">Gestión</div></div>
       <div class="panel">
         <div class="panel-hdr"><span class="panel-ttl">Nueva Tarea</span></div>
-        <div class="fi"><label>Proyecto</label><select id="g-proj"></select></div>
+        <div class="fi"><label>Proyecto</label><select id="g-proj" onchange="updateGestionStates(this.value)"></select></div>
         <div class="fi"><label>Nombre</label><input type="text" id="g-name" placeholder="Ej. Publicación IG Lunes"></div>
         <div class="fi"><label>Descripción</label><textarea id="g-desc" placeholder="Detalles, links, referencias…"></textarea></div>
         <div class="form-row">
@@ -371,14 +371,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-hei
           <div class="fi"><label>Fecha inicio</label><input type="date" id="g-start"></div>
           <div class="fi"><label>Fecha fin</label><input type="date" id="g-end"></div>
         </div>
-        <div class="fi"><label>Estado kanban</label>
-          <select id="g-kstatus">
-            <option value="investigacion">🔍 Investigación</option>
-            <option value="ideacion">💡 Ideación</option>
-            <option value="planeacion">📋 Planeación</option>
-            <option value="ejecucion">⚡ Ejecución</option>
-            <option value="cierre">✅ Cierre</option>
-          </select>
+        <div class="fi"><label id="g-state-lbl">Estado</label>
+          <select id="g-kstatus"></select>
         </div>
         <button class="btn btn-p w-full" onclick="createTask()">Crear Tarea</button>
       </div>
@@ -491,7 +485,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-hei
     <div class="fi"><label>Nombre</label><input type="text" id="tf-name" placeholder="Nombre de la tarea"></div>
     <div class="fi"><label>Descripción</label><textarea id="tf-desc" placeholder="Detalles, notas…"></textarea></div>
     <div class="form-row">
-      <div class="fi"><label>Proyecto</label><select id="tf-proj"></select></div>
+      <div class="fi"><label>Proyecto</label><select id="tf-proj" onchange="updateTaskFormStates(this.value)"></select></div>
       <div class="fi"><label>Área</label>
         <select id="tf-area">
           <option value="marketing">📣 Marketing</option>
@@ -510,14 +504,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-hei
           <option value="baja">🟢 Baja</option>
         </select>
       </div>
-      <div class="fi"><label>Estado</label>
-        <select id="tf-kstatus">
-          <option value="investigacion">🔍 Investigación</option>
-          <option value="ideacion">💡 Ideación</option>
-          <option value="planeacion">📋 Planeación</option>
-          <option value="ejecucion">⚡ Ejecución</option>
-          <option value="cierre">✅ Cierre</option>
-        </select>
+      <div class="fi" id="tf-state-wrap"><label id="tf-state-lbl">Estado</label>
+        <select id="tf-kstatus"></select>
       </div>
     </div>
     <div class="fi"><label>Asignar a</label>
@@ -598,11 +586,18 @@ const PRIOS = {
   baja: {label:'Baja', cls:'bg'},
 };
 const KB_COLS = [
-  {id:'investigacion', label:'Investigación', icon:'🔍', cls:'bb'},
-  {id:'ideacion',      label:'Ideación',      icon:'💡', cls:'by'},
-  {id:'planeacion',    label:'Planeación',    icon:'📋', cls:'bo'},
-  {id:'ejecucion',     label:'Ejecución',     icon:'⚡', cls:'br'},
-  {id:'cierre',        label:'Cierre',        icon:'✅', cls:'bg'},
+  {id:'investigacion', label:'Investigación', icon:'🔍', cls:'bb', color:'var(--blu)'},
+  {id:'ideacion',      label:'Ideación',      icon:'💡', cls:'by', color:'var(--yel)'},
+  {id:'planeacion',    label:'Planeación',    icon:'📋', cls:'bo', color:'var(--org)'},
+  {id:'ejecucion',     label:'Ejecución',     icon:'⚡', cls:'br', color:'var(--red)'},
+  {id:'cierre',        label:'Cierre',        icon:'✅', cls:'bg', color:'var(--grn)'},
+];
+const CAL_COLS = [
+  {id:'idea',      label:'Idea',      icon:'💡', cls:'bb', color:'var(--blu)',  done:false},
+  {id:'edicion',   label:'Edición',   icon:'✂️',  cls:'by', color:'var(--yel)', done:false},
+  {id:'ajustes',   label:'Ajustes',   icon:'🔧', cls:'bo', color:'var(--org)',  done:false},
+  {id:'aprobado',  label:'Aprobado',  icon:'👍', cls:'bg', color:'var(--grn)',  done:false},
+  {id:'publicado', label:'Publicado', icon:'🚀', cls:'bp', color:'var(--pur)',  done:true },
 ];
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAYS_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -752,7 +747,7 @@ function navigate(view, projId){
   if(view==='tasks')       renderDashboard();
   if(view==='projs')       renderProjGrid();
   if(view==='proj-detail') renderProjDetail(currentProjId);
-  if(view==='gestion')     { populateProjSels('g-proj'); renderGTaskList(); }
+  if(view==='gestion')     { populateProjSels('g-proj'); const fp=_projects[0]?.id; updateGestionStates(fp||''); renderGTaskList(); }
   if(view==='revision')    renderRevision();
 }
 function goBack(){ navigate('projs'); }
@@ -836,14 +831,25 @@ function taskRowHTML(t){
     const rm=ROLES[u.role];
     return `<div class="udot" style="width:18px;height:18px;font-size:7px;background:${rm.bg};color:${rm.color};" title="${u.name}">${u.ini}</div>`;
   }).join('');
+  // state badge depending on project methodology
+  const projMeth=proj?.meth||'lista';
+  let stateBdg='';
+  if(projMeth==='kanban'){
+    const kcol=KB_COLS.find(c=>c.id===(t.kStatus||'investigacion'));
+    if(kcol) stateBdg=`<span class="bdg ${kcol.cls}" style="display:none;">${kcol.icon} ${kcol.label}</span>`;
+  } else if(projMeth==='calendario'){
+    const ccol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
+    stateBdg=`<span class="bdg ${ccol.cls}">${ccol.icon} ${ccol.label}</span>`;
+  }
+
   return `<div class="task-row ${done?'done-r':''}" onclick="openTaskDetail('${t.id}')">
     <div class="tr-chk ${done?'on':''}" onclick="event.stopPropagation();toggleTask('${t.id}')">
       <svg viewBox="0 0 12 10" fill="none" stroke-width="2.5"><polyline points="1,5 4.5,8.5 11,1"/></svg>
     </div>
     <div class="tr-name ${done?'done':''}">${esc(t.name)}</div>
     <div class="tr-meta">
-      ${proj?`<span class="txt-xs txt-muted" style="display:none;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${proj.icon||'📁'} ${esc(proj.name)}</span>`:''}
       <span class="bdg ${am.cls}">${am.icon}</span>
+      ${stateBdg}
       <span class="bdg ${pm.cls}">${pm.label}</span>
       ${dateStr?`<span class="txt-xs txt-muted" style="white-space:nowrap;">📅 ${dateStr}</span>`:''}
       <div class="flex" style="gap:2px;">${dots}</div>
@@ -905,11 +911,27 @@ function refreshDetailPopup(){
     </div>`;
   }).join('');
 
-  // kanban states
-  document.getElementById('tdp-states').innerHTML=KB_COLS.map(col=>{
-    const isOn=(t.kStatus||'investigacion')===col.id;
-    return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}')">${col.icon} ${col.label}</button>`;
-  }).join('');
+  // states — depend on project methodology
+  const meth=proj?.meth||'lista';
+  const statesEl=document.getElementById('tdp-states');
+  const statesLbl=document.getElementById('tdp-states-lbl');
+  if(meth==='kanban'){
+    statesLbl.style.display='block';
+    statesEl.innerHTML=KB_COLS.map(col=>{
+      const isOn=(t.kStatus||'investigacion')===col.id;
+      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','kanban')">${col.icon} ${col.label}</button>`;
+    }).join('');
+  } else if(meth==='calendario'){
+    statesLbl.style.display='block';
+    statesEl.innerHTML=CAL_COLS.map(col=>{
+      const isOn=(t.calStatus||'idea')===col.id;
+      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','calendario')">${col.icon} ${col.label}</button>`;
+    }).join('');
+  } else {
+    // lista — no states, just the done toggle
+    statesLbl.style.display='none';
+    statesEl.innerHTML='';
+  }
 
   // done button
   document.getElementById('tdp-done-btn').textContent=done?'↩ Reabrir':'✓ Completar';
@@ -926,19 +948,32 @@ async function tdpToggleUser(userId){
   if(!_fbOn) refreshDetailPopup();
 }
 
-async function tdpSetState(colId){
+async function tdpSetState(colId, meth){
   const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
-  t.kStatus=colId;
-  t.status=colId==='cierre'?'done':'pending';
+  if(meth==='calendario'){
+    t.calStatus=colId;
+    const col=CAL_COLS.find(c=>c.id===colId);
+    t.status=col?.done?'done':'pending';
+  } else {
+    t.kStatus=colId;
+    t.status=colId==='cierre'?'done':'pending';
+  }
   await persistTask(t);
   if(!_fbOn){ refreshDetailPopup(); onDataChange(); }
 }
 
 async function tdpToggleDone(){
   const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
+  const proj=_projects.find(p=>p.id===t.projectId);
+  const meth=proj?.meth||'lista';
   t.status=t.status==='done'?'pending':'done';
-  if(t.status==='done') t.kStatus='cierre';
-  if(t.status==='pending'&&t.kStatus==='cierre') t.kStatus='ejecucion';
+  if(meth==='calendario'){
+    if(t.status==='done') t.calStatus='publicado';
+    if(t.status==='pending'&&t.calStatus==='publicado') t.calStatus='aprobado';
+  } else {
+    if(t.status==='done') t.kStatus='cierre';
+    if(t.status==='pending'&&t.kStatus==='cierre') t.kStatus='ejecucion';
+  }
   await persistTask(t);
   if(!_fbOn){ refreshDetailPopup(); onDataChange(); }
 }
@@ -1181,14 +1216,16 @@ function renderCalHTML(projId){
       return dStr>=s && dStr<=e;
     });
     const chips=dayTasks.map(t=>{
-      const am=AREAS[t.area]||AREAS.general;
       const isStart=(tStart(t)||tEnd(t))===dStr;
-      const color=am.color||'var(--tx3)';
+      const calCol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
+      const color=calCol.color;
       const title=esc(t.name);
       return `<div class="cal-chip ${t.status==='done'?'done-c':''} ${isStart?'':'span-day'}"
         style="background:${color}22;color:${color};border:1px solid ${color}44;"
         onclick="event.stopPropagation();openTaskDetail('${t.id}')"
-        title="${title}">${isStart?title:'▸'}</div>`;
+        title="${calCol.icon} ${calCol.label} — ${title}">
+        ${isStart?`<span style="font-size:8px;">${calCol.icon}</span> ${title}`:'▸'}
+      </div>`;
     }).join('');
     const addHint=isCeo?`<div class="cal-add-hint">+ tarea</div>`:'';
     const clickHandler=isCeo?`calDayClick('${dStr}','${projId}')`:'';
@@ -1382,33 +1419,74 @@ function openNewTaskForProj(projId){
   openTaskForm(null, projId);
 }
 
+/* ── State options by methodology ── */
+function stateOptionsHTML(meth, currentVal){
+  if(meth==='calendario'){
+    return CAL_COLS.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
+  } else if(meth==='kanban'){
+    return KB_COLS.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
+  }
+  return ''; // lista — no state needed
+}
+function updateTaskFormStates(projId, currentVal){
+  const p=_projects.find(x=>x.id===projId);
+  const meth=p?.meth||'lista';
+  const wrap=document.getElementById('tf-state-wrap');
+  const lbl=document.getElementById('tf-state-lbl');
+  const sel=document.getElementById('tf-kstatus');
+  if(meth==='lista'){
+    wrap.style.display='none';
+  } else {
+    wrap.style.display='block';
+    lbl.textContent=meth==='calendario'?'Estado contenido':'Estado kanban';
+    sel.innerHTML=stateOptionsHTML(meth, currentVal||(meth==='calendario'?'idea':'investigacion'));
+  }
+}
+function updateGestionStates(projId, currentVal){
+  const p=_projects.find(x=>x.id===projId);
+  const meth=p?.meth||'lista';
+  const lbl=document.getElementById('g-state-lbl');
+  const sel=document.getElementById('g-kstatus');
+  if(meth==='lista'){
+    lbl.textContent='Estado';
+    sel.innerHTML='<option value="pending">⬜ Pendiente</option><option value="done">✅ Completada</option>';
+  } else {
+    lbl.textContent=meth==='calendario'?'Estado contenido':'Estado kanban';
+    sel.innerHTML=stateOptionsHTML(meth, currentVal||(meth==='calendario'?'idea':'investigacion'));
+  }
+}
+
 // openTaskForm(taskId, projId, prefilledStartDate)
 function openTaskForm(taskId, projId, preDate){
-  populateProjSels('tf-proj', projId);
   if(taskId){
     // editing
     const t=_tasks.find(x=>x.id===taskId); if(!t) return;
-    document.getElementById('tf-id').value     =t.id;
-    document.getElementById('tf-name').value   =t.name;
-    document.getElementById('tf-desc').value   =t.desc||'';
-    document.getElementById('tf-area').value   =t.area||'general';
-    document.getElementById('tf-prio').value   =t.priority||'media';
-    document.getElementById('tf-kstatus').value=t.kStatus||'investigacion';
-    document.getElementById('tf-start').value  =tStart(t);
-    document.getElementById('tf-end').value    =tEnd(t);
-    populateProjSels('tf-proj',t.projectId);
+    const proj=_projects.find(p=>p.id===t.projectId);
+    const meth=proj?.meth||'lista';
+    populateProjSels('tf-proj', t.projectId);
+    const currentState=meth==='calendario'?(t.calStatus||'idea'):(t.kStatus||'investigacion');
+    updateTaskFormStates(t.projectId, currentState);
+    document.getElementById('tf-id').value   =t.id;
+    document.getElementById('tf-name').value =t.name;
+    document.getElementById('tf-desc').value =t.desc||'';
+    document.getElementById('tf-area').value =t.area||'general';
+    document.getElementById('tf-prio').value =t.priority||'media';
+    document.getElementById('tf-start').value=tStart(t);
+    document.getElementById('tf-end').value  =tEnd(t);
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>{
       c.classList.toggle('sel',(t.assignedUsers||[]).includes(c.querySelector('input').value));
     });
     document.getElementById('tf-ttl').textContent='Editar Tarea';
   } else {
     // new
+    const useProjId=projId||_projects[0]?.id||'';
+    populateProjSels('tf-proj', useProjId);
+    updateTaskFormStates(useProjId);
     document.getElementById('tf-id').value   ='';
     document.getElementById('tf-name').value ='';
     document.getElementById('tf-desc').value ='';
     document.getElementById('tf-area').value ='marketing';
     document.getElementById('tf-prio').value ='media';
-    document.getElementById('tf-kstatus').value='investigacion';
     document.getElementById('tf-start').value=preDate||'';
     document.getElementById('tf-end').value  ='';
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>c.classList.remove('sel'));
@@ -1423,24 +1501,36 @@ async function saveTaskForm(){
   if(!name) return alert('Nombre requerido.');
   const projId=document.getElementById('tf-proj').value;
   if(!projId) return alert('Selecciona un proyecto.');
+  const proj=_projects.find(p=>p.id===projId);
+  const meth=proj?.meth||'lista';
   const assigned=[...document.querySelectorAll('#tf-assign .a-chip.sel')].map(c=>c.querySelector('input').value);
   const startDate=document.getElementById('tf-start').value;
   const endDate  =document.getElementById('tf-end').value;
-  const ks=document.getElementById('tf-kstatus').value;
-
+  const stateVal=document.getElementById('tf-kstatus').value;
   const existing=idVal?_tasks.find(x=>x.id===idVal):null;
+
+  let kStatus='investigacion', calStatus='idea', status='pending';
+  if(meth==='calendario'){
+    calStatus=stateVal||'idea';
+    const col=CAL_COLS.find(c=>c.id===calStatus);
+    status=col?.done?'done':'pending';
+  } else if(meth==='kanban'){
+    kStatus=stateVal||'investigacion';
+    status=kStatus==='cierre'?'done':'pending';
+  } else {
+    // lista — preserve existing status
+    status=existing?.status||'pending';
+  }
+
   const t={
     id: idVal||uid(),
     projectId:projId, name,
-    desc:   document.getElementById('tf-desc').value.trim(),
-    area:   document.getElementById('tf-area').value,
-    priority:document.getElementById('tf-prio').value,
-    startDate,
-    endDate,
-    dueDate:endDate, // backward compat
+    desc:     document.getElementById('tf-desc').value.trim(),
+    area:     document.getElementById('tf-area').value,
+    priority: document.getElementById('tf-prio').value,
+    startDate, endDate, dueDate:endDate,
     assignedUsers:assigned,
-    kStatus:ks,
-    status: ks==='cierre'?'done':(existing?.status||'pending'),
+    kStatus, calStatus, status,
     createdAt:existing?.createdAt||Date.now(),
   };
   await persistTask(t);
@@ -1454,10 +1544,23 @@ async function createTask(){
   const name=document.getElementById('g-name').value.trim();
   if(!projId) return alert('Selecciona proyecto.');
   if(!name)   return alert('Nombre requerido.');
+  const proj=_projects.find(p=>p.id===projId);
+  const meth=proj?.meth||'lista';
   const assigned=[...document.querySelectorAll('#g-assign .a-chip.sel')].map(c=>c.querySelector('input').value);
   const startDate=document.getElementById('g-start').value;
   const endDate  =document.getElementById('g-end').value;
-  const ks=document.getElementById('g-kstatus').value;
+  const stateVal=document.getElementById('g-kstatus').value;
+
+  let kStatus='investigacion', calStatus='idea', status='pending';
+  if(meth==='calendario'){
+    calStatus=stateVal||'idea';
+    const col=CAL_COLS.find(c=>c.id===calStatus);
+    status=col?.done?'done':'pending';
+  } else if(meth==='kanban'){
+    kStatus=stateVal||'investigacion';
+    status=kStatus==='cierre'?'done':'pending';
+  }
+
   const t={
     id:uid(), projectId:projId, name,
     desc:document.getElementById('g-desc').value.trim(),
@@ -1465,14 +1568,13 @@ async function createTask(){
     priority:document.getElementById('g-prio').value,
     startDate, endDate, dueDate:endDate,
     assignedUsers:assigned,
-    kStatus:ks,
-    status:ks==='cierre'?'done':'pending',
+    kStatus, calStatus, status,
     createdAt:Date.now(),
   };
   await persistTask(t);
   ['g-name','g-desc','g-start','g-end'].forEach(i=>document.getElementById(i).value='');
   document.querySelectorAll('#g-assign .a-chip').forEach(c=>c.classList.remove('sel'));
-  if(!_fbOn) renderGTaskList();
+  if(!_fbOn){ renderGTaskList(); onDataChange(); }
 }
 
 async function toggleTask(id){
@@ -1523,6 +1625,7 @@ Object.assign(window,{
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
   toggleChip,
+  updateTaskFormStates, updateGestionStates,
 });
 
 /* ═══════════════════════════════════════
