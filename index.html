@@ -92,8 +92,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--tx);min-heigh
 .nav-right{display:flex;align-items:center;gap:7px;margin-left:auto;}
 .theme-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
 .theme-btn:hover{background:var(--bg4);}
-.sync-dot{font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--tx3);border:1px solid var(--bd2);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:5px;}
-.sync-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.sync-dot{font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--tx3);border:1px solid var(--bd2);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;transition:opacity .18s;}
+.sync-dot:hover{opacity:.75;}
+.sync-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;transition:background .18s;}
 .user-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:2px solid var(--ac3);background:var(--ac2);color:var(--accent);cursor:pointer;flex-shrink:0;letter-spacing:.03em;}
 
 /* ── LOGIN ── */
@@ -397,7 +398,7 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <div class="nav-brand">FC<em>NOISE.</em></div>
     <div class="nav-links" id="nav-links"></div>
     <div class="nav-right">
-      <div class="sync-dot" id="sync-dot">💾 Local</div>
+      <div class="sync-dot" id="sync-dot" onclick="toggleLive()" title="Clic para conectar / desconectar en tiempo real" style="cursor:pointer;">Off Live</div>
       <div class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Modo claro / oscuro"></div>
       <div class="user-av" id="nav-av" title="Perfil"></div>
     </div>
@@ -633,14 +634,10 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 
     <!-- Contenido-only fields -->
     <div id="tf-contenido-fields" style="display:none;">
-      <div class="fi"><label>Estado del contenido</label>
-        <select id="tf-calstatus">
-          <option value="idea">💡 Idea</option>
-          <option value="edicion">✂️ Edición</option>
-          <option value="ajuste">🔧 Ajuste</option>
-          <option value="aprobado">👍 Aprobado</option>
-          <option value="publicado">🚀 Publicado</option>
-        </select>
+      <div class="fi">
+        <label>Estado del contenido</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-cal-pills"></div>
+        <input type="hidden" id="tf-calstatus" value="idea">
       </div>
     </div>
 
@@ -686,8 +683,8 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <div class="tdp-divider"></div>
     <div class="tdp-acts">
       <button class="btn btn-g btn-sm" id="tdp-done-btn" onclick="tdpToggleDone()"></button>
-      <button class="btn btn-g btn-sm" onclick="tdpEdit()">✏️ Editar</button>
-      <button class="btn btn-g btn-sm btn-del" style="margin-left:auto;" onclick="tdpDelete()">🗑 Eliminar</button>
+      <button class="btn btn-g btn-sm" id="tdp-edit-btn" onclick="tdpEdit()">✏️ Editar</button>
+      <button class="btn btn-g btn-sm btn-del" id="tdp-del-btn" style="margin-left:auto;" onclick="tdpDelete()">🗑 Eliminar</button>
     </div>
   </div>
 </div>
@@ -712,7 +709,8 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 
 <script type="module">
 import { firebaseInit, isConnected, listenProjects, listenTasks,
-         fbSaveProject, fbDeleteProject, fbSaveTask, fbDeleteTask } from './firebase.js';
+         fbSaveProject, fbDeleteProject, fbSaveTask, fbDeleteTask,
+         fbStopListening } from './firebase.js';
 
 /* ═══════════════════════════════════════
    CONSTANTS
@@ -815,16 +813,37 @@ function todayStr(){ return new Date().toISOString().split('T')[0]; }
    FIREBASE
 ═══════════════════════════════════════ */
 async function initData(){
-  _fbOn = firebaseInit();
-  setSyncDot(_fbOn);
+  // Init Firebase SDK silently (no listeners yet — user must turn ON LIVE manually)
+  firebaseInit();
+  _fbOn=false;
+  setSyncDot(false);
+  _projects=JSON.parse(localStorage.getItem(LS.proj)||'[]');
+  _tasks   =JSON.parse(localStorage.getItem(LS.task)||'[]');
+}
+
+async function toggleLive(){
   if(_fbOn){
-    listenProjects(docs=>{ _projects=docs; onDataChange(); });
-    listenTasks(docs=>{ _tasks=docs; onDataChange(); });
-  } else {
+    // ── GO OFFLINE ──
+    _fbOn=false;
+    fbStopListening();
+    setSyncDot(false);
+    // reload from localStorage (persisted on every write)
     _projects=JSON.parse(localStorage.getItem(LS.proj)||'[]');
     _tasks   =JSON.parse(localStorage.getItem(LS.task)||'[]');
+    onDataChange();
+  } else {
+    // ── GO LIVE ──
+    if(!isConnected()){
+      alert('Firebase no disponible. Revisa la configuración.');
+      return;
+    }
+    _fbOn=true;
+    setSyncDot(true);
+    listenProjects(docs=>{ _projects=docs; onDataChange(); });
+    listenTasks(docs=>{ _tasks=docs; onDataChange(); });
   }
 }
+
 function setSyncDot(on){
   const d=document.getElementById('sync-dot'); if(!d) return;
   d.textContent=on?'On Live':'Off Live';
@@ -1104,6 +1123,13 @@ function refreshDetailPopup(){
   document.getElementById('tdp-done-btn').style.background=done?'var(--bg5)':'var(--grn2)';
   document.getElementById('tdp-done-btn').style.color=done?'var(--tx2)':'var(--grn)';
   document.getElementById('tdp-done-btn').style.borderColor=done?'var(--bd2)':'var(--grn3)';
+  // permissions
+  const isCeo_=currentUser?.role==='ceo';
+  const isAssigned_=(t.assignedUsers||[]).includes(currentUser?.id);
+  const editBtn=document.getElementById('tdp-edit-btn');
+  const delBtn=document.getElementById('tdp-del-btn');
+  if(editBtn) editBtn.style.display=(isCeo_||isAssigned_)?'':'none';
+  if(delBtn)  delBtn.style.display=isCeo_?'':'none';
 }
 
 async function tdpToggleUser(userId){
@@ -1260,7 +1286,8 @@ function renderProjDetail(id){
     <div class="prog-bg" style="height:8px;margin-top:6px;border-radius:6px;">
       <div class="prog-fill" style="width:${pct}%;background:${fillMap[am.cls]||'var(--tx3)'};border-radius:6px;"></div>
     </div>`;
-  document.getElementById('detail-actions').innerHTML=isCeo
+  const canAddTask=isCeo||(p.team||[]).includes(currentUser.id);
+  document.getElementById('detail-actions').innerHTML=canAddTask
     ?`<button class="btn btn-p btn-sm" onclick="openNewTaskForProj('${id}')">+ Tarea</button>`:'';
   renderMethContent(id, meth);
 }
@@ -1597,6 +1624,24 @@ function openNewTaskForProj(projId){
   openTaskForm(null, projId);
 }
 
+/* ── Contenido state pills ── */
+function populateCalPills(selectedId){
+  const container=document.getElementById('tf-cal-pills');
+  const hidden=document.getElementById('tf-calstatus');
+  if(!container) return;
+  const sel=selectedId||'idea';
+  container.innerHTML=CAL_COLS.map(c=>
+    `<button type="button" class="tdp-state ${c.id===sel?'on':''}"
+      onclick="selectCalPill(this,'${c.id}')">${c.icon} ${c.label}</button>`
+  ).join('');
+  if(hidden) hidden.value=sel;
+}
+function selectCalPill(btn, id){
+  document.querySelectorAll('#tf-cal-pills .tdp-state').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('tf-calstatus').value=id;
+}
+
 /* ── Task type toggle (Tarea / Contenido) ── */
 function switchTaskType(type){
   document.getElementById('tf-type').value=type;
@@ -1610,7 +1655,9 @@ function switchTaskType(type){
   document.getElementById('tf-start-lbl').textContent=isContent?'Fecha de entrega':'Fecha inicio';
   document.getElementById('tf-end-lbl').textContent  =isContent?'Fecha de publicación':'Fecha fin';
   // Populate states
-  if(!isContent){
+  if(isContent){
+    populateCalPills(document.getElementById('tf-calstatus').value||'idea');
+  } else {
     updateTaskFormStates(document.getElementById('tf-proj').value);
   }
 }
@@ -1663,7 +1710,7 @@ function openTaskForm(taskId, projId, preDate){
     const currentState=editType==='contenido'?(t.calStatus||'idea'):(t.taskStatus||'pendiente');
     switchTaskType(editType);
     if(editType==='tarea') updateTaskFormStates(t.projectId, currentState);
-    if(editType==='contenido') document.getElementById('tf-calstatus').value=currentState;
+    if(editType==='contenido') populateCalPills(currentState);
     document.getElementById('tf-id').value   =t.id;
     document.getElementById('tf-name').value =t.name;
     document.getElementById('tf-desc').value =t.desc||'';
@@ -1899,6 +1946,7 @@ Object.assign(window,{
   updateTaskFormStates, updateGestionStates,
   switchTaskType,
   openProfile, saveProfile,
+  toggleLive, selectCalPill,
 });
 
 /* ═══════════════════════════════════════

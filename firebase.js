@@ -34,14 +34,23 @@ export function firebaseInit() {
       console.warn("[FCN] Firebase no configurado — usando localStorage");
       return false;
     }
+    if (db) return true; // already initialized — idempotent
     const app = initializeApp(FIREBASE_CONFIG, "fcnoise-proyectos");
     db = getFirestore(app);
-    console.log("[FCN] Firebase conectado ✓");
+    console.log("[FCN] Firebase SDK listo ✓");
     return true;
   } catch (e) {
-    console.warn("[FCN] Firebase error:", e);
-    return false;
+    // App may already exist from a previous init — db is still valid
+    console.warn("[FCN] Firebase init:", e.message||e);
+    return db !== null;
   }
+}
+
+/* ── STOP LISTENERS ── */
+export function fbStopListening() {
+  if (_projUnsub) { _projUnsub(); _projUnsub = null; }
+  if (_taskUnsub) { _taskUnsub(); _taskUnsub = null; }
+  console.log("[FCN] Firebase listeners detenidos");
 }
 
 /* ── LISTENERS en tiempo real ── */
