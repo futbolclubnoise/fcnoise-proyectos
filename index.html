@@ -234,6 +234,7 @@ textarea{resize:vertical;min-height:70px;}
   <nav class="nav">
     <div class="nav-brand">FC<span>NOISE</span></div>
     <div class="nav-right">
+      <div id="sync-badge" style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.07);color:#999;letter-spacing:.3px;">💾 Local</div>
       <div class="nav-role-pill" onclick="showRoleSelect()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
         <span id="nav-role-label">CEO</span>
@@ -406,17 +407,77 @@ textarea{resize:vertical;min-height:70px;}
   </div>
 </div>
 
-<script>
+<script type="module">
 /* ───────────────────────────────────────────────
-   DATA LAYER  (localStorage)
+   DATA LAYER  — Firebase (primario) + localStorage (fallback)
 ─────────────────────────────────────────────── */
+import {
+  firebaseInit, isConnected,
+  listenProjects, listenTasks,
+  fbSaveProject, fbDeleteProject,
+  fbSaveTask, fbDeleteTask
+} from './firebase.js';
+
 const LS_PROJ = 'fcn_projects';
 const LS_TASK = 'fcn_tasks';
 
-function loadProjects(){ return JSON.parse(localStorage.getItem(LS_PROJ)||'[]'); }
-function saveProjects(d){ localStorage.setItem(LS_PROJ,JSON.stringify(d)); }
-function loadTasks(){ return JSON.parse(localStorage.getItem(LS_TASK)||'[]'); }
-function saveTasks(d){ localStorage.setItem(LS_TASK,JSON.stringify(d)); }
+/* Estado en memoria (sincronizado desde Firebase o localStorage) */
+let _projects = [];
+let _tasks    = [];
+let _fbOn     = false;
+
+/* ── Indicador de sync ── */
+function setSyncBadge(on){
+  const b = document.getElementById('sync-badge');
+  if(!b) return;
+  b.textContent = on ? '🔴 Live' : '💾 Local';
+  b.style.background = on ? 'rgba(58,170,106,.18)' : 'rgba(255,255,255,.07)';
+  b.style.color = on ? '#3aaa6a' : '#999';
+}
+
+/* ── Init Firebase ── */
+async function initData(){
+  _fbOn = firebaseInit();
+  setSyncBadge(_fbOn);
+  if(_fbOn){
+    listenProjects(docs => { _projects = docs; renderProjects(); renderRevision && currentRole==='ceo' && renderRevision(); renderRoleView && currentRole && currentRole!=='ceo' && renderRoleView(currentRole); });
+    listenTasks   (docs => { _tasks    = docs; renderProjects(); renderAllTasks(); renderRevision && currentRole==='ceo' && renderRevision(); renderRoleView && currentRole && currentRole!=='ceo' && renderRoleView(currentRole); });
+  } else {
+    _projects = JSON.parse(localStorage.getItem(LS_PROJ)||'[]');
+    _tasks    = JSON.parse(localStorage.getItem(LS_TASK)||'[]');
+  }
+}
+
+function loadProjects(){ return _projects; }
+function loadTasks()   { return _tasks; }
+
+function saveProjects(d){
+  _projects = d;
+  localStorage.setItem(LS_PROJ, JSON.stringify(d));
+}
+function saveTasks(d){
+  _tasks = d;
+  localStorage.setItem(LS_TASK, JSON.stringify(d));
+}
+
+/* ── Wrappers Firebase-aware ── */
+async function persistProject(proj){
+  saveProjects([..._projects.filter(p=>p.id!==proj.id), proj].sort((a,b)=>a.createdAt-b.createdAt));
+  if(_fbOn) await fbSaveProject(proj);
+}
+async function removeProject(id){
+  saveProjects(_projects.filter(p=>p.id!==id));
+  saveTasks(_tasks.filter(t=>t.projectId!==id));
+  if(_fbOn){ await fbDeleteProject(id); _tasks.filter(t=>t.projectId===id).forEach(t=>fbDeleteTask(t.id)); }
+}
+async function persistTask(task){
+  saveTasks([..._tasks.filter(t=>t.id!==task.id), task].sort((a,b)=>a.createdAt-b.createdAt));
+  if(_fbOn) await fbSaveTask(task);
+}
+async function removeTask(id){
+  saveTasks(_tasks.filter(t=>t.id!==id));
+  if(_fbOn) await fbDeleteTask(id);
+}
 
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 
@@ -497,12 +558,11 @@ function toggleCyclePeriod(){
 /* ───────────────────────────────────────────────
    PROJECTS
 ─────────────────────────────────────────────── */
-function createProject(){
+async function createProject(){
   const name = document.getElementById('proy-name').value.trim();
   if(!name) return alert('El proyecto necesita un nombre.');
-  const projects = loadProjects();
   const cyclic = document.getElementById('proy-type').value === 'cyclic';
-  projects.push({
+  const proj = {
     id: uid(),
     name,
     desc: document.getElementById('proy-desc').value.trim(),
@@ -511,8 +571,8 @@ function createProject(){
     icon: document.getElementById('proy-icon').value || '📁',
     status: 'active',
     createdAt: Date.now(),
-  });
-  saveProjects(projects);
+  };
+  await persistProject(proj);
   document.getElementById('proy-name').value='';
   document.getElementById('proy-desc').value='';
   document.getElementById('proy-icon').value='';
@@ -520,25 +580,23 @@ function createProject(){
   toggleCyclePeriod();
   closeModal('modal-proyecto');
   populateProjectSelect();
-  renderProjects();
+  if(!_fbOn) renderProjects();
 }
 
-function deleteProject(id){
+async function deleteProject(id){
   if(!confirm('¿Eliminar proyecto y todas sus tareas?')) return;
-  saveProjects(loadProjects().filter(p=>p.id!==id));
-  saveTasks(loadTasks().filter(t=>t.projectId!==id));
-  renderProjects();
-  populateProjectSelect();
+  await removeProject(id);
+  if(!_fbOn){ renderProjects(); populateProjectSelect(); }
+  else populateProjectSelect();
 }
 
-function toggleProjectStatus(id){
-  const projects = loadProjects();
-  const p = projects.find(x=>x.id===id);
+async function toggleProjectStatus(id){
+  const p = loadProjects().find(x=>x.id===id);
   if(!p) return;
   const cycle = ['active','paused','done'];
   p.status = cycle[(cycle.indexOf(p.status)+1)%cycle.length];
-  saveProjects(projects);
-  renderProjects();
+  await persistProject(p);
+  if(!_fbOn) renderProjects();
 }
 
 let expandedProj = null;
@@ -630,13 +688,12 @@ function taskHTML(t, showRole=false){
   </div>`;
 }
 
-function createTask(){
+async function createTask(){
   const projId = document.getElementById('task-proyecto-sel').value;
   const name   = document.getElementById('task-name').value.trim();
   if(!projId) return alert('Selecciona un proyecto.');
   if(!name)   return alert('La tarea necesita un nombre.');
-  const tasks = loadTasks();
-  tasks.push({
+  const task = {
     id: uid(),
     projectId: projId,
     name,
@@ -646,29 +703,31 @@ function createTask(){
     dueDate:      document.getElementById('task-due').value,
     status: 'pending',
     createdAt: Date.now(),
-  });
-  saveTasks(tasks);
+  };
+  await persistTask(task);
   document.getElementById('task-name').value='';
   document.getElementById('task-desc').value='';
   document.getElementById('task-due').value='';
-  renderAllTasks();
-  renderProjects();
+  if(!_fbOn){ renderAllTasks(); renderProjects(); }
 }
 
-function toggleTask(id){
-  const tasks = loadTasks();
-  const t = tasks.find(x=>x.id===id);
+async function toggleTask(id){
+  const t = loadTasks().find(x=>x.id===id);
   if(!t) return;
   t.status = t.status==='done' ? 'pending' : 'done';
-  saveTasks(tasks);
-  if(currentRole==='ceo'){ renderAllTasks(); renderProjects(); }
-  else renderRoleView(currentRole);
+  await persistTask(t);
+  if(!_fbOn){
+    if(currentRole==='ceo'){ renderAllTasks(); renderProjects(); }
+    else renderRoleView(currentRole);
+  }
 }
 
-function deleteTask(id){
-  saveTasks(loadTasks().filter(t=>t.id!==id));
-  if(currentRole==='ceo'){ renderAllTasks(); renderProjects(); }
-  else renderRoleView(currentRole);
+async function deleteTask(id){
+  await removeTask(id);
+  if(!_fbOn){
+    if(currentRole==='ceo'){ renderAllTasks(); renderProjects(); }
+    else renderRoleView(currentRole);
+  }
 }
 
 function populateProjectSelect(){
@@ -831,6 +890,25 @@ function renderRevision(){
    UTIL
 ─────────────────────────────────────────────── */
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ── Exponer funciones al HTML (onclick) desde módulo ES ── */
+window.selectRole        = selectRole;
+window.showRoleSelect    = showRoleSelect;
+window.ceoTab            = ceoTab;
+window.openModal         = openModal;
+window.closeModal        = closeModal;
+window.toggleCyclePeriod = toggleCyclePeriod;
+window.createProject     = createProject;
+window.deleteProject     = deleteProject;
+window.toggleProjectStatus = toggleProjectStatus;
+window.toggleExpand      = toggleExpand;
+window.createTask        = createTask;
+window.toggleTask        = toggleTask;
+window.deleteTask        = deleteTask;
+window.renderAllTasks    = renderAllTasks;
+
+/* ── Arranque ── */
+initData();
 </script>
 </body>
 </html>
