@@ -333,6 +333,37 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
 .sec-lbl:first-child{margin-top:0;}
 .txt-xs{font-size:10px;}
 .txt-muted{color:var(--tx3);}
+
+/* ── THEME TOGGLE (CSS switch, no emoji) ── */
+.theme-toggle{
+  width:42px;height:24px;
+  background:var(--bg5);border:1px solid var(--bd2);
+  border-radius:12px;cursor:pointer;position:relative;
+  flex-shrink:0;transition:background .22s,border-color .22s;
+  display:flex;align-items:center;padding:0;
+}
+.theme-toggle::after{
+  content:'';position:absolute;
+  top:3px;left:3px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--gray-500);
+  transition:transform .22s,background .22s;
+}
+body.light .theme-toggle{background:var(--orange);border-color:var(--orange-deep);}
+body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
+
+/* ── TYPE TOGGLE (Tarea / Contenido) ── */
+.type-toggle{display:flex;background:var(--bg4);border:1px solid var(--bd2);border-radius:10px;padding:3px;gap:3px;margin-bottom:16px;}
+.tt-btn{flex:1;padding:7px 0;border:none;border-radius:8px;font-family:var(--font-body);font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:var(--tx3);transition:all .18s;letter-spacing:.02em;}
+.tt-btn.on{background:var(--orange);color:#fff;}
+.tt-btn:not(.on):hover{background:var(--bg5);color:var(--tx);}
+
+/* ── ASSIGN CHIPS (div-based, no checkbox) ── */
+.a-chip{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;border:1px solid var(--bd2);background:var(--bg4);cursor:pointer;font-size:11px;font-weight:600;color:var(--tx3);user-select:none;transition:all .18s;}
+.a-chip.sel{border-color:var(--orange);background:var(--ac2);color:var(--orange);}
+.a-chip:not(.sel):hover{border-color:var(--bd3);color:var(--tx2);}
+.a-chip-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:.5;}
+.a-chip.sel .a-chip-dot{opacity:1;}
 </style>
 </head>
 <body>
@@ -366,7 +397,7 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
     <div class="nav-links" id="nav-links"></div>
     <div class="nav-right">
       <div class="sync-dot" id="sync-dot">💾 Local</div>
-      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+      <div class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Modo claro / oscuro"></div>
       <div class="user-av" id="nav-av" title="Cerrar sesión" onclick="logout()"></div>
     </div>
   </nav>
@@ -426,10 +457,10 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
         </div>
         <div class="fi"><label>Asignar a</label>
           <div class="assign-grid" id="g-assign">
-            <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="leonardo">LE Leonardo</label>
-            <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="veronica">VE Verónica</label>
-            <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="laura">LA Laura</label>
-            <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="editor">ED Editor</label>
+            <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>LE Leonardo</div>
+            <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>VE Verónica</div>
+            <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>LA Laura</div>
+            <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>ED Editor</div>
           </div>
         </div>
         <div class="form-row">
@@ -529,10 +560,10 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
     <div class="fi"><label>Emoji</label><input type="text" id="mp-icon" placeholder="📁" maxlength="2" style="width:70px;"></div>
     <div class="fi"><label>Equipo</label>
       <div class="assign-grid" id="mp-assign">
-        <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="leonardo">LE Leonardo</label>
-        <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="veronica">VE Verónica</label>
-        <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="laura">LA Laura</label>
-        <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="editor">ED Editor</label>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>LE Leonardo</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>VE Verónica</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>LA Laura</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>ED Editor</div>
       </div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
@@ -547,8 +578,17 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
   <div class="modal">
     <div class="mhdr"><span class="mttl" id="tf-ttl">Nueva Tarea</span><button class="mclose" onclick="closeMod('m-task-form')">✕</button></div>
     <input type="hidden" id="tf-id">
-    <div class="fi"><label>Nombre</label><input type="text" id="tf-name" placeholder="Nombre de la tarea"></div>
-    <div class="fi"><label>Descripción</label><textarea id="tf-desc" placeholder="Detalles, notas…"></textarea></div>
+    <input type="hidden" id="tf-type" value="tarea">
+
+    <!-- tipo -->
+    <div class="type-toggle" id="tf-type-toggle">
+      <button class="tt-btn on" onclick="switchTaskType('tarea')" id="ttt-tarea">Tarea</button>
+      <button class="tt-btn" onclick="switchTaskType('contenido')" id="ttt-contenido">Contenido</button>
+    </div>
+
+    <div class="fi"><label>Nombre</label><input type="text" id="tf-name" placeholder="Nombre"></div>
+    <div class="fi" id="tf-desc-wrap"><label>Descripción</label><textarea id="tf-desc" placeholder="Detalles, notas…"></textarea></div>
+
     <div class="form-row">
       <div class="fi"><label>Proyecto</label><select id="tf-proj" onchange="updateTaskFormStates(this.value)"></select></div>
       <div class="fi"><label>Área</label>
@@ -561,29 +601,36 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
         </select>
       </div>
     </div>
-    <div class="form-row">
-      <div class="fi"><label>Prioridad</label>
-        <select id="tf-prio">
-          <option value="alta">🔴 Alta</option>
-          <option value="media">🟡 Media</option>
-          <option value="baja">🟢 Baja</option>
-        </select>
-      </div>
-      <div class="fi" id="tf-state-wrap"><label id="tf-state-lbl">Estado</label>
-        <select id="tf-kstatus"></select>
+
+    <!-- Tarea-only fields -->
+    <div id="tf-tarea-fields">
+      <div class="form-row">
+        <div class="fi"><label>Prioridad</label>
+          <select id="tf-prio">
+            <option value="alta">🔴 Alta</option>
+            <option value="media">🟡 Media</option>
+            <option value="baja">🟢 Baja</option>
+          </select>
+        </div>
+        <div class="fi" id="tf-state-wrap"><label id="tf-state-lbl">Estado</label>
+          <select id="tf-kstatus"></select>
+        </div>
       </div>
     </div>
+
     <div class="fi"><label>Asignar a</label>
       <div class="assign-grid" id="tf-assign">
-        <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="leonardo">LE Leonardo</label>
-        <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="veronica">VE Verónica</label>
-        <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="laura">LA Laura</label>
-        <label class="a-chip" onclick="toggleChip(this)"><input type="checkbox" value="editor">ED Editor</label>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>LE Leonardo</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>VE Verónica</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>LA Laura</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>ED Editor</div>
       </div>
     </div>
+
+    <!-- Dates — labels change by type -->
     <div class="form-row">
-      <div class="fi"><label>Fecha inicio</label><input type="date" id="tf-start"></div>
-      <div class="fi"><label>Fecha fin</label><input type="date" id="tf-end"></div>
+      <div class="fi"><label id="tf-start-lbl">Fecha inicio</label><input type="date" id="tf-start"></div>
+      <div class="fi"><label id="tf-end-lbl">Fecha fin</label><input type="date" id="tf-end"></div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
       <button class="btn btn-g btn-sm" onclick="closeMod('m-task-form')">Cancelar</button>
@@ -748,11 +795,11 @@ function toggleTheme(){
   document.body.classList.toggle('light');
   const isL=document.body.classList.contains('light');
   localStorage.setItem(LS.theme, isL?'light':'dark');
-  document.getElementById('theme-btn').textContent=isL?'☀️':'🌙';
+  // CSS handles the visual state via body.light — no JS needed
 }
 function applyTheme(){
   const t=localStorage.getItem(LS.theme);
-  if(t==='light'){ document.body.classList.add('light'); document.getElementById('theme-btn').textContent='☀️'; }
+  if(t==='light') document.body.classList.add('light');
 }
 
 /* ═══════════════════════════════════════
@@ -1436,7 +1483,7 @@ function openEditProj(id){
   document.getElementById('mp-cycle-w').style.display=p.type==='cyclic'?'block':'none';
   const team=p.team||[];
   document.querySelectorAll('#mp-assign .a-chip').forEach(c=>{
-    c.classList.toggle('sel',team.includes(c.querySelector('input').value));
+    c.classList.toggle('sel',team.includes(c.dataset.value));
   });
   document.getElementById('mp-ttl').textContent='Editar Proyecto';
   openMod('m-proj');
@@ -1446,7 +1493,7 @@ async function saveProject(){
   if(!name) return alert('Nombre requerido.');
   const id=document.getElementById('mp-id').value||uid();
   const cyclic=document.getElementById('mp-type').value==='cyclic';
-  const team=[...document.querySelectorAll('#mp-assign .a-chip.sel')].map(c=>c.querySelector('input').value);
+  const team=[...document.querySelectorAll('#mp-assign .a-chip.sel')].map(c=>c.dataset.value);
   const proj={
     id, name,
     desc: document.getElementById('mp-desc').value.trim(),
@@ -1482,6 +1529,30 @@ async function deleteProject(id){
 ═══════════════════════════════════════ */
 function openNewTaskForProj(projId){
   openTaskForm(null, projId);
+}
+
+/* ── Task type toggle (Tarea / Contenido) ── */
+function switchTaskType(type){
+  document.getElementById('tf-type').value=type;
+  document.getElementById('ttt-tarea').classList.toggle('on', type==='tarea');
+  document.getElementById('ttt-contenido').classList.toggle('on', type==='contenido');
+  const isContent=type==='contenido';
+  // Tarea-only fields
+  document.getElementById('tf-tarea-fields').style.display=isContent?'none':'block';
+  // Date labels
+  document.getElementById('tf-start-lbl').textContent=isContent?'Fecha de entrega':'Fecha inicio';
+  document.getElementById('tf-end-lbl').textContent  =isContent?'Fecha de publicación':'Fecha fin';
+  // State wrap: for contenido it's always CAL states; for tarea depends on project
+  if(isContent){
+    const projId=document.getElementById('tf-proj').value;
+    const p=_projects.find(x=>x.id===projId);
+    if(p?.meth!=='calendario'){
+      // force CAL states for content in any project
+      document.getElementById('tf-state-wrap').style.display='none';
+    }
+  } else {
+    updateTaskFormStates(document.getElementById('tf-proj').value);
+  }
 }
 
 /* ── State options by methodology ── */
@@ -1528,9 +1599,11 @@ function openTaskForm(taskId, projId, preDate){
     const t=_tasks.find(x=>x.id===taskId); if(!t) return;
     const proj=_projects.find(p=>p.id===t.projectId);
     const meth=proj?.meth||'lista';
+    const editType=t.taskType||( meth==='calendario'?'contenido':'tarea' );
     populateProjSels('tf-proj', t.projectId);
     const currentState=meth==='calendario'?(t.calStatus||'idea'):(t.kStatus||'investigacion');
-    updateTaskFormStates(t.projectId, currentState);
+    switchTaskType(editType);
+    if(editType==='tarea') updateTaskFormStates(t.projectId, currentState);
     document.getElementById('tf-id').value   =t.id;
     document.getElementById('tf-name').value =t.name;
     document.getElementById('tf-desc').value =t.desc||'';
@@ -1539,14 +1612,15 @@ function openTaskForm(taskId, projId, preDate){
     document.getElementById('tf-start').value=tStart(t);
     document.getElementById('tf-end').value  =tEnd(t);
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>{
-      c.classList.toggle('sel',(t.assignedUsers||[]).includes(c.querySelector('input').value));
+      c.classList.toggle('sel', (t.assignedUsers||[]).includes(c.dataset.value));
     });
     document.getElementById('tf-ttl').textContent='Editar Tarea';
   } else {
     // new
     const useProjId=projId||_projects[0]?.id||'';
+    const usedProj=_projects.find(x=>x.id===useProjId);
+    const defaultType=usedProj?.meth==='calendario'?'contenido':'tarea';
     populateProjSels('tf-proj', useProjId);
-    updateTaskFormStates(useProjId);
     document.getElementById('tf-id').value   ='';
     document.getElementById('tf-name').value ='';
     document.getElementById('tf-desc').value ='';
@@ -1556,6 +1630,8 @@ function openTaskForm(taskId, projId, preDate){
     document.getElementById('tf-end').value  ='';
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>c.classList.remove('sel'));
     document.getElementById('tf-ttl').textContent='Nueva Tarea';
+    switchTaskType(defaultType);
+    if(defaultType==='tarea') updateTaskFormStates(useProjId);
   }
   openMod('m-task-form');
 }
@@ -1568,14 +1644,18 @@ async function saveTaskForm(){
   if(!projId) return alert('Selecciona un proyecto.');
   const proj=_projects.find(p=>p.id===projId);
   const meth=proj?.meth||'lista';
-  const assigned=[...document.querySelectorAll('#tf-assign .a-chip.sel')].map(c=>c.querySelector('input').value);
+  const taskType=document.getElementById('tf-type').value||'tarea';
+  const assigned=[...document.querySelectorAll('#tf-assign .a-chip.sel')].map(c=>c.dataset.value);
   const startDate=document.getElementById('tf-start').value;
   const endDate  =document.getElementById('tf-end').value;
-  const stateVal=document.getElementById('tf-kstatus').value;
+  // for contenido: always use CAL states
+  const stateVal=taskType==='contenido'
+    ? 'idea'
+    : (document.getElementById('tf-kstatus').value||'investigacion');
   const existing=idVal?_tasks.find(x=>x.id===idVal):null;
 
   let kStatus='investigacion', calStatus='idea', status='pending';
-  if(meth==='calendario'){
+  if(taskType==='contenido' || meth==='calendario'){
     calStatus=stateVal||'idea';
     const col=CAL_COLS.find(c=>c.id===calStatus);
     status=col?.done?'done':'pending';
@@ -1583,16 +1663,16 @@ async function saveTaskForm(){
     kStatus=stateVal||'investigacion';
     status=kStatus==='cierre'?'done':'pending';
   } else {
-    // lista — preserve existing status
     status=existing?.status||'pending';
   }
 
   const t={
     id: idVal||uid(),
+    taskType,
     projectId:projId, name,
     desc:     document.getElementById('tf-desc').value.trim(),
     area:     document.getElementById('tf-area').value,
-    priority: document.getElementById('tf-prio').value,
+    priority: taskType==='contenido'?'media':(document.getElementById('tf-prio').value),
     startDate, endDate, dueDate:endDate,
     assignedUsers:assigned,
     kStatus, calStatus, status,
@@ -1611,7 +1691,7 @@ async function createTask(){
   if(!name)   return alert('Nombre requerido.');
   const proj=_projects.find(p=>p.id===projId);
   const meth=proj?.meth||'lista';
-  const assigned=[...document.querySelectorAll('#g-assign .a-chip.sel')].map(c=>c.querySelector('input').value);
+  const assigned=[...document.querySelectorAll('#g-assign .a-chip.sel')].map(c=>c.dataset.value);
   const startDate=document.getElementById('g-start').value;
   const endDate  =document.getElementById('g-end').value;
   const stateVal=document.getElementById('g-kstatus').value;
@@ -1654,7 +1734,7 @@ async function toggleTask(id){
 /* ═══════════════════════════════════════
    HELPERS
 ═══════════════════════════════════════ */
-function toggleChip(chip){ chip.classList.toggle('sel'); }
+function toggleChip(chip){ chip.classList.toggle('sel'); chip.blur(); }
 
 function populateProjSels(targetId, selectedId){
   const ids=targetId?[targetId]:['g-proj','tf-proj'];
@@ -1691,6 +1771,7 @@ Object.assign(window,{
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
   toggleChip,
   updateTaskFormStates, updateGestionStates,
+  switchTaskType,
 });
 
 /* ═══════════════════════════════════════
