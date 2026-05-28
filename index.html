@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FCNOISE — Proyectos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Design tokens (dark default, same as main app) ── */
+:root {
+  --bg:#0c0c0c;--bg2:#111;--bg3:#181818;--bg4:#202020;--bg5:#2a2a2a;
+  --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.13);--bd3:rgba(255,255,255,.22);
+  --tx:#ffffff;--tx2:#e8e8e8;--tx3:#d0d0d0;
+  --g0:#fff;--g1:#f0f0f0;--g2:#d0d0d0;--g3:#999;--g4:#555;
+  --card:#161616;--inp:#1e1e1e;
+  --red:#e03c3c;--red2:rgba(224,60,60,.13);--red3:rgba(224,60,60,.28);
+  --grn:#3aaa6a;--grn2:rgba(58,170,106,.13);--grn3:rgba(58,170,106,.28);
+  --org:#e07c2a;--org2:rgba(224,124,42,.13);--org3:rgba(224,124,42,.28);
+  --blu:#4a9eff;--blu2:rgba(74,158,255,.13);--blu3:rgba(74,158,255,.28);
+  --pur:#a06ee0;--pur2:rgba(160,110,224,.13);--pur3:rgba(160,110,224,.28);
+  --r:10px;
+  /* role accent (set by JS) */
+  --role:#e07c2a;--role2:rgba(224,124,42,.13);--role3:rgba(224,124,42,.28);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;}
+
+/* ── BAND ── */
+.band{height:30px;background:#000;border-bottom:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+.band-mid{font-family:'Poppins',sans-serif;font-weight:700;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--tx3);}
+
+/* ── NAV ── */
+.nav{height:54px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100;}
+.nav-brand{font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--tx);}
+.nav-brand span{color:var(--org);}
+.nav-role-pill{display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:20px;border:1px solid var(--role);background:var(--role2);cursor:pointer;transition:all .2s;}
+.nav-role-pill svg{width:14px;height:14px;color:var(--role);}
+.nav-role-pill span{font-size:11px;font-weight:600;color:var(--role);letter-spacing:.5px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+
+/* ── ROLE SELECT SCREEN ── */
+#screen-role{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:var(--bg);}
+.role-header{text-align:center;margin-bottom:40px;}
+.role-header h1{font-size:26px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.role-header h1 span{color:var(--org);}
+.role-header p{color:var(--tx3);font-size:13px;margin-top:8px;}
+.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:500px;width:100%;}
+.role-card{background:var(--bg3);border:2px solid var(--bd2);border-radius:14px;padding:24px 20px;cursor:pointer;transition:all .25s;text-align:center;position:relative;overflow:hidden;}
+.role-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .25s;}
+.role-card:hover{transform:translateY(-2px);}
+.role-card:hover::before{opacity:1;}
+.role-card.ceo{--rc:var(--org);--rc2:var(--org2);--rc3:var(--org3);}
+.role-card.estratega{--rc:var(--blu);--rc2:var(--blu2);--rc3:var(--blu3);}
+.role-card.asistente{--rc:var(--grn);--rc2:var(--grn2);--rc3:var(--grn3);}
+.role-card.diseno{--rc:var(--pur);--rc2:var(--pur2);--rc3:var(--pur3);}
+.role-card:hover{border-color:var(--rc);}
+.role-card::before{background:var(--rc2);}
+.role-icon{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px;background:var(--rc2);border:1px solid var(--rc3);}
+.role-name{font-weight:700;font-size:15px;letter-spacing:1px;text-transform:uppercase;color:var(--rc);}
+.role-desc{font-size:11px;color:var(--tx3);margin-top:6px;line-height:1.5;}
+
+/* ── MAIN LAYOUT ── */
+#screen-app{display:none;}
+.app-body{padding:20px;max-width:880px;margin:0 auto;}
+
+/* ── TABS ── */
+.tabs-row{display:flex;gap:4px;background:var(--bg3);padding:4px;border-radius:var(--r);margin-bottom:20px;}
+.tab-btn{flex:1;padding:8px 0;border:none;background:transparent;color:var(--tx3);font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;transition:all .2s;letter-spacing:.3px;}
+.tab-btn.on{background:var(--tx);color:var(--bg);}
+
+/* ── CARDS / PANELS ── */
+.panel{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:12px;}
+.panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.panel-title{font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx2);}
+
+/* ── PROJECT CARDS ── */
+.proj-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative;}
+.proj-card:hover{border-color:var(--bd3);background:var(--bg4);}
+.proj-card.expanded{border-color:var(--role);background:var(--bg4);}
+.proj-top{display:flex;align-items:center;gap:12px;}
+.proj-icon{width:36px;height:36px;border-radius:8px;background:var(--role2);border:1px solid var(--role3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.proj-info{flex:1;min-width:0;}
+.proj-name{font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.proj-meta{font-size:10px;color:var(--tx3);margin-top:2px;}
+.proj-badges{display:flex;gap:6px;align-items:center;}
+.bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.bdg-cyclic{background:var(--blu2);color:var(--blu);border:1px solid var(--blu3);}
+.bdg-once{background:var(--bg5);color:var(--tx3);border:1px solid var(--bd2);}
+.bdg-active{background:var(--grn2);color:var(--grn);border:1px solid var(--grn3);}
+.bdg-paused{background:var(--org2);color:var(--org);border:1px solid var(--org3);}
+.bdg-done{background:var(--bg5);color:var(--tx3);border:1px solid var(--bd2);}
+.proj-progress{margin-top:10px;}
+.prog-bar-bg{height:4px;background:var(--bg5);border-radius:4px;overflow:hidden;margin-top:4px;}
+.prog-bar{height:100%;background:var(--role);border-radius:4px;transition:width .4s;}
+.prog-label{font-size:9px;color:var(--tx3);}
+
+/* ── TASK CARDS ── */
+.task-list{padding-top:10px;border-top:1px solid var(--bd);margin-top:10px;}
+.task-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);}
+.task-item:last-child{border-bottom:none;}
+.task-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--bd3);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.task-check.done{background:var(--grn);border-color:var(--grn);}
+.task-check svg{width:10px;height:10px;color:#fff;opacity:0;transition:opacity .2s;}
+.task-check.done svg{opacity:1;}
+.task-body{flex:1;min-width:0;}
+.task-name{font-size:12px;font-weight:500;color:var(--tx);transition:color .2s;}
+.task-name.done{color:var(--tx3);text-decoration:line-through;}
+.task-sub{font-size:10px;color:var(--tx3);margin-top:1px;}
+.task-badges{display:flex;gap:5px;flex-shrink:0;align-items:center;}
+.prio-hi{background:var(--red2);color:var(--red);border:1px solid var(--red3);}
+.prio-md{background:var(--org2);color:var(--org);border:1px solid var(--org3);}
+.prio-lo{background:var(--grn2);color:var(--grn);border:1px solid var(--grn3);}
+.role-tag{padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.3px;}
+.rt-estratega{background:var(--blu2);color:var(--blu);border:1px solid var(--blu3);}
+.rt-asistente{background:var(--grn2);color:var(--grn);border:1px solid var(--grn3);}
+.rt-diseno{background:var(--pur2);color:var(--pur);border:1px solid var(--pur3);}
+.rt-ceo{background:var(--org2);color:var(--org);border:1px solid var(--org3);}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:14px;}
+label{display:block;font-size:11px;font-weight:600;color:var(--tx3);margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase;}
+input[type=text],input[type=date],select,textarea{width:100%;padding:10px 13px;background:var(--inp);border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-family:'Poppins',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+input[type=text]:focus,input[type=date]:focus,select:focus,textarea:focus{border-color:var(--role);}
+select option{background:var(--bg3);color:var(--tx);}
+textarea{resize:vertical;min-height:70px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn{padding:10px 18px;border:none;border-radius:8px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
+.btn-primary{background:var(--role);color:#fff;}
+.btn-primary:hover{opacity:.88;}
+.btn-ghost{background:var(--bg4);color:var(--tx2);border:1px solid var(--bd2);}
+.btn-ghost:hover{background:var(--bg5);}
+.btn-sm{padding:6px 13px;font-size:11px;}
+.btn-icon{width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--bg4);border:1px solid var(--bd2);color:var(--tx3);cursor:pointer;transition:all .2s;}
+.btn-icon:hover{background:var(--bg5);color:var(--tx);}
+
+/* ── STATS (CEO review) ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.stat-box{background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r);padding:14px;text-align:center;}
+.stat-num{font-size:24px;font-weight:700;color:var(--role);}
+.stat-lbl{font-size:10px;color:var(--tx3);margin-top:2px;letter-spacing:.3px;text-transform:uppercase;}
+
+/* ── ROLE VIEWS ── */
+.role-banner{display:flex;align-items:center;gap:14px;padding:16px;background:var(--role2);border:1px solid var(--role3);border-radius:var(--r);margin-bottom:20px;}
+.role-banner-icon{width:42px;height:42px;border-radius:10px;background:var(--role3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.role-banner-name{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--role);}
+.role-banner-desc{font-size:11px;color:var(--tx3);margin-top:2px;}
+
+/* ── REVIEW TABLE (CEO) ── */
+.review-table{width:100%;border-collapse:collapse;}
+.review-table th{text-align:left;padding:8px 10px;font-size:10px;color:var(--tx3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--bd2);}
+.review-table td{padding:10px;border-bottom:1px solid var(--bd);font-size:12px;vertical-align:middle;}
+.review-table tr:last-child td{border-bottom:none;}
+.review-table tr:hover td{background:var(--bg4);}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:40px 20px;color:var(--tx3);}
+.empty-icon{font-size:32px;margin-bottom:10px;}
+.empty p{font-size:12px;}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg3);border:1px solid var(--bd2);border-radius:14px;padding:24px;width:100%;max-width:480px;transform:translateY(10px);transition:transform .2s;}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.modal-title{font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.modal-close{width:28px;height:28px;border:none;background:var(--bg5);border-radius:6px;color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;}
+
+/* ── CYCLE BADGE ── */
+.cycle-info{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--blu);background:var(--blu2);border:1px solid var(--blu3);padding:4px 10px;border-radius:20px;margin-top:4px;width:fit-content;}
+
+/* ── SEPARADOR SECCIÓN ── */
+.sec-label{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;margin-top:18px;padding-left:2px;}
+
+/* ── UTIL ── */
+.flex{display:flex;align-items:center;}
+.gap-8{gap:8px;}
+.gap-12{gap:12px;}
+.mt-4{margin-top:4px;}
+.mt-8{margin-top:8px;}
+.ml-auto{margin-left:auto;}
+.txt-sm{font-size:11px;}
+.txt-xs{font-size:10px;}
+.txt-muted{color:var(--tx3);}
+.txt-accent{color:var(--role);}
+.fw-700{font-weight:700;}
+.hidden{display:none!important;}
+.w-full{width:100%;}
+.divider{height:1px;background:var(--bd);margin:14px 0;}
+</style>
+</head>
+<body>
+
+<!-- BAND -->
+<div class="band">
+  <div class="band-mid">FCNOISE — GESTIÓN DE PROYECTOS</div>
+</div>
+
+<!-- ROLE SELECT SCREEN -->
+<div id="screen-role">
+  <div class="role-header">
+    <h1>FC<span>NOISE</span></h1>
+    <p>Selecciona tu rol para continuar</p>
+  </div>
+  <div class="role-grid">
+    <div class="role-card ceo" onclick="selectRole('ceo')">
+      <div class="role-icon">🎯</div>
+      <div class="role-name">CEO</div>
+      <div class="role-desc">Crea proyectos, asigna tareas y revisa el avance de todo el equipo</div>
+    </div>
+    <div class="role-card estratega" onclick="selectRole('estratega')">
+      <div class="role-icon">📊</div>
+      <div class="role-name">Estratega</div>
+      <div class="role-desc">Visualiza y gestiona tus tareas de estrategia y planificación</div>
+    </div>
+    <div class="role-card asistente" onclick="selectRole('asistente')">
+      <div class="role-icon">⚡</div>
+      <div class="role-name">Asistente</div>
+      <div class="role-desc">Tareas de soporte, coordinación y ejecución operativa</div>
+    </div>
+    <div class="role-card diseno" onclick="selectRole('diseno')">
+      <div class="role-icon">🎨</div>
+      <div class="role-name">Diseño</div>
+      <div class="role-desc">Piezas visuales, publicaciones y producción creativa</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="screen-app">
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-brand">FC<span>NOISE</span></div>
+    <div class="nav-right">
+      <div class="nav-role-pill" onclick="showRoleSelect()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span id="nav-role-label">CEO</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CEO VIEW -->
+  <div id="view-ceo" class="hidden">
+    <div class="app-body">
+      <div class="role-banner">
+        <div class="role-banner-icon">🎯</div>
+        <div>
+          <div class="role-banner-name">CEO</div>
+          <div class="role-banner-desc">Vista completa · Crear proyectos · Asignar tareas · Revisar avance</div>
+        </div>
+      </div>
+
+      <div class="tabs-row" id="ceo-tabs">
+        <button class="tab-btn on" onclick="ceoTab('proyectos',this)">Proyectos</button>
+        <button class="tab-btn" onclick="ceoTab('tareas',this)">Tareas</button>
+        <button class="tab-btn" onclick="ceoTab('revision',this)">Revisión</button>
+      </div>
+
+      <!-- TAB: PROYECTOS -->
+      <div id="ceo-tab-proyectos">
+        <div class="panel">
+          <div class="panel-hdr">
+            <span class="panel-title">Proyectos</span>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-proyecto')">+ Nuevo</button>
+          </div>
+          <div id="list-proyectos"></div>
+        </div>
+      </div>
+
+      <!-- TAB: TAREAS -->
+      <div id="ceo-tab-tareas" class="hidden">
+        <div class="panel">
+          <div class="panel-hdr">
+            <span class="panel-title">Nueva Tarea</span>
+          </div>
+          <div class="form-group">
+            <label>Proyecto</label>
+            <select id="task-proyecto-sel"></select>
+          </div>
+          <div class="form-group">
+            <label>Nombre de la tarea</label>
+            <input type="text" id="task-name" placeholder="Ej. Publicación semanal IG">
+          </div>
+          <div class="form-group">
+            <label>Descripción (opcional)</label>
+            <textarea id="task-desc" placeholder="Detalles, referencias, links…"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Asignar a</label>
+              <select id="task-role">
+                <option value="estratega">Estratega</option>
+                <option value="asistente">Asistente</option>
+                <option value="diseno">Diseño</option>
+                <option value="ceo">CEO</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Prioridad</label>
+              <select id="task-prio">
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+                <option value="baja">Baja</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Fecha límite</label>
+              <input type="date" id="task-due">
+            </div>
+            <div class="form-group" style="align-self:end;">
+              <button class="btn btn-primary w-full" onclick="createTask()">Crear Tarea</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hdr">
+            <span class="panel-title">Todas las Tareas</span>
+            <select id="filter-role" onchange="renderAllTasks()" style="width:auto;padding:6px 10px;font-size:11px;">
+              <option value="all">Todos los roles</option>
+              <option value="estratega">Estratega</option>
+              <option value="asistente">Asistente</option>
+              <option value="diseno">Diseño</option>
+              <option value="ceo">CEO</option>
+            </select>
+          </div>
+          <div id="all-tasks-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB: REVISIÓN -->
+      <div id="ceo-tab-revision" class="hidden">
+        <div class="stats-grid" id="ceo-stats"></div>
+        <div class="panel">
+          <div class="panel-hdr"><span class="panel-title">Estado por Proyecto</span></div>
+          <div id="review-table-wrap"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><span class="panel-title">Carga por Rol</span></div>
+          <div id="role-load-wrap"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROLE VIEW (Estratega / Asistente / Diseño) -->
+  <div id="view-role" class="hidden">
+    <div class="app-body">
+      <div class="role-banner" id="role-banner-el">
+        <div class="role-banner-icon" id="role-banner-icon">📊</div>
+        <div>
+          <div class="role-banner-name" id="role-banner-name">Estratega</div>
+          <div class="role-banner-desc" id="role-banner-desc">Tus tareas asignadas</div>
+        </div>
+        <div class="ml-auto txt-xs txt-muted" id="role-task-count"></div>
+      </div>
+      <div id="role-tasks-by-project"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NUEVO PROYECTO -->
+<div class="modal-overlay" id="modal-proyecto">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">Nuevo Proyecto</span>
+      <button class="modal-close" onclick="closeModal('modal-proyecto')">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Nombre del proyecto</label>
+      <input type="text" id="proy-name" placeholder="Ej. Marketing Mayo 2026">
+    </div>
+    <div class="form-group">
+      <label>Descripción</label>
+      <textarea id="proy-desc" placeholder="Objetivo, contexto, entregables…" style="min-height:60px;"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="proy-type" onchange="toggleCyclePeriod()">
+          <option value="once">Único</option>
+          <option value="cyclic">Cíclico</option>
+        </select>
+      </div>
+      <div class="form-group" id="cycle-period-wrap" style="display:none;">
+        <label>Frecuencia</label>
+        <select id="proy-cycle">
+          <option value="weekly">Semanal</option>
+          <option value="biweekly">Quincenal</option>
+          <option value="monthly">Mensual</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Emoji / Icono</label>
+      <input type="text" id="proy-icon" placeholder="📣" maxlength="2" style="width:70px;">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-proyecto')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="createProject()">Crear Proyecto</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ───────────────────────────────────────────────
+   DATA LAYER  (localStorage)
+─────────────────────────────────────────────── */
+const LS_PROJ = 'fcn_projects';
+const LS_TASK = 'fcn_tasks';
+
+function loadProjects(){ return JSON.parse(localStorage.getItem(LS_PROJ)||'[]'); }
+function saveProjects(d){ localStorage.setItem(LS_PROJ,JSON.stringify(d)); }
+function loadTasks(){ return JSON.parse(localStorage.getItem(LS_TASK)||'[]'); }
+function saveTasks(d){ localStorage.setItem(LS_TASK,JSON.stringify(d)); }
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ───────────────────────────────────────────────
+   ROLE SYSTEM
+─────────────────────────────────────────────── */
+const ROLES = {
+  ceo:       { label:'CEO',       icon:'🎯', desc:'Vista completa · Crear proyectos · Asignar tareas · Revisar avance', color:'var(--org)',  c2:'var(--org2)', c3:'var(--org3)' },
+  estratega: { label:'Estratega', icon:'📊', desc:'Tareas de estrategia y planificación asignadas a ti',                color:'var(--blu)',  c2:'var(--blu2)', c3:'var(--blu3)' },
+  asistente: { label:'Asistente', icon:'⚡', desc:'Tareas operativas y de coordinación asignadas a ti',                color:'var(--grn)',  c2:'var(--grn2)', c3:'var(--grn3)' },
+  diseno:    { label:'Diseño',    icon:'🎨', desc:'Piezas visuales y producción creativa asignadas a ti',               color:'var(--pur)',  c2:'var(--pur2)', c3:'var(--pur3)' },
+};
+
+let currentRole = null;
+
+function selectRole(role){
+  currentRole = role;
+  const r = ROLES[role];
+  // apply CSS vars
+  document.documentElement.style.setProperty('--role', r.color.replace('var(','').replace(')',''));
+  // quick inline override
+  document.documentElement.style.cssText += `;--role:${r.color};--role2:${r.c2};--role3:${r.c3}`;
+  document.getElementById('nav-role-label').textContent = r.label;
+  document.getElementById('screen-role').style.display = 'none';
+  document.getElementById('screen-app').style.display = 'block';
+
+  if(role === 'ceo'){
+    document.getElementById('view-ceo').classList.remove('hidden');
+    document.getElementById('view-role').classList.add('hidden');
+    populateProjectSelect();
+    renderProjects();
+    renderAllTasks();
+  } else {
+    document.getElementById('view-ceo').classList.add('hidden');
+    document.getElementById('view-role').classList.remove('hidden');
+    document.getElementById('role-banner-icon').textContent = r.icon;
+    document.getElementById('role-banner-name').textContent = r.label;
+    document.getElementById('role-banner-desc').textContent = r.desc;
+    renderRoleView(role);
+  }
+}
+
+function showRoleSelect(){
+  document.getElementById('screen-role').style.display = 'flex';
+  document.getElementById('screen-app').style.display = 'none';
+  currentRole = null;
+}
+
+/* ───────────────────────────────────────────────
+   CEO TABS
+─────────────────────────────────────────────── */
+function ceoTab(tab, btn){
+  ['proyectos','tareas','revision'].forEach(t=>{
+    document.getElementById('ceo-tab-'+t).classList.add('hidden');
+  });
+  document.querySelectorAll('#ceo-tabs .tab-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('ceo-tab-'+tab).classList.remove('hidden');
+  btn.classList.add('on');
+  if(tab==='revision') renderRevision();
+  if(tab==='tareas'){ populateProjectSelect(); renderAllTasks(); }
+}
+
+/* ───────────────────────────────────────────────
+   MODAL
+─────────────────────────────────────────────── */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+
+function toggleCyclePeriod(){
+  const v = document.getElementById('proy-type').value;
+  document.getElementById('cycle-period-wrap').style.display = v==='cyclic'?'block':'none';
+}
+
+/* ───────────────────────────────────────────────
+   PROJECTS
+─────────────────────────────────────────────── */
+function createProject(){
+  const name = document.getElementById('proy-name').value.trim();
+  if(!name) return alert('El proyecto necesita un nombre.');
+  const projects = loadProjects();
+  const cyclic = document.getElementById('proy-type').value === 'cyclic';
+  projects.push({
+    id: uid(),
+    name,
+    desc: document.getElementById('proy-desc').value.trim(),
+    type: document.getElementById('proy-type').value,
+    cycle: cyclic ? document.getElementById('proy-cycle').value : null,
+    icon: document.getElementById('proy-icon').value || '📁',
+    status: 'active',
+    createdAt: Date.now(),
+  });
+  saveProjects(projects);
+  document.getElementById('proy-name').value='';
+  document.getElementById('proy-desc').value='';
+  document.getElementById('proy-icon').value='';
+  document.getElementById('proy-type').value='once';
+  toggleCyclePeriod();
+  closeModal('modal-proyecto');
+  populateProjectSelect();
+  renderProjects();
+}
+
+function deleteProject(id){
+  if(!confirm('¿Eliminar proyecto y todas sus tareas?')) return;
+  saveProjects(loadProjects().filter(p=>p.id!==id));
+  saveTasks(loadTasks().filter(t=>t.projectId!==id));
+  renderProjects();
+  populateProjectSelect();
+}
+
+function toggleProjectStatus(id){
+  const projects = loadProjects();
+  const p = projects.find(x=>x.id===id);
+  if(!p) return;
+  const cycle = ['active','paused','done'];
+  p.status = cycle[(cycle.indexOf(p.status)+1)%cycle.length];
+  saveProjects(projects);
+  renderProjects();
+}
+
+let expandedProj = null;
+
+function renderProjects(){
+  const projects = loadProjects();
+  const tasks = loadTasks();
+  const el = document.getElementById('list-proyectos');
+  if(!projects.length){
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📂</div><p>Aún no hay proyectos. Crea el primero.</p></div>';
+    return;
+  }
+  el.innerHTML = projects.map(p=>{
+    const ptasks = tasks.filter(t=>t.projectId===p.id);
+    const done = ptasks.filter(t=>t.status==='done').length;
+    const pct = ptasks.length ? Math.round(done/ptasks.length*100) : 0;
+    const exp = expandedProj === p.id;
+    const cycleLabel = {weekly:'Semanal',biweekly:'Quincenal',monthly:'Mensual'}[p.cycle]||'';
+    return `
+    <div class="proj-card ${exp?'expanded':''}" id="proj-${p.id}">
+      <div class="proj-top" onclick="toggleExpand('${p.id}')">
+        <div class="proj-icon">${p.icon}</div>
+        <div class="proj-info">
+          <div class="proj-name">${esc(p.name)}</div>
+          <div class="proj-meta">${esc(p.desc)||'Sin descripción'}</div>
+          <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;">
+            <span class="bdg ${p.type==='cyclic'?'bdg-cyclic':'bdg-once'}">${p.type==='cyclic'?'🔄 '+cycleLabel:'📌 Único'}</span>
+            <span class="bdg bdg-${p.status==='active'?'active':p.status==='paused'?'paused':'done'}">${{active:'Activo',paused:'Pausado',done:'Completado'}[p.status]}</span>
+          </div>
+        </div>
+        <div class="proj-badges" style="flex-direction:column;gap:4px;align-items:flex-end;">
+          <span class="txt-xs txt-muted">${ptasks.length} tareas</span>
+          <div style="display:flex;gap:5px;">
+            <button class="btn-icon" onclick="event.stopPropagation();toggleProjectStatus('${p.id}')" title="Cambiar estado">⚡</button>
+            <button class="btn-icon" style="color:var(--red);" onclick="event.stopPropagation();deleteProject('${p.id}')" title="Eliminar">✕</button>
+          </div>
+        </div>
+      </div>
+      <div class="proj-progress">
+        <div class="flex" style="justify-content:space-between;">
+          <span class="prog-label">${done}/${ptasks.length} completadas</span>
+          <span class="prog-label">${pct}%</span>
+        </div>
+        <div class="prog-bar-bg"><div class="prog-bar" style="width:${pct}%"></div></div>
+      </div>
+      ${exp ? renderTasksInline(p.id) : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleExpand(id){
+  expandedProj = expandedProj===id ? null : id;
+  renderProjects();
+}
+
+function renderTasksInline(projId){
+  const tasks = loadTasks().filter(t=>t.projectId===projId);
+  if(!tasks.length) return '<div class="task-list"><div class="txt-xs txt-muted" style="padding:10px 0;text-align:center;">Sin tareas — crea una desde la pestaña Tareas</div></div>';
+  return '<div class="task-list">'+tasks.map(t=>taskHTML(t,true)).join('')+'</div>';
+}
+
+/* ───────────────────────────────────────────────
+   TASKS
+─────────────────────────────────────────────── */
+const PRIO_MAP  = {alta:'prio-hi',media:'prio-md',baja:'prio-lo'};
+const PRIO_LABEL= {alta:'Alta',media:'Media',baja:'Baja'};
+const ROLE_CLS  = {estratega:'rt-estratega',asistente:'rt-asistente',diseno:'rt-diseno',ceo:'rt-ceo'};
+const ROLE_LABEL= {estratega:'Estratega',asistente:'Asistente',diseno:'Diseño',ceo:'CEO'};
+
+function taskHTML(t, showRole=false){
+  const isDone = t.status==='done';
+  const due = t.dueDate ? ` · ${t.dueDate}` : '';
+  return `
+  <div class="task-item" id="ti-${t.id}">
+    <div class="task-check ${isDone?'done':''}" onclick="toggleTask('${t.id}')">
+      <svg viewBox="0 0 12 10" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="1,5 4.5,8.5 11,1"/>
+      </svg>
+    </div>
+    <div class="task-body">
+      <div class="task-name ${isDone?'done':''}">${esc(t.name)}</div>
+      <div class="task-sub">${esc(t.desc)||''} ${due}</div>
+    </div>
+    <div class="task-badges">
+      ${showRole ? `<span class="bdg ${ROLE_CLS[t.assignedRole]||''}">${ROLE_LABEL[t.assignedRole]||t.assignedRole}</span>`:''}
+      <span class="bdg ${PRIO_MAP[t.priority]||'prio-md'}">${PRIO_LABEL[t.priority]||t.priority}</span>
+      <button class="btn-icon" style="width:24px;height:24px;color:var(--red);" onclick="deleteTask('${t.id}')">✕</button>
+    </div>
+  </div>`;
+}
+
+function createTask(){
+  const projId = document.getElementById('task-proyecto-sel').value;
+  const name   = document.getElementById('task-name').value.trim();
+  if(!projId) return alert('Selecciona un proyecto.');
+  if(!name)   return alert('La tarea necesita un nombre.');
+  const tasks = loadTasks();
+  tasks.push({
+    id: uid(),
+    projectId: projId,
+    name,
+    desc:         document.getElementById('task-desc').value.trim(),
+    assignedRole: document.getElementById('task-role').value,
+    priority:     document.getElementById('task-prio').value,
+    dueDate:      document.getElementById('task-due').value,
+    status: 'pending',
+    createdAt: Date.now(),
+  });
+  saveTasks(tasks);
+  document.getElementById('task-name').value='';
+  document.getElementById('task-desc').value='';
+  document.getElementById('task-due').value='';
+  renderAllTasks();
+  renderProjects();
+}
+
+function toggleTask(id){
+  const tasks = loadTasks();
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  t.status = t.status==='done' ? 'pending' : 'done';
+  saveTasks(tasks);
+  if(currentRole==='ceo'){ renderAllTasks(); renderProjects(); }
+  else renderRoleView(currentRole);
+}
+
+function deleteTask(id){
+  saveTasks(loadTasks().filter(t=>t.id!==id));
+  if(currentRole==='ceo'){ renderAllTasks(); renderProjects(); }
+  else renderRoleView(currentRole);
+}
+
+function populateProjectSelect(){
+  const sel = document.getElementById('task-proyecto-sel');
+  const projects = loadProjects();
+  sel.innerHTML = projects.length
+    ? projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')
+    : '<option value="">— Sin proyectos —</option>';
+}
+
+function renderAllTasks(){
+  const filter = document.getElementById('filter-role')?.value || 'all';
+  let tasks = loadTasks();
+  if(filter!=='all') tasks = tasks.filter(t=>t.assignedRole===filter);
+  const el = document.getElementById('all-tasks-list');
+  if(!tasks.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">✅</div><p>Sin tareas que mostrar.</p></div>';
+    return;
+  }
+  const projects = loadProjects();
+  // group by project
+  const byProj = {};
+  tasks.forEach(t=>{
+    if(!byProj[t.projectId]) byProj[t.projectId]=[];
+    byProj[t.projectId].push(t);
+  });
+  el.innerHTML = Object.entries(byProj).map(([pid,ts])=>{
+    const proj = projects.find(p=>p.id===pid);
+    const pname = proj ? proj.name : 'Proyecto eliminado';
+    return `<div class="sec-label">${esc(pname)}</div>
+    <div style="background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:0 12px;margin-bottom:10px;">
+      ${ts.map(t=>taskHTML(t,true)).join('')}
+    </div>`;
+  }).join('');
+}
+
+/* ───────────────────────────────────────────────
+   ROLE VIEW
+─────────────────────────────────────────────── */
+function renderRoleView(role){
+  const allTasks = loadTasks().filter(t=>t.assignedRole===role);
+  const projects = loadProjects();
+  const el = document.getElementById('role-tasks-by-project');
+  const countEl = document.getElementById('role-task-count');
+
+  const pending = allTasks.filter(t=>t.status!=='done').length;
+  const total   = allTasks.length;
+  countEl.textContent = `${pending} pendiente${pending!==1?'s':''} / ${total} total`;
+
+  if(!total){
+    el.innerHTML='<div class="empty"><div class="empty-icon">🌙</div><p>No tienes tareas asignadas aún.</p></div>';
+    return;
+  }
+
+  const byProj = {};
+  allTasks.forEach(t=>{
+    if(!byProj[t.projectId]) byProj[t.projectId]=[];
+    byProj[t.projectId].push(t);
+  });
+
+  el.innerHTML = Object.entries(byProj).map(([pid,ts])=>{
+    const proj = projects.find(p=>p.id===pid);
+    const pname = proj ? proj.name : 'Proyecto';
+    const picon = proj ? proj.icon : '📁';
+    const cyclic = proj && proj.type==='cyclic';
+    const cycleLabel = {weekly:'Semanal',biweekly:'Quincenal',monthly:'Mensual'}[proj?.cycle]||'';
+    const doneCount = ts.filter(t=>t.status==='done').length;
+    const pct = Math.round(doneCount/ts.length*100);
+    return `
+    <div class="panel" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="font-size:20px;">${picon}</span>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;">${esc(pname)}</div>
+          <div style="display:flex;gap:5px;margin-top:3px;">
+            ${cyclic ? `<span class="bdg bdg-cyclic">🔄 ${cycleLabel}</span>` : '<span class="bdg bdg-once">📌 Único</span>'}
+          </div>
+        </div>
+        <span class="txt-xs txt-muted">${pct}%</span>
+      </div>
+      <div class="prog-bar-bg" style="margin-bottom:12px;"><div class="prog-bar" style="width:${pct}%"></div></div>
+      ${ts.map(t=>taskHTML(t,false)).join('')}
+    </div>`;
+  }).join('');
+}
+
+/* ───────────────────────────────────────────────
+   CEO REVISION
+─────────────────────────────────────────────── */
+function renderRevision(){
+  const projects = loadProjects();
+  const tasks    = loadTasks();
+  const done     = tasks.filter(t=>t.status==='done').length;
+  const pending  = tasks.length - done;
+
+  // stats
+  document.getElementById('ceo-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-num">${projects.length}</div><div class="stat-lbl">Proyectos</div></div>
+    <div class="stat-box"><div class="stat-num">${tasks.length}</div><div class="stat-lbl">Tareas</div></div>
+    <div class="stat-box"><div class="stat-num">${tasks.length?Math.round(done/tasks.length*100):0}%</div><div class="stat-lbl">Completado</div></div>
+  `;
+
+  // project table
+  const wrap = document.getElementById('review-table-wrap');
+  if(!projects.length){
+    wrap.innerHTML='<div class="empty"><p>Sin proyectos todavía.</p></div>';
+  } else {
+    wrap.innerHTML = `
+    <table class="review-table">
+      <thead><tr>
+        <th>Proyecto</th><th>Tipo</th><th>Tareas</th><th>Done</th><th>%</th><th>Estado</th>
+      </tr></thead>
+      <tbody>${projects.map(p=>{
+        const pt = tasks.filter(t=>t.projectId===p.id);
+        const pd = pt.filter(t=>t.status==='done').length;
+        const pct= pt.length?Math.round(pd/pt.length*100):0;
+        const cLabel={weekly:'Semanal',biweekly:'Quincenal',monthly:'Mensual'}[p.cycle]||'';
+        return `<tr>
+          <td><span style="margin-right:6px;">${p.icon}</span>${esc(p.name)}</td>
+          <td>${p.type==='cyclic'?`<span class="bdg bdg-cyclic">🔄 ${cLabel}</span>`:'<span class="bdg bdg-once">Único</span>'}</td>
+          <td>${pt.length}</td>
+          <td>${pd}</td>
+          <td>
+            <div class="prog-bar-bg" style="width:80px;display:inline-block;vertical-align:middle;">
+              <div class="prog-bar" style="width:${pct}%"></div>
+            </div>
+            <span style="margin-left:6px;font-size:10px;">${pct}%</span>
+          </td>
+          <td><span class="bdg bdg-${p.status==='active'?'active':p.status==='paused'?'paused':'done'}">${{active:'Activo',paused:'Pausado',done:'Listo'}[p.status]}</span></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+  }
+
+  // role load
+  const roles = ['estratega','asistente','diseno','ceo'];
+  const roleWrap = document.getElementById('role-load-wrap');
+  roleWrap.innerHTML = roles.map(r=>{
+    const rt = tasks.filter(t=>t.assignedRole===r);
+    const rd = rt.filter(t=>t.status==='done').length;
+    const rp = rt.length-rd;
+    const pct= rt.length?Math.round(rd/rt.length*100):0;
+    const rinfo = ROLES[r];
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd);">
+      <span style="font-size:16px;width:24px;text-align:center;">${rinfo.icon}</span>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:600;">${rinfo.label}</div>
+        <div style="font-size:10px;color:var(--tx3);">${rp} pendiente${rp!==1?'s':''} · ${rd} completada${rd!==1?'s':''}</div>
+      </div>
+      <div style="text-align:right;width:100px;">
+        <div class="prog-bar-bg"><div class="prog-bar" style="width:${pct}%"></div></div>
+        <div style="font-size:10px;color:var(--tx3);margin-top:3px;">${pct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ───────────────────────────────────────────────
+   UTIL
+─────────────────────────────────────────────── */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
