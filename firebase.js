@@ -11,12 +11,12 @@ import { getFirestore,
 
 /* ── CONFIG — reemplazar con el config de tu proyecto Firebase ── */
 const FIREBASE_CONFIG = {
-  apiKey:            "PASTE_API_KEY",
-  authDomain:        "PASTE_PROJECT_ID.firebaseapp.com",
-  projectId:         "PASTE_PROJECT_ID",
-  storageBucket:     "PASTE_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId:             "PASTE_APP_ID"
+  apiKey:            "AIzaSyAMgsbJ2rOqLDofRMl6porBY7yczcJgZTA",
+  authDomain:        "fcnoise-proyectos.firebaseapp.com",
+  projectId:         "fcnoise-proyectos",
+  storageBucket:     "fcnoise-proyectos.firebasestorage.app",
+  messagingSenderId: "996777317756",
+  appId:             "1:996777317756:web:bdc555f3c288903b07c0f9"
 };
 
 /* ── COLECCIONES ── */
