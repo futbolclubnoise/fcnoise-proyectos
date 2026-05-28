@@ -1313,8 +1313,10 @@ function renderProjDetail(id){
       <div class="prog-fill" style="width:${pct}%;background:${fillMap[am.cls]||'var(--tx3)'};border-radius:6px;"></div>
     </div>`;
   const canAddTask=isCeo||(p.team||[]).includes(currentUser.id);
-  document.getElementById('detail-actions').innerHTML=canAddTask
-    ?`<button class="btn btn-p btn-sm" onclick="openNewTaskForProj('${id}')">+ Tarea</button>`:'';
+  document.getElementById('detail-actions').innerHTML=`
+    ${isCeo?`<button class="btn btn-g btn-sm" onclick="openEditProj('${id}')">⚙️ Editar proyecto</button>`:''}
+    ${canAddTask?`<button class="btn btn-p btn-sm" onclick="openNewTaskForProj('${id}')">+ Tarea</button>`:''}
+  `;
   renderMethContent(id, meth);
 }
 
