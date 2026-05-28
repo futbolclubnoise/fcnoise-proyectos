@@ -398,7 +398,7 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <div class="nav-right">
       <div class="sync-dot" id="sync-dot">💾 Local</div>
       <div class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Modo claro / oscuro"></div>
-      <div class="user-av" id="nav-av" title="Cerrar sesión" onclick="logout()"></div>
+      <div class="user-av" id="nav-av" title="Perfil"></div>
     </div>
   </nav>
 
@@ -444,6 +444,9 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
               <option value="estrategia">📊 Estrategia</option>
               <option value="operaciones">⚡ Operaciones</option>
               <option value="diseno">🎨 Diseño</option>
+              <option value="admin">🗂 Admin</option>
+              <option value="ventas">💰 Ventas</option>
+              <option value="edicion">✂️ Edición</option>
               <option value="general">💼 General</option>
             </select>
           </div>
@@ -457,10 +460,10 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
         </div>
         <div class="fi"><label>Asignar a</label>
           <div class="assign-grid" id="g-assign">
-            <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>LE Leonardo</div>
-            <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>VE Verónica</div>
-            <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>LA Laura</div>
-            <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>ED Editor</div>
+            <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>Leonardo</div>
+            <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>Verónica</div>
+            <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>Laura</div>
+            <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>Editor</div>
           </div>
         </div>
         <div class="form-row">
@@ -489,6 +492,9 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
               <option value="estrategia">Estrategia</option>
               <option value="operaciones">Operaciones</option>
               <option value="diseno">Diseño</option>
+              <option value="admin">Admin</option>
+              <option value="ventas">Ventas</option>
+              <option value="edicion">Edición</option>
               <option value="general">General</option>
             </select>
           </div>
@@ -531,6 +537,9 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
           <option value="estrategia">📊 Estrategia</option>
           <option value="operaciones">⚡ Operaciones</option>
           <option value="diseno">🎨 Diseño</option>
+          <option value="admin">🗂 Admin</option>
+          <option value="ventas">💰 Ventas</option>
+          <option value="edicion">✂️ Edición</option>
           <option value="general">💼 General</option>
         </select>
       </div>
@@ -560,10 +569,10 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <div class="fi"><label>Emoji</label><input type="text" id="mp-icon" placeholder="📁" maxlength="2" style="width:70px;"></div>
     <div class="fi"><label>Equipo</label>
       <div class="assign-grid" id="mp-assign">
-        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>LE Leonardo</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>VE Verónica</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>LA Laura</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>ED Editor</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>Leonardo</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>Verónica</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>Laura</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>Editor</div>
       </div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
@@ -597,6 +606,9 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
           <option value="estrategia">📊 Estrategia</option>
           <option value="operaciones">⚡ Operaciones</option>
           <option value="diseno">🎨 Diseño</option>
+          <option value="admin">🗂 Admin</option>
+          <option value="ventas">💰 Ventas</option>
+          <option value="edicion">✂️ Edición</option>
           <option value="general">💼 General</option>
         </select>
       </div>
@@ -620,10 +632,10 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 
     <div class="fi"><label>Asignar a</label>
       <div class="assign-grid" id="tf-assign">
-        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>LE Leonardo</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>VE Verónica</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>LA Laura</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>ED Editor</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>Leonardo</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>Verónica</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>Laura</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>Editor</div>
       </div>
     </div>
 
@@ -666,6 +678,24 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
   </div>
 </div>
 
+<!-- ═══ MODAL PERFIL ═══ -->
+<div class="mov" id="m-profile">
+  <div class="modal" style="max-width:380px;">
+    <div class="mhdr"><span class="mttl">Mi Perfil</span><button class="mclose" onclick="closeMod('m-profile')">✕</button></div>
+    <div class="fi"><label>Nombre</label><input type="text" id="prof-name" placeholder="Tu nombre"></div>
+    <div class="fi"><label>Nueva contraseña</label><input type="password" id="prof-pass" placeholder="Dejar vacío para no cambiar"></div>
+    <div class="fi"><label>Confirmar contraseña</label><input type="password" id="prof-pass2" placeholder="Repetir nueva contraseña"></div>
+    <div id="prof-err" class="login-err"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+      <button class="btn btn-g btn-sm" onclick="logout()">🚪 Cerrar sesión</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-g btn-sm" onclick="closeMod('m-profile')">Cancelar</button>
+        <button class="btn btn-p btn-sm" onclick="saveProfile()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { firebaseInit, isConnected, listenProjects, listenTasks,
          fbSaveProject, fbDeleteProject, fbSaveTask, fbDeleteTask } from './firebase.js';
@@ -690,6 +720,9 @@ const AREAS = {
   estrategia: {label:'Estrategia',  icon:'📊', cls:'bb', color:'var(--blu)'},
   operaciones:{label:'Operaciones', icon:'⚡', cls:'bg', color:'var(--grn)'},
   diseno:     {label:'Diseño',      icon:'🎨', cls:'bp', color:'var(--pur)'},
+  admin:      {label:'Admin',       icon:'🗂',  cls:'bw', color:'var(--tx3)'},
+  ventas:     {label:'Ventas',      icon:'💰', cls:'by', color:'var(--yel)'},
+  edicion:    {label:'Edición',     icon:'✂️',  cls:'br', color:'var(--red)'},
   general:    {label:'General',     icon:'💼', cls:'bw', color:'var(--tx3)'},
 };
 const PRIOS = {
@@ -707,9 +740,15 @@ const KB_COLS = [
 const CAL_COLS = [
   {id:'idea',      label:'Idea',      icon:'💡', cls:'bb', color:'var(--blu)',  done:false},
   {id:'edicion',   label:'Edición',   icon:'✂️',  cls:'by', color:'var(--yel)', done:false},
-  {id:'ajustes',   label:'Ajustes',   icon:'🔧', cls:'bo', color:'var(--org)',  done:false},
+  {id:'ajuste',    label:'Ajuste',    icon:'🔧', cls:'bo', color:'var(--org)',  done:false},
   {id:'aprobado',  label:'Aprobado',  icon:'👍', cls:'bg', color:'var(--grn)',  done:false},
   {id:'publicado', label:'Publicado', icon:'🚀', cls:'bp', color:'var(--pur)',  done:true },
+];
+const TASK_STATES = [
+  {id:'pendiente',  label:'Pendiente',  icon:'⬜', cls:'bw', done:false},
+  {id:'en-proceso', label:'En proceso', icon:'🔵', cls:'bb', done:false},
+  {id:'revision',   label:'Revisión',   icon:'🟡', cls:'by', done:false},
+  {id:'completada', label:'Completada', icon:'✅', cls:'bg', done:true },
 ];
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAYS_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -835,7 +874,8 @@ function showApp(){
 function renderNav(){
   const u=currentUser, rm=ROLES[u.role];
   const av=document.getElementById('nav-av');
-  av.textContent=u.ini; av.title=`${u.name} — Cerrar sesión`;
+  av.textContent=u.name.charAt(0).toUpperCase(); av.title=`${u.name} — Perfil`;
+  av.onclick=openProfile;
   av.style.cssText+=`;border-color:${rm.brd};background:${rm.bg};color:${rm.color};`;
   const isCeo=u.role==='ceo';
   document.getElementById('nav-links').innerHTML=`
@@ -884,7 +924,7 @@ function renderDashboard(){
 
   document.getElementById('dash-top').innerHTML=`
     <div class="dash-user">
-      <div class="dash-av" style="background:${rm.bg};color:${rm.color};">${currentUser.ini}</div>
+      <div class="dash-av" style="background:${rm.bg};color:${rm.color};">${currentUser.name.charAt(0).toUpperCase()}</div>
       <div>
         <div class="dash-name" style="color:${rm.color};">${currentUser.name}</div>
         <div class="dash-role">${rm.label}</div>
@@ -941,17 +981,18 @@ function taskRowHTML(t){
   const dots=(t.assignedUsers||[]).map(uid_=>{
     const u=USERS[uid_]; if(!u) return '';
     const rm=ROLES[u.role];
-    return `<div class="udot" style="width:18px;height:18px;font-size:7px;background:${rm.bg};color:${rm.color};" title="${u.name}">${u.ini}</div>`;
+    return `<div class="udot" style="width:18px;height:18px;font-size:7px;background:${rm.bg};color:${rm.color};" title="${u.name}">${u.name.charAt(0).toUpperCase()}</div>`;
   }).join('');
-  // state badge depending on project methodology
+  // state badge depending on task type
   const projMeth=proj?.meth||'lista';
+  const taskType_=t.taskType||(projMeth==='calendario'?'contenido':'tarea');
   let stateBdg='';
-  if(projMeth==='kanban'){
-    const kcol=KB_COLS.find(c=>c.id===(t.kStatus||'investigacion'));
-    if(kcol) stateBdg=`<span class="bdg ${kcol.cls}" style="display:none;">${kcol.icon} ${kcol.label}</span>`;
-  } else if(projMeth==='calendario'){
+  if(taskType_==='contenido'){
     const ccol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
     stateBdg=`<span class="bdg ${ccol.cls}">${ccol.icon} ${ccol.label}</span>`;
+  } else {
+    const ts=TASK_STATES.find(s=>s.id===(t.taskStatus||'pendiente'))||TASK_STATES[0];
+    stateBdg=`<span class="bdg ${ts.cls}">${ts.icon} ${ts.label}</span>`;
   }
 
   return `<div class="task-row ${done?'done-r':''}" onclick="openTaskDetail('${t.id}')">
@@ -1017,32 +1058,29 @@ function refreshDetailPopup(){
     const isAssigned=(t.assignedUsers||[]).includes(u.id);
     const style=isAssigned?`border-color:${rm.brd};background:${rm.bg};color:${rm.color};`:'';
     return `<div class="tdp-user ${isAssigned?'on':''}" style="${style}" onclick="tdpToggleUser('${u.id}')">
-      <span style="font-size:10px;font-weight:700;">${u.ini}</span>
       <span>${u.name}</span>
       ${isAssigned?'<span style="font-size:11px;">✓</span>':''}
     </div>`;
   }).join('');
 
-  // states — depend on project methodology
+  // states — depend on task type
   const meth=proj?.meth||'lista';
+  const tdpType=t.taskType||(meth==='calendario'?'contenido':'tarea');
   const statesEl=document.getElementById('tdp-states');
   const statesLbl=document.getElementById('tdp-states-lbl');
-  if(meth==='kanban'){
-    statesLbl.style.display='block';
-    statesEl.innerHTML=KB_COLS.map(col=>{
-      const isOn=(t.kStatus||'investigacion')===col.id;
-      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','kanban')">${col.icon} ${col.label}</button>`;
-    }).join('');
-  } else if(meth==='calendario'){
+  if(tdpType==='contenido'){
     statesLbl.style.display='block';
     statesEl.innerHTML=CAL_COLS.map(col=>{
       const isOn=(t.calStatus||'idea')===col.id;
-      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','calendario')">${col.icon} ${col.label}</button>`;
+      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','contenido')">${col.icon} ${col.label}</button>`;
     }).join('');
   } else {
-    // lista — no states, just the done toggle
-    statesLbl.style.display='none';
-    statesEl.innerHTML='';
+    // tarea — always show TASK_STATES
+    statesLbl.style.display='block';
+    statesEl.innerHTML=TASK_STATES.map(col=>{
+      const isOn=(t.taskStatus||'pendiente')===col.id;
+      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','tarea')">${col.icon} ${col.label}</button>`;
+    }).join('');
   }
 
   // done button
@@ -1060,13 +1098,17 @@ async function tdpToggleUser(userId){
   if(!_fbOn) refreshDetailPopup();
 }
 
-async function tdpSetState(colId, meth){
+async function tdpSetState(colId, type){
   const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
-  if(meth==='calendario'){
+  if(type==='contenido'){
     t.calStatus=colId;
     const col=CAL_COLS.find(c=>c.id===colId);
     t.status=col?.done?'done':'pending';
-  } else {
+  } else if(type==='tarea'){
+    t.taskStatus=colId;
+    const ts=TASK_STATES.find(s=>s.id===colId);
+    t.status=ts?.done?'done':'pending';
+  } else if(type==='kanban'){
     t.kStatus=colId;
     t.status=colId==='cierre'?'done':'pending';
   }
@@ -1078,13 +1120,20 @@ async function tdpToggleDone(){
   const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
   const proj=_projects.find(p=>p.id===t.projectId);
   const meth=proj?.meth||'lista';
+  const ttype=t.taskType||(meth==='calendario'?'contenido':'tarea');
   t.status=t.status==='done'?'pending':'done';
-  if(meth==='calendario'){
+  if(ttype==='contenido'){
     if(t.status==='done') t.calStatus='publicado';
     if(t.status==='pending'&&t.calStatus==='publicado') t.calStatus='aprobado';
   } else {
-    if(t.status==='done') t.kStatus='cierre';
-    if(t.status==='pending'&&t.kStatus==='cierre') t.kStatus='ejecucion';
+    // tarea
+    if(t.status==='done') t.taskStatus='completada';
+    if(t.status==='pending'&&t.taskStatus==='completada') t.taskStatus='en-proceso';
+    // also sync kStatus for kanban board
+    if(meth==='kanban'){
+      if(t.status==='done') t.kStatus='cierre';
+      if(t.status==='pending'&&t.kStatus==='cierre') t.kStatus='ejecucion';
+    }
   }
   await persistTask(t);
   if(!_fbOn){ refreshDetailPopup(); onDataChange(); }
@@ -1124,7 +1173,7 @@ function renderProjGrid(){
     const teamDots=(p.team||[]).map(uid_=>{
       const u=USERS[uid_]; if(!u) return '';
       const rm=ROLES[u.role];
-      return `<div class="udot" style="background:${rm.bg};color:${rm.color};">${u.ini}</div>`;
+      return `<div class="udot" style="background:${rm.bg};color:${rm.color};">${u.name.charAt(0).toUpperCase()}</div>`;
     }).join('');
     const editBtns=isCeo?`<div class="pc-actions">
       <button class="btn-icon" onclick="event.stopPropagation();openEditProj('${p.id}')" title="Editar">✏️</button>
@@ -1171,7 +1220,7 @@ function renderProjDetail(id){
   const teamDots=(p.team||[]).map(uid_=>{
     const u=USERS[uid_]; if(!u) return '';
     const rm=ROLES[u.role];
-    return `<div class="udot" style="width:26px;height:26px;font-size:9px;background:${rm.bg};color:${rm.color};" title="${u.name}">${u.ini}</div>`;
+    return `<div class="udot" style="width:26px;height:26px;font-size:9px;background:${rm.bg};color:${rm.color};" title="${u.name}">${u.name.charAt(0).toUpperCase()}</div>`;
   }).join('');
   const isCeo=currentUser?.role==='ceo';
   document.getElementById('pdh').innerHTML=`
@@ -1188,11 +1237,12 @@ function renderProjDetail(id){
         </div>
       </div>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-top:12px;" class="txt-xs txt-muted">
-      <span>${done}/${pt.length} completadas</span><span>${pct}%</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
+      <span class="txt-xs txt-muted">${done}/${pt.length} tareas completadas</span>
+      <span style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em;color:${fillMap[am.cls]||'var(--tx3)'};">${pct}%</span>
     </div>
-    <div class="prog-bg" style="height:6px;margin-top:6px;">
-      <div class="prog-fill" style="width:${pct}%;background:${fillMap[am.cls]||'var(--tx3)'};"></div>
+    <div class="prog-bg" style="height:8px;margin-top:6px;border-radius:6px;">
+      <div class="prog-fill" style="width:${pct}%;background:${fillMap[am.cls]||'var(--tx3)'};border-radius:6px;"></div>
     </div>`;
   document.getElementById('detail-actions').innerHTML=isCeo
     ?`<button class="btn btn-p btn-sm" onclick="openNewTaskForProj('${id}')">+ Tarea</button>`:'';
@@ -1239,7 +1289,7 @@ function renderKanbanHTML(projId){
       const dots=(t.assignedUsers||[]).map(uid_=>{
         const u=USERS[uid_]; if(!u) return '';
         const rm=ROLES[u.role];
-        return `<div class="udot" style="background:${rm.bg};color:${rm.color};">${u.ini}</div>`;
+        return `<div class="udot" style="background:${rm.bg};color:${rm.color};">${u.name.charAt(0).toUpperCase()}</div>`;
       }).join('');
       const mBtns=KB_COLS.filter(c=>c.id!==col.id).map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join('');
       return `<div class="kb-card ${done?'done-c':''}" id="kc-${t.id}" draggable="true"
@@ -1449,7 +1499,7 @@ function renderRevision(){
     const uu=ut.length?Math.round(ud/ut.length*100):0;
     const rm=ROLES[u.role];
     return `<div class="flex gap-10" style="padding:10px 0;border-bottom:1px solid var(--bd);">
-      <div class="udot" style="width:28px;height:28px;font-size:10px;background:${rm.bg};color:${rm.color};">${u.ini}</div>
+      <div class="udot" style="width:28px;height:28px;font-size:10px;background:${rm.bg};color:${rm.color};">${u.name.charAt(0).toUpperCase()}</div>
       <div style="flex:1;">
         <div style="font-size:12px;font-weight:600;">${u.name}</div>
         <div class="txt-xs txt-muted">${ut.length-ud} pendientes · ${ud} completadas</div>
@@ -1537,20 +1587,13 @@ function switchTaskType(type){
   document.getElementById('ttt-tarea').classList.toggle('on', type==='tarea');
   document.getElementById('ttt-contenido').classList.toggle('on', type==='contenido');
   const isContent=type==='contenido';
-  // Tarea-only fields
+  // Tarea-only fields (includes state selector)
   document.getElementById('tf-tarea-fields').style.display=isContent?'none':'block';
   // Date labels
   document.getElementById('tf-start-lbl').textContent=isContent?'Fecha de entrega':'Fecha inicio';
   document.getElementById('tf-end-lbl').textContent  =isContent?'Fecha de publicación':'Fecha fin';
-  // State wrap: for contenido it's always CAL states; for tarea depends on project
-  if(isContent){
-    const projId=document.getElementById('tf-proj').value;
-    const p=_projects.find(x=>x.id===projId);
-    if(p?.meth!=='calendario'){
-      // force CAL states for content in any project
-      document.getElementById('tf-state-wrap').style.display='none';
-    }
-  } else {
+  // Populate TASK_STATES when switching to tarea
+  if(!isContent){
     updateTaskFormStates(document.getElementById('tf-proj').value);
   }
 }
@@ -1565,30 +1608,29 @@ function stateOptionsHTML(meth, currentVal){
   return ''; // lista — no state needed
 }
 function updateTaskFormStates(projId, currentVal){
-  const p=_projects.find(x=>x.id===projId);
-  const meth=p?.meth||'lista';
+  // For tarea type: always show TASK_STATES regardless of project methodology
   const wrap=document.getElementById('tf-state-wrap');
   const lbl=document.getElementById('tf-state-lbl');
   const sel=document.getElementById('tf-kstatus');
-  if(meth==='lista'){
-    wrap.style.display='none';
-  } else {
-    wrap.style.display='block';
-    lbl.textContent=meth==='calendario'?'Estado contenido':'Estado kanban';
-    sel.innerHTML=stateOptionsHTML(meth, currentVal||(meth==='calendario'?'idea':'investigacion'));
-  }
+  wrap.style.display='block';
+  lbl.textContent='Estado';
+  const cv=currentVal||'pendiente';
+  sel.innerHTML=TASK_STATES.map(c=>`<option value="${c.id}" ${cv===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
 }
 function updateGestionStates(projId, currentVal){
   const p=_projects.find(x=>x.id===projId);
   const meth=p?.meth||'lista';
   const lbl=document.getElementById('g-state-lbl');
   const sel=document.getElementById('g-kstatus');
-  if(meth==='lista'){
-    lbl.textContent='Estado';
-    sel.innerHTML='<option value="pending">⬜ Pendiente</option><option value="done">✅ Completada</option>';
+  if(meth==='calendario'){
+    lbl.textContent='Estado contenido';
+    sel.innerHTML=CAL_COLS.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
+  } else if(meth==='kanban'){
+    lbl.textContent='Estado kanban';
+    sel.innerHTML=KB_COLS.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
   } else {
-    lbl.textContent=meth==='calendario'?'Estado contenido':'Estado kanban';
-    sel.innerHTML=stateOptionsHTML(meth, currentVal||(meth==='calendario'?'idea':'investigacion'));
+    lbl.textContent='Estado';
+    sel.innerHTML=TASK_STATES.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
   }
 }
 
@@ -1601,7 +1643,7 @@ function openTaskForm(taskId, projId, preDate){
     const meth=proj?.meth||'lista';
     const editType=t.taskType||( meth==='calendario'?'contenido':'tarea' );
     populateProjSels('tf-proj', t.projectId);
-    const currentState=meth==='calendario'?(t.calStatus||'idea'):(t.kStatus||'investigacion');
+    const currentState=editType==='contenido'?(t.calStatus||'idea'):(t.taskStatus||'pendiente');
     switchTaskType(editType);
     if(editType==='tarea') updateTaskFormStates(t.projectId, currentState);
     document.getElementById('tf-id').value   =t.id;
@@ -1648,22 +1690,20 @@ async function saveTaskForm(){
   const assigned=[...document.querySelectorAll('#tf-assign .a-chip.sel')].map(c=>c.dataset.value);
   const startDate=document.getElementById('tf-start').value;
   const endDate  =document.getElementById('tf-end').value;
-  // for contenido: always use CAL states
-  const stateVal=taskType==='contenido'
-    ? 'idea'
-    : (document.getElementById('tf-kstatus').value||'investigacion');
   const existing=idVal?_tasks.find(x=>x.id===idVal):null;
 
-  let kStatus='investigacion', calStatus='idea', status='pending';
-  if(taskType==='contenido' || meth==='calendario'){
-    calStatus=stateVal||'idea';
+  let kStatus=existing?.kStatus||'investigacion', calStatus='idea', taskStatus='pendiente', status='pending';
+  if(taskType==='contenido'){
+    calStatus=existing?.calStatus||'idea';
     const col=CAL_COLS.find(c=>c.id===calStatus);
     status=col?.done?'done':'pending';
-  } else if(meth==='kanban'){
-    kStatus=stateVal||'investigacion';
-    status=kStatus==='cierre'?'done':'pending';
   } else {
-    status=existing?.status||'pending';
+    // tarea — always use TASK_STATES
+    taskStatus=document.getElementById('tf-kstatus').value||existing?.taskStatus||'pendiente';
+    const ts=TASK_STATES.find(s=>s.id===taskStatus);
+    status=ts?.done?'done':'pending';
+    // keep kStatus in sync for kanban board layout
+    if(meth==='kanban') kStatus=existing?.kStatus||'investigacion';
   }
 
   const t={
@@ -1675,7 +1715,7 @@ async function saveTaskForm(){
     priority: taskType==='contenido'?'media':(document.getElementById('tf-prio').value),
     startDate, endDate, dueDate:endDate,
     assignedUsers:assigned,
-    kStatus, calStatus, status,
+    kStatus, calStatus, taskStatus, status,
     createdAt:existing?.createdAt||Date.now(),
   };
   await persistTask(t);
@@ -1696,7 +1736,7 @@ async function createTask(){
   const endDate  =document.getElementById('g-end').value;
   const stateVal=document.getElementById('g-kstatus').value;
 
-  let kStatus='investigacion', calStatus='idea', status='pending';
+  let kStatus='investigacion', calStatus='idea', taskStatus='pendiente', status='pending';
   if(meth==='calendario'){
     calStatus=stateVal||'idea';
     const col=CAL_COLS.find(c=>c.id===calStatus);
@@ -1704,16 +1744,22 @@ async function createTask(){
   } else if(meth==='kanban'){
     kStatus=stateVal||'investigacion';
     status=kStatus==='cierre'?'done':'pending';
+    taskStatus='pendiente';
+  } else {
+    // lista — stateVal is TASK_STATES id
+    taskStatus=stateVal||'pendiente';
+    const ts=TASK_STATES.find(s=>s.id===taskStatus);
+    status=ts?.done?'done':'pending';
   }
 
   const t={
-    id:uid(), projectId:projId, name,
+    id:uid(), taskType:'tarea', projectId:projId, name,
     desc:document.getElementById('g-desc').value.trim(),
     area:document.getElementById('g-area').value,
     priority:document.getElementById('g-prio').value,
     startDate, endDate, dueDate:endDate,
     assignedUsers:assigned,
-    kStatus, calStatus, status,
+    kStatus, calStatus, taskStatus, status,
     createdAt:Date.now(),
   };
   await persistTask(t);
@@ -1724,11 +1770,73 @@ async function createTask(){
 
 async function toggleTask(id){
   const t=_tasks.find(x=>x.id===id); if(!t) return;
+  const proj=_projects.find(p=>p.id===t.projectId);
+  const meth=proj?.meth||'lista';
+  const ttype=t.taskType||(meth==='calendario'?'contenido':'tarea');
   t.status=t.status==='done'?'pending':'done';
-  if(t.status==='done') t.kStatus='cierre';
-  if(t.status==='pending'&&t.kStatus==='cierre') t.kStatus='ejecucion';
+  if(ttype==='contenido'){
+    if(t.status==='done') t.calStatus='publicado';
+    if(t.status==='pending'&&t.calStatus==='publicado') t.calStatus='aprobado';
+  } else {
+    if(t.status==='done') t.taskStatus='completada';
+    if(t.status==='pending'&&t.taskStatus==='completada') t.taskStatus='en-proceso';
+    if(meth==='kanban'){
+      if(t.status==='done') t.kStatus='cierre';
+      if(t.status==='pending'&&t.kStatus==='cierre') t.kStatus='ejecucion';
+    }
+  }
   await persistTask(t);
   if(!_fbOn) onDataChange();
+}
+
+/* ═══════════════════════════════════════
+   PROFILE
+═══════════════════════════════════════ */
+const LS_UOVER='fcn_user_overrides';
+
+function loadUserOverrides(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(LS_UOVER)||'{}');
+    Object.keys(saved).forEach(uid_=>{
+      if(USERS[uid_]){
+        if(saved[uid_].name) USERS[uid_].name=saved[uid_].name;
+        if(saved[uid_].pass) USERS[uid_].pass=saved[uid_].pass;
+      }
+    });
+  }catch(e){}
+}
+
+function openProfile(){
+  if(!currentUser) return;
+  document.getElementById('prof-name').value=currentUser.name;
+  document.getElementById('prof-pass').value='';
+  document.getElementById('prof-pass2').value='';
+  const errEl=document.getElementById('prof-err');
+  if(errEl){ errEl.textContent=''; errEl.classList.remove('show'); }
+  openMod('m-profile');
+}
+
+function saveProfile(){
+  const name=document.getElementById('prof-name').value.trim();
+  const pass=document.getElementById('prof-pass').value;
+  const pass2=document.getElementById('prof-pass2').value;
+  const errEl=document.getElementById('prof-err');
+  const showErr=msg=>{ errEl.textContent=msg; errEl.classList.add('show'); };
+  errEl.classList.remove('show');
+  if(!name) return showErr('El nombre no puede estar vacío.');
+  if(pass&&pass!==pass2) return showErr('Las contraseñas no coinciden.');
+  // Update in-memory
+  currentUser.name=name;
+  if(pass) currentUser.pass=pass;
+  // Persist overrides
+  const saved=JSON.parse(localStorage.getItem(LS_UOVER)||'{}');
+  if(!saved[currentUser.id]) saved[currentUser.id]={};
+  saved[currentUser.id].name=name;
+  if(pass) saved[currentUser.id].pass=pass;
+  localStorage.setItem(LS_UOVER,JSON.stringify(saved));
+  closeMod('m-profile');
+  renderNav();
+  onDataChange();
 }
 
 /* ═══════════════════════════════════════
@@ -1772,12 +1880,14 @@ Object.assign(window,{
   toggleChip,
   updateTaskFormStates, updateGestionStates,
   switchTaskType,
+  openProfile, saveProfile,
 });
 
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
 (async()=>{
+  loadUserOverrides(); // apply any saved name/password changes
   applyTheme();
   await initData();
   const saved=localStorage.getItem(LS.user);
