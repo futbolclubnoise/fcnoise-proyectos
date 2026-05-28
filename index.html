@@ -92,7 +92,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--tx);min-heigh
 .nav-right{display:flex;align-items:center;gap:7px;margin-left:auto;}
 .theme-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
 .theme-btn:hover{background:var(--bg4);}
-.sync-dot{font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--bg3);color:var(--tx3);border:1px solid var(--bd2);letter-spacing:.02em;}
+.sync-dot{font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--tx3);border:1px solid var(--bd2);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:5px;}
+.sync-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
 .user-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:2px solid var(--ac3);background:var(--ac2);color:var(--accent);cursor:pointer;flex-shrink:0;letter-spacing:.03em;}
 
 /* ── LOGIN ── */
@@ -630,6 +631,19 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
       </div>
     </div>
 
+    <!-- Contenido-only fields -->
+    <div id="tf-contenido-fields" style="display:none;">
+      <div class="fi"><label>Estado del contenido</label>
+        <select id="tf-calstatus">
+          <option value="idea">💡 Idea</option>
+          <option value="edicion">✂️ Edición</option>
+          <option value="ajuste">🔧 Ajuste</option>
+          <option value="aprobado">👍 Aprobado</option>
+          <option value="publicado">🚀 Publicado</option>
+        </select>
+      </div>
+    </div>
+
     <div class="fi"><label>Asignar a</label>
       <div class="assign-grid" id="tf-assign">
         <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>Leonardo</div>
@@ -813,8 +827,10 @@ async function initData(){
 }
 function setSyncDot(on){
   const d=document.getElementById('sync-dot'); if(!d) return;
-  d.textContent=on?'🔴 Live':'💾 Local';
+  d.textContent=on?'On Live':'Off Live';
   d.style.color=on?'var(--grn)':'var(--tx3)';
+  d.style.background=on?'var(--grn2)':'var(--bg3)';
+  d.style.borderColor=on?'var(--grn3)':'var(--bd2)';
 }
 function onDataChange(){
   if(!currentUser) return;
@@ -1587,12 +1603,13 @@ function switchTaskType(type){
   document.getElementById('ttt-tarea').classList.toggle('on', type==='tarea');
   document.getElementById('ttt-contenido').classList.toggle('on', type==='contenido');
   const isContent=type==='contenido';
-  // Tarea-only fields (includes state selector)
+  // Show/hide methodology-specific fields
   document.getElementById('tf-tarea-fields').style.display=isContent?'none':'block';
+  document.getElementById('tf-contenido-fields').style.display=isContent?'block':'none';
   // Date labels
   document.getElementById('tf-start-lbl').textContent=isContent?'Fecha de entrega':'Fecha inicio';
   document.getElementById('tf-end-lbl').textContent  =isContent?'Fecha de publicación':'Fecha fin';
-  // Populate TASK_STATES when switching to tarea
+  // Populate states
   if(!isContent){
     updateTaskFormStates(document.getElementById('tf-proj').value);
   }
@@ -1646,6 +1663,7 @@ function openTaskForm(taskId, projId, preDate){
     const currentState=editType==='contenido'?(t.calStatus||'idea'):(t.taskStatus||'pendiente');
     switchTaskType(editType);
     if(editType==='tarea') updateTaskFormStates(t.projectId, currentState);
+    if(editType==='contenido') document.getElementById('tf-calstatus').value=currentState;
     document.getElementById('tf-id').value   =t.id;
     document.getElementById('tf-name').value =t.name;
     document.getElementById('tf-desc').value =t.desc||'';
@@ -1694,7 +1712,7 @@ async function saveTaskForm(){
 
   let kStatus=existing?.kStatus||'investigacion', calStatus='idea', taskStatus='pendiente', status='pending';
   if(taskType==='contenido'){
-    calStatus=existing?.calStatus||'idea';
+    calStatus=document.getElementById('tf-calstatus').value||existing?.calStatus||'idea';
     const col=CAL_COLS.find(c=>c.id===calStatus);
     status=col?.done?'done':'pending';
   } else {
