@@ -635,7 +635,7 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
       <div class="page-hdr">
         <div class="page-title">PULSE WEEK</div>
         <div class="ml-auto">
-          <button class="btn btn-p btn-sm" onclick="_taskFromProjId=null;openTaskForm(null)">+ Nueva Tarea</button>
+          <button class="btn btn-p btn-sm" onclick="openNewTask()">+ Nueva Tarea</button>
         </div>
       </div>
 
@@ -2093,7 +2093,11 @@ function renderOpsView(){
   if(!projs.length){ lanesEl.innerHTML=''; return; }
   // Sort projects: alta → media → baja
   const prioOrder={alta:0,media:1,baja:2};
-  const sorted=[...projs].sort((a,b)=>(prioOrder[a.priority||'media']||1)-(prioOrder[b.priority||'media']||1));
+  const sorted=[...projs].sort((a,b)=>{
+    const oa=prioOrder[a.priority??'media']??1;
+    const ob=prioOrder[b.priority??'media']??1;
+    return oa-ob;
+  });
   const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
   const html=sorted.map(p=>{
     const am=AREAS[p.area]||AREAS.general;
@@ -2483,6 +2487,8 @@ async function saveTaskForm(){
 
 // createTask is no longer used (gestión inline form removed)
 function createTask(){ openTaskForm(null); }
+// Free-form task (resets any project lock before opening)
+function openNewTask(){ _taskFromProjId=null; openTaskForm(null); }
 
 async function toggleTask(id){
   const t=_tasks.find(x=>x.id===id); if(!t) return;
@@ -3027,7 +3033,7 @@ Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
-  createTask, openTaskForm, saveTaskForm, toggleTask,
+  createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
   openNewTaskForProj, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   calNav, calDayClick,
