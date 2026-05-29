@@ -389,6 +389,27 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 .ops-lane-hdr{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--bd);background:var(--bg3);}
 .ops-lane-name{font-size:12px;font-weight:700;flex:1;}
 .ops-lane-body{padding:8px;}
+/* ── OPS PROJECT CARDS ── */
+.ops-proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.ops-pcard{background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.ops-pcard:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.35);}
+.ops-pcard-top{padding:14px 14px 10px;border-bottom:1px solid var(--bd);}
+.ops-pcard-icon{font-size:24px;margin-bottom:6px;}
+.ops-pcard-name{font-family:var(--font-display);font-size:14px;letter-spacing:.03em;line-height:1.2;margin-bottom:4px;}
+.ops-pcard-desc{font-size:10px;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ops-pcard-foot{padding:8px 14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.ops-pcard-bar{height:3px;background:var(--bg5);border-radius:3px;overflow:hidden;margin:2px 14px 10px;}
+.ops-pcard-fill{height:100%;border-radius:3px;transition:width .4s;}
+/* priority pill on project card */
+.prio-alta{background:var(--red2);color:var(--red);border:1px solid var(--red3);border-radius:20px;font-size:9px;font-weight:700;padding:2px 7px;letter-spacing:.04em;}
+.prio-media{background:var(--yel2);color:var(--yel);border:1px solid var(--yel3);border-radius:20px;font-size:9px;font-weight:700;padding:2px 7px;letter-spacing:.04em;}
+.prio-baja{background:var(--grn2);color:var(--grn);border:1px solid var(--grn3);border-radius:20px;font-size:9px;font-weight:700;padding:2px 7px;letter-spacing:.04em;}
+/* section label in ops modal */
+.ops-prio-lbl{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);padding:10px 0 4px;border-bottom:1px solid var(--bd);margin-bottom:6px;}
+.ops-prio-lbl:first-child{padding-top:0;}
+/* project dates */
+.proj-dates{display:flex;gap:10px;font-size:9px;color:var(--tx3);margin-top:4px;}
+.proj-dates span{display:flex;align-items:center;gap:3px;}
 
 /* ── MOBILE RESPONSIVE ── */
 @media(max-width:640px){
@@ -434,8 +455,9 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
   /* Revision table scrollable */
   .rtbl{font-size:11px;}
 
-  /* Ops lanes single col */
+  /* Ops lanes / project cards single col */
   .ops-lanes-grid{grid-template-columns:1fr;}
+  .ops-proj-grid{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:440px){
   .nav-icon-btn{display:none;}
@@ -661,6 +683,7 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
           <option value="admin">🗂 Admin</option>
           <option value="ventas">💰 Ventas</option>
           <option value="edicion">✂️ Edición</option>
+          <option value="eventos">🎟 Eventos</option>
           <option value="general">💼 General</option>
         </select>
       </div>
@@ -687,7 +710,20 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
         </select>
       </div>
     </div>
-    <div class="fi"><label>Emoji</label><input type="text" id="mp-icon" placeholder="📁" maxlength="2" style="width:70px;"></div>
+    <div class="form-row">
+      <div class="fi"><label>Prioridad</label>
+        <select id="mp-prio">
+          <option value="alta">🔴 Alta</option>
+          <option value="media">🟡 Media</option>
+          <option value="baja">🟢 Baja</option>
+        </select>
+      </div>
+      <div class="fi"><label>Emoji</label><input type="text" id="mp-icon" placeholder="📁" maxlength="2" style="width:70px;"></div>
+    </div>
+    <div class="form-row">
+      <div class="fi"><label>Fecha inicio</label><input type="date" id="mp-start"></div>
+      <div class="fi"><label>Fecha cierre</label><input type="date" id="mp-end"></div>
+    </div>
     <div class="fi"><label>Equipo</label>
       <div class="assign-grid" id="mp-assign">
         <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>Leonardo</div>
@@ -734,6 +770,7 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
           <option value="admin">🗂 Admin</option>
           <option value="ventas">💰 Ventas</option>
           <option value="edicion">✂️ Edición</option>
+          <option value="eventos">🎟 Eventos</option>
           <option value="general">💼 General</option>
         </select>
       </div>
@@ -883,6 +920,45 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
   </div>
 </div>
 
+<!-- ═══ MODAL OPERACIONES — PROYECTO TAREAS ═══ -->
+<div class="mov" id="m-ops-proj">
+  <div class="modal" style="max-width:560px;">
+    <div class="mhdr">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+        <div id="opsp-icon" style="font-size:22px;flex-shrink:0;"></div>
+        <div style="min-width:0;">
+          <div class="mttl" id="opsp-name" style="font-size:15px;"></div>
+          <div id="opsp-meta" style="font-size:10px;color:var(--tx3);margin-top:1px;display:flex;gap:6px;align-items:center;"></div>
+        </div>
+      </div>
+      <button class="mclose" onclick="closeMod('m-ops-proj')">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:100px;background:var(--bg3);border-radius:8px;padding:8px 12px;text-align:center;">
+        <div id="opsp-total" style="font-family:var(--font-display);font-size:22px;"></div>
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;">Total</div>
+      </div>
+      <div style="flex:1;min-width:100px;background:var(--bg3);border-radius:8px;padding:8px 12px;text-align:center;">
+        <div id="opsp-pending" style="font-family:var(--font-display);font-size:22px;color:var(--org);"></div>
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;">Pendientes</div>
+      </div>
+      <div style="flex:1;min-width:100px;background:var(--bg3);border-radius:8px;padding:8px 12px;text-align:center;">
+        <div id="opsp-done" style="font-family:var(--font-display);font-size:22px;color:var(--grn);"></div>
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;">Completadas</div>
+      </div>
+      <div style="flex:1;min-width:100px;background:var(--bg3);border-radius:8px;padding:8px 12px;text-align:center;">
+        <div id="opsp-pct" style="font-family:var(--font-display);font-size:22px;color:var(--blu);"></div>
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;">Progreso</div>
+      </div>
+    </div>
+    <div id="opsp-body" style="max-height:55vh;overflow-y:auto;"></div>
+    <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-ops-proj')">Cerrar</button>
+      <button class="btn btn-p btn-sm" id="opsp-goto-btn">Ver proyecto →</button>
+    </div>
+  </div>
+</div>
+
 <script src="seed-data.js"></script>
 <script type="module">
 import { firebaseInit, isConnected,
@@ -912,6 +988,7 @@ const AREAS = {
   admin:      {label:'Admin',       icon:'🗂',  cls:'bw', color:'var(--tx3)'},
   ventas:     {label:'Ventas',      icon:'💰', cls:'by', color:'var(--yel)'},
   edicion:    {label:'Edición',     icon:'✂️',  cls:'br', color:'var(--red)'},
+  eventos:    {label:'Eventos',     icon:'🎟', cls:'bp', color:'var(--pur)'},
   general:    {label:'General',     icon:'💼', cls:'bw', color:'var(--tx3)'},
 };
 const PRIOS = {
@@ -1207,8 +1284,8 @@ function renderDashboard(){
 
   const all=myTasks();
   const today=todayStr();
-  const todayTasks=all.filter(t=>t.status!=='done'&&(tEnd(t)===today||tStart(t)===today));
-  const overdue   =all.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today);
+  const todayTasks=all.filter(t=>t.status!=='done'&&(tEnd(t)===today||tStart(t)===today)&&(t.priority||'media')==='alta');
+  const overdue   =all.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today&&(t.priority||'media')==='alta');
   const done      =all.filter(t=>t.status==='done');
   const myProjs   =visibleProjects();
 
@@ -1594,6 +1671,12 @@ function renderProjGrid(){
     </div>`:'';
     const bgMap={bo:'var(--org2)',bb:'var(--blu2)',bg:'var(--grn2)',bp:'var(--pur2)',bw:'var(--bg5)'};
     const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
+    const prioMap={alta:'🔴 Alta',media:'🟡 Media',baja:'🟢 Baja'};
+    const prioCls={alta:'prio-alta',media:'prio-media',baja:'prio-baja'};
+    const prioLabel=prioMap[p.priority||'media'];
+    const prioCl=prioCls[p.priority||'media'];
+    const dateStr=p.startDate||p.endDate
+      ?`<div class="proj-dates">${p.startDate?`<span>🟢 ${p.startDate}</span>`:''}${p.endDate?`<span>🔴 ${p.endDate}</span>`:''}</div>`:'';
     return `<div class="proj-card" onclick="navigate('proj-detail','${p.id}')">
       ${editBtns}
       <div class="pc-top">
@@ -1605,10 +1688,11 @@ function renderProjGrid(){
       </div>
       <div class="pc-foot">
         <span class="bdg ${am.cls}">${am.icon} ${am.label}</span>
-        <span class="bdg bw">${methIcon} ${methLabel}</span>
+        <span class="${prioCl}">${prioLabel}</span>
         ${p.type==='cyclic'?`<span class="bdg bb">🔄</span>`:''}
         <div class="flex" style="gap:2px;margin-left:auto;">${teamDots}</div>
       </div>
+      ${dateStr}
       <div style="display:flex;justify-content:space-between;margin-top:10px;" class="txt-xs txt-muted">
         <span>${pt.length} tareas</span><span>${pct}%</span>
       </div>
@@ -1896,48 +1980,87 @@ function renderOpsView(){
       <div class="hstat-num" style="color:var(--grn);">${doneTd.length}</div>
       <div class="hstat-lbl">✅ Completadas</div>
     </div>`;
-  // ── Team Lanes ──
+  // ── Project Cards ──
   const lanesEl=document.getElementById('ops-lanes');
   if(!lanesEl) return;
-  const members=Object.values(USERS);
-  const html=members.map(u=>{
-    const rm=ROLES[u.role];
-    const photo=getUserPhoto(u.id);
-    const avIn=photo?`<img src="${photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
-                    :`<span style="font-size:10px;font-weight:700;">${u.name.charAt(0).toUpperCase()}</span>`;
-    const uTasks=allT.filter(t=>(t.assignedUsers||[]).includes(u.id));
-    const uPend =uTasks.filter(t=>t.status!=='done');
-    const uDone =uTasks.filter(t=>t.status==='done').length;
-    const online=_presence[u.id]?.online===true;
-    const pct   =uTasks.length?Math.round(uDone/uTasks.length*100):0;
-    const topTasks=uPend.slice(0,4);
-    return `<div class="ops-lane">
-      <div class="ops-lane-hdr">
-        <div class="user-av" style="width:24px;height:24px;background:${photo?'transparent':rm.bg};color:${rm.color};border-color:${rm.brd};flex-shrink:0;">${avIn}</div>
-        <span class="ops-lane-name">${u.name}</span>
-        <div class="online-pip ${online?'on':'off'}" style="margin-right:2px;"></div>
-        <span style="font-size:9px;font-weight:700;background:var(--bg4);color:var(--tx3);padding:2px 6px;border-radius:20px;">${uPend.length}</span>
+  const projs=visibleProjects();
+  if(!projs.length){ lanesEl.innerHTML=''; return; }
+  // Sort projects: alta → media → baja
+  const prioOrder={alta:0,media:1,baja:2};
+  const sorted=[...projs].sort((a,b)=>(prioOrder[a.priority||'media']||1)-(prioOrder[b.priority||'media']||1));
+  const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
+  const html=sorted.map(p=>{
+    const am=AREAS[p.area]||AREAS.general;
+    const pt=allT.filter(t=>t.projectId===p.id);
+    const pend=pt.filter(t=>t.status!=='done').length;
+    const done=pt.filter(t=>t.status==='done').length;
+    const pct=pt.length?Math.round(done/pt.length*100):0;
+    const fill=fillMap[am.cls]||'var(--tx3)';
+    const prioCls={alta:'prio-alta',media:'prio-media',baja:'prio-baja'};
+    const prioLbl={alta:'🔴 Alta',media:'🟡 Media',baja:'🟢 Baja'};
+    const pc=prioCls[p.priority||'media'];
+    const pl=prioLbl[p.priority||'media'];
+    const dateStr=p.endDate?`<span style="font-size:9px;color:var(--tx3);">🔴 ${p.endDate}</span>`:'';
+    return `<div class="ops-pcard" onclick="openOpsProjModal('${p.id}')">
+      <div class="ops-pcard-top">
+        <div class="ops-pcard-icon">${p.icon||'📁'}</div>
+        <div class="ops-pcard-name">${esc(p.name)}</div>
+        <div class="ops-pcard-desc">${esc(p.desc)||'Sin descripción'}</div>
       </div>
-      <div class="ops-lane-body">
-        ${topTasks.length
-          ? topTasks.map(t=>{
-              const stateColorMap={pendiente:'var(--tx3)','en-proceso':'var(--blu)',revision:'var(--yel)',completada:'var(--grn)'};
-              const dot=stateColorMap[t.taskStatus||'pendiente']||'var(--tx3)';
-              return `<div onclick="openTaskDetail('${t.id}')" style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--bd);cursor:pointer;">
-                <div style="width:7px;height:7px;border-radius:50%;background:${dot};flex-shrink:0;"></div>
-                <span style="font-size:11px;color:var(--tx2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(t.name)}</span>
-              </div>`;
-            }).join('')
-          : `<div style="font-size:10px;color:var(--tx3);padding:8px 0;text-align:center;">✓ Sin tareas pendientes</div>`}
-        ${uPend.length>4?`<div style="font-size:9px;color:var(--tx3);padding-top:4px;text-align:center;">+${uPend.length-4} más</div>`:''}
-        <div style="margin-top:6px;">
-          <div class="prog-bg"><div class="prog-fill" style="width:${pct}%;background:${rm.color};"></div></div>
-          <div style="font-size:9px;color:var(--tx3);margin-top:2px;">${pct}% completado · ${uTasks.length} total</div>
-        </div>
+      <div class="ops-pcard-foot">
+        <span class="bdg ${am.cls}">${am.icon}</span>
+        <span class="${pc}">${pl}</span>
+        ${dateStr}
+        <span style="margin-left:auto;font-size:9px;color:var(--tx3);">${pend} pendientes</span>
       </div>
+      <div class="ops-pcard-bar"><div class="ops-pcard-fill" style="width:${pct}%;background:${fill};"></div></div>
     </div>`;
   }).join('');
-  lanesEl.innerHTML=`<div class="ops-lanes-grid">${html}</div>`;
+  lanesEl.innerHTML=`<div class="ops-proj-grid">${html}</div>`;
+}
+
+function openOpsProjModal(projId){
+  const p=_projects.find(x=>x.id===projId); if(!p) return;
+  const am=AREAS[p.area]||AREAS.general;
+  const pt=_tasks.filter(t=>t.projectId===projId);
+  const pend=pt.filter(t=>t.status!=='done');
+  const done=pt.filter(t=>t.status==='done').length;
+  const pct =pt.length?Math.round(done/pt.length*100):0;
+  const prioCls={alta:'prio-alta',media:'prio-media',baja:'prio-baja'};
+  const prioLbl={alta:'🔴 Alta',media:'🟡 Media',baja:'🟢 Baja'};
+  // header
+  document.getElementById('opsp-icon').textContent=p.icon||'📁';
+  document.getElementById('opsp-name').textContent=p.name;
+  document.getElementById('opsp-meta').innerHTML=`
+    <span class="bdg ${am.cls}">${am.icon} ${am.label}</span>
+    <span class="${prioCls[p.priority||'media']}">${prioLbl[p.priority||'media']}</span>
+    ${p.startDate?`<span style="font-size:9px;color:var(--tx3);">🟢 ${p.startDate}</span>`:''}
+    ${p.endDate  ?`<span style="font-size:9px;color:var(--tx3);">🔴 ${p.endDate}</span>`  :''}`;
+  // mini stats
+  document.getElementById('opsp-total').textContent  =pt.length;
+  document.getElementById('opsp-pending').textContent=pend.length;
+  document.getElementById('opsp-done').textContent   =done;
+  document.getElementById('opsp-pct').textContent    =pct+'%';
+  // "goto project" button
+  document.getElementById('opsp-goto-btn').onclick=()=>{ closeMod('m-ops-proj'); navigate('proj-detail',projId); };
+  // body — tasks grouped by priority
+  const alta  =pend.filter(t=>(t.priority||'media')==='alta');
+  const media =pend.filter(t=>(t.priority||'media')==='media');
+  const baja  =pend.filter(t=>(t.priority||'media')==='baja');
+  const doneTks=pt.filter(t=>t.status==='done');
+  function section(label, color, tasks){
+    if(!tasks.length) return '';
+    return `<div class="ops-prio-lbl" style="color:${color};">${label}</div>
+      ${tasks.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;">${taskRowHTML(t)}</div>`).join('')}`;
+  }
+  const body=
+    section('🔴 Alta prioridad','var(--red)',alta)+
+    section('🟡 Media prioridad','var(--yel)',media)+
+    section('🟢 Baja prioridad','var(--grn)',baja)+
+    (doneTks.length?`<div class="ops-prio-lbl" style="color:var(--grn);">✅ Completadas (${doneTks.length})</div>
+      ${doneTks.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;opacity:.55;">${taskRowHTML(t)}</div>`).join('')}`:'');
+  document.getElementById('opsp-body').innerHTML=body||'<div class="empty"><p>Sin tareas en este proyecto.</p></div>';
+  openMod('m-ops-proj');
 }
 
 function renderGTaskList(){
@@ -2020,14 +2143,17 @@ function openNewProj(){
 }
 function openEditProj(id){
   const p=_projects.find(x=>x.id===id); if(!p) return;
-  document.getElementById('mp-id').value  =p.id;
-  document.getElementById('mp-name').value=p.name;
-  document.getElementById('mp-desc').value=p.desc||'';
-  document.getElementById('mp-area').value=p.area||'marketing';
-  document.getElementById('mp-meth').value=p.meth||'lista';
-  document.getElementById('mp-type').value=p.type||'once';
-  document.getElementById('mp-cycle').value=p.cycle||'weekly';
-  document.getElementById('mp-icon').value=p.icon||'';
+  document.getElementById('mp-id').value    =p.id;
+  document.getElementById('mp-name').value  =p.name;
+  document.getElementById('mp-desc').value  =p.desc||'';
+  document.getElementById('mp-area').value  =p.area||'marketing';
+  document.getElementById('mp-meth').value  =p.meth||'lista';
+  document.getElementById('mp-type').value  =p.type||'once';
+  document.getElementById('mp-cycle').value =p.cycle||'weekly';
+  document.getElementById('mp-icon').value  =p.icon||'';
+  document.getElementById('mp-prio').value  =p.priority||'media';
+  document.getElementById('mp-start').value =p.startDate||'';
+  document.getElementById('mp-end').value   =p.endDate||'';
   document.getElementById('mp-cycle-w').style.display=p.type==='cyclic'?'block':'none';
   const team=p.team||[];
   document.querySelectorAll('#mp-assign .a-chip').forEach(c=>{
@@ -2044,26 +2170,30 @@ async function saveProject(){
   const team=[...document.querySelectorAll('#mp-assign .a-chip.sel')].map(c=>c.dataset.value);
   const proj={
     id, name,
-    desc: document.getElementById('mp-desc').value.trim(),
-    area: document.getElementById('mp-area').value,
-    meth: document.getElementById('mp-meth').value,
-    type: document.getElementById('mp-type').value,
-    cycle:cyclic?document.getElementById('mp-cycle').value:null,
-    icon: document.getElementById('mp-icon').value||'📁',
+    desc:      document.getElementById('mp-desc').value.trim(),
+    area:      document.getElementById('mp-area').value,
+    meth:      document.getElementById('mp-meth').value,
+    type:      document.getElementById('mp-type').value,
+    cycle:     cyclic?document.getElementById('mp-cycle').value:null,
+    icon:      document.getElementById('mp-icon').value||'📁',
+    priority:  document.getElementById('mp-prio').value||'media',
+    startDate: document.getElementById('mp-start').value||null,
+    endDate:   document.getElementById('mp-end').value||null,
     team,
-    status:_projects.find(p=>p.id===id)?.status||'active',
-    createdAt:_projects.find(p=>p.id===id)?.createdAt||Date.now(),
-    createdBy:_projects.find(p=>p.id===id)?.createdBy||currentUser.id,
+    status:    _projects.find(p=>p.id===id)?.status||'active',
+    createdAt: _projects.find(p=>p.id===id)?.createdAt||Date.now(),
+    createdBy: _projects.find(p=>p.id===id)?.createdBy||currentUser.id,
   };
   await persistProject(proj);
   closeMod('m-proj'); clearProjForm();
   if(!_fbOn) renderProjGrid();
 }
 function clearProjForm(){
-  ['mp-id','mp-name','mp-desc','mp-icon'].forEach(i=>document.getElementById(i).value='');
+  ['mp-id','mp-name','mp-desc','mp-icon','mp-start','mp-end'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('mp-area').value='marketing';
   document.getElementById('mp-meth').value='lista';
   document.getElementById('mp-type').value='once';
+  document.getElementById('mp-prio').value='media';
   document.getElementById('mp-cycle-w').style.display='none';
   document.querySelectorAll('#mp-assign .a-chip').forEach(c=>c.classList.remove('sel'));
 }
@@ -2558,7 +2688,7 @@ Object.assign(window,{
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openTaskForm, saveTaskForm, toggleTask,
-  openNewTaskForProj, renderGTaskList, populateGestionFilters, renderOpsView,
+  openNewTaskForProj, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
