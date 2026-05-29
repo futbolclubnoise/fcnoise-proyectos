@@ -376,12 +376,72 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 /* ── NAV ICON BUTTONS ── */
 .nav-icon-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0;}
 .nav-icon-btn:hover{background:var(--bg4);color:var(--tx);}
-.nav-icon-btn.danger{color:var(--red);}
-.nav-icon-btn.danger:hover{background:var(--red2);border-color:var(--red3);}
+.nav-logout{padding:5px 12px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--tx3);font-family:var(--font-body);font-size:10px;font-weight:600;cursor:pointer;transition:all .18s;letter-spacing:.04em;white-space:nowrap;flex-shrink:0;}
+.nav-logout:hover{color:var(--red);border-color:var(--red3);background:var(--red2);}
 
 /* ── THEME BUTTONS ── */
 .theme-pair{display:flex;gap:6px;}
 .theme-pair button{flex:1;padding:8px 0;border-radius:10px;font-family:var(--font-body);font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;letter-spacing:.02em;}
+
+/* ── OPS LANES (Operaciones) ── */
+.ops-lanes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.ops-lane{background:var(--bg2);border:1px solid var(--bd2);border-radius:12px;overflow:hidden;}
+.ops-lane-hdr{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--bd);background:var(--bg3);}
+.ops-lane-name{font-size:12px;font-weight:700;flex:1;}
+.ops-lane-body{padding:8px;}
+
+/* ── MOBILE RESPONSIVE ── */
+@media(max-width:640px){
+  /* Nav: make links scroll horizontally, shrink right side */
+  .nav{padding:0 12px;gap:4px;height:48px;}
+  .nav-brand{font-size:18px;margin-right:4px;}
+  .nav-links{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:1px;}
+  .nav-links::-webkit-scrollbar{display:none;}
+  .nav-link{padding:4px 9px;font-size:10px;white-space:nowrap;}
+  .nav-right{gap:4px;}
+  .sync-dot{font-size:8px;padding:3px 7px;}
+  .nav-logout{display:none;} /* hidden on mobile — logout via settings */
+  .user-av{width:28px;height:28px;}
+
+  /* App body padding */
+  .app-body{padding:10px;}
+
+  /* Page headers */
+  .page-hdr{margin-bottom:12px;}
+  .page-title{font-size:20px;}
+
+  /* Modals fill from bottom */
+  .modal{padding:18px 16px;}
+
+  /* Dashboard greeting */
+  .home-greeting{padding:6px 0 10px;}
+  .home-greeting-av{width:40px;height:40px;}
+  .greeting-name{font-size:18px;}
+
+  /* Stats 2-col on mobile */
+  .home-stats{grid-template-columns:repeat(2,1fr);gap:6px;}
+  .hstat{padding:10px 12px;}
+  .hstat-num{font-size:24px;}
+
+  /* Full-width task tickets, project cards */
+  .proj-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+
+  /* Kanban scroll */
+  .kanban-board{gap:8px;}
+  .kanban-col{min-width:190px;}
+
+  /* Revision table scrollable */
+  .rtbl{font-size:11px;}
+
+  /* Ops lanes single col */
+  .ops-lanes-grid{grid-template-columns:1fr;}
+}
+@media(max-width:440px){
+  .nav-icon-btn{display:none;}
+  .user-av{display:flex;}
+  /* Settings still accessible via avatar */
+}
 
 /* ── HOME DASHBOARD ── */
 .home-greeting{display:flex;align-items:center;gap:14px;padding:10px 0 14px;}
@@ -484,7 +544,7 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <div class="nav-right">
       <div class="sync-dot" id="sync-dot" onclick="toggleLive()" title="Conectar / desconectar en tiempo real" style="cursor:pointer;">Off Live</div>
       <button class="nav-icon-btn" onclick="openSettingsModal()" title="Configuraciones">⚙️</button>
-      <button class="nav-icon-btn danger" onclick="logout()" title="Cerrar sesión">🚪</button>
+      <button class="nav-logout" onclick="logout()">Cerrar sesión</button>
       <div class="user-av" id="nav-av" title="Perfil" style="overflow:hidden;padding:0;" onclick="openSettingsModal()"></div>
     </div>
   </nav>
@@ -515,38 +575,39 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
       <div id="meth-content"></div>
     </div>
 
-    <!-- ── GESTIÓN (Admin) ── -->
+    <!-- ── CENTRO DE OPERACIONES (Admin) ── -->
     <div id="view-gestion" class="hidden">
       <div class="page-hdr">
-        <div class="page-title">Gestión de Tareas</div>
+        <div class="page-title">Operaciones</div>
         <div class="ml-auto">
           <button class="btn btn-p btn-sm" onclick="_taskFromProjId=null;openTaskForm(null)">+ Nueva Tarea</button>
         </div>
       </div>
+      <!-- Stats -->
+      <div class="home-stats" id="ops-stats" style="margin-bottom:16px;"></div>
+      <!-- Team lanes -->
+      <div id="ops-lanes" style="margin-bottom:16px;"></div>
+      <!-- Full task list -->
       <div class="panel">
         <div class="panel-hdr">
-          <span class="panel-ttl">Todas las Tareas</span>
-          <div class="flex gap-6">
+          <span class="panel-ttl">Todas las tareas</span>
+          <div class="flex gap-6" style="flex-wrap:wrap;">
             <select id="ft-proj" onchange="renderGTaskList()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:'Inter',sans-serif;">
               <option value="all">Todos los proyectos</option>
             </select>
             <select id="ft-user" onchange="renderGTaskList()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:'Inter',sans-serif;">
-              <option value="all">Todos</option>
+              <option value="all">Todo el equipo</option>
               <option value="leonardo">Leonardo</option>
               <option value="veronica">Verónica</option>
               <option value="laura">Laura</option>
               <option value="editor">Editor</option>
             </select>
-            <select id="ft-area" onchange="renderGTaskList()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:'Inter',sans-serif;">
-              <option value="all">Todas las áreas</option>
-              <option value="marketing">Marketing</option>
-              <option value="estrategia">Estrategia</option>
-              <option value="operaciones">Operaciones</option>
-              <option value="diseno">Diseño</option>
-              <option value="admin">Admin</option>
-              <option value="ventas">Ventas</option>
-              <option value="edicion">Edición</option>
-              <option value="general">General</option>
+            <select id="ft-status" onchange="renderGTaskList()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:'Inter',sans-serif;">
+              <option value="all">Todos los estados</option>
+              <option value="pendiente">⬜ Pendiente</option>
+              <option value="en-proceso">🔵 En proceso</option>
+              <option value="revision">🟡 Revisión</option>
+              <option value="completada">✅ Completada</option>
             </select>
           </div>
         </div>
@@ -1039,7 +1100,7 @@ function onDataChange(){
   if(currentView==='tasks')       renderDashboard();
   if(currentView==='projs')       renderProjGrid();
   if(currentView==='proj-detail') renderProjDetail(currentProjId);
-  if(currentView==='gestion')     renderGTaskList();
+  if(currentView==='gestion')     { renderOpsView(); renderGTaskList(); }
   if(currentView==='revision')    renderRevision();
   if(currentView==='eventos')     renderEventos();
   // refresh open detail popup if needed
@@ -1105,8 +1166,7 @@ function renderNav(){
   document.getElementById('nav-links').innerHTML=`
     <button class="nav-link" onclick="navigate('tasks')">Inicio</button>
     <button class="nav-link" onclick="navigate('projs')">Proyectos</button>
-    <button class="nav-link" onclick="navigate('eventos')">Eventos</button>
-    ${admin?`<button class="nav-link" onclick="navigate('gestion')">Gestión</button>
+    ${admin?`<button class="nav-link" onclick="navigate('gestion')">Operaciones</button>
              <button class="nav-link" onclick="navigate('revision')">Revisión</button>`:''}`;
 }
 
@@ -1117,15 +1177,15 @@ function navigate(view, projId){
     document.getElementById('view-'+v)?.classList.add('hidden'));
   document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('on'));
   document.getElementById('view-'+view)?.classList.remove('hidden');
-  // nav link index: 0=Inicio 1=Proyectos 2=Eventos 3=Gestión(admin) 4=Revisión(admin)
-  const map={'tasks':0,'projs':1,'eventos':2,'gestion':3,'revision':4};
+  // nav link index: 0=Inicio 1=Proyectos 2=Operaciones(admin) 3=Revisión(admin)
+  const map={'tasks':0,'projs':1,'gestion':2,'revision':3};
   const links=document.querySelectorAll('.nav-link');
   const idx=map[view]; if(idx!==undefined && links[idx]) links[idx].classList.add('on');
 
   if(view==='tasks')       renderDashboard();
   if(view==='projs')       renderProjGrid();
   if(view==='proj-detail') renderProjDetail(currentProjId);
-  if(view==='gestion')     { populateGestionFilters(); renderGTaskList(); }
+  if(view==='gestion')     { renderOpsView(); populateGestionFilters(); renderGTaskList(); }
   if(view==='revision')    renderRevision();
   if(view==='eventos')     renderEventos();
 }
@@ -1805,27 +1865,99 @@ function showAlerts(){
    GESTIÓN (Admin)
 ═══════════════════════════════════════ */
 function populateGestionFilters(){
-  // populate project filter
   const sel=document.getElementById('ft-proj'); if(!sel) return;
   sel.innerHTML=`<option value="all">Todos los proyectos</option>`+
     _projects.map(p=>`<option value="${p.id}">${p.icon||'📁'} ${esc(p.name)}</option>`).join('');
 }
 
+function renderOpsView(){
+  const today=new Date().toISOString().slice(0,10);
+  // ── Stats ──
+  const allT=_tasks;
+  const urgent  =allT.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today);
+  const inProc  =allT.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='en-proceso');
+  const inRev   =allT.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='revision');
+  const doneTd  =allT.filter(t=>t.status==='done');
+  const statsEl =document.getElementById('ops-stats');
+  if(statsEl) statsEl.innerHTML=`
+    <div class="hstat">
+      <div class="hstat-num" style="color:var(--red);">${urgent.length}</div>
+      <div class="hstat-lbl">⚠️ Atrasadas</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num" style="color:var(--blu);">${inProc.length}</div>
+      <div class="hstat-lbl">🔵 En proceso</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num" style="color:var(--yel);">${inRev.length}</div>
+      <div class="hstat-lbl">🟡 En revisión</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num" style="color:var(--grn);">${doneTd.length}</div>
+      <div class="hstat-lbl">✅ Completadas</div>
+    </div>`;
+  // ── Team Lanes ──
+  const lanesEl=document.getElementById('ops-lanes');
+  if(!lanesEl) return;
+  const members=Object.values(USERS);
+  const html=members.map(u=>{
+    const rm=ROLES[u.role];
+    const photo=getUserPhoto(u.id);
+    const avIn=photo?`<img src="${photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+                    :`<span style="font-size:10px;font-weight:700;">${u.name.charAt(0).toUpperCase()}</span>`;
+    const uTasks=allT.filter(t=>(t.assignedUsers||[]).includes(u.id));
+    const uPend =uTasks.filter(t=>t.status!=='done');
+    const uDone =uTasks.filter(t=>t.status==='done').length;
+    const online=_presence[u.id]?.online===true;
+    const pct   =uTasks.length?Math.round(uDone/uTasks.length*100):0;
+    const topTasks=uPend.slice(0,4);
+    return `<div class="ops-lane">
+      <div class="ops-lane-hdr">
+        <div class="user-av" style="width:24px;height:24px;background:${photo?'transparent':rm.bg};color:${rm.color};border-color:${rm.brd};flex-shrink:0;">${avIn}</div>
+        <span class="ops-lane-name">${u.name}</span>
+        <div class="online-pip ${online?'on':'off'}" style="margin-right:2px;"></div>
+        <span style="font-size:9px;font-weight:700;background:var(--bg4);color:var(--tx3);padding:2px 6px;border-radius:20px;">${uPend.length}</span>
+      </div>
+      <div class="ops-lane-body">
+        ${topTasks.length
+          ? topTasks.map(t=>{
+              const stateColorMap={pendiente:'var(--tx3)','en-proceso':'var(--blu)',revision:'var(--yel)',completada:'var(--grn)'};
+              const dot=stateColorMap[t.taskStatus||'pendiente']||'var(--tx3)';
+              return `<div onclick="openTaskDetail('${t.id}')" style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--bd);cursor:pointer;">
+                <div style="width:7px;height:7px;border-radius:50%;background:${dot};flex-shrink:0;"></div>
+                <span style="font-size:11px;color:var(--tx2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(t.name)}</span>
+              </div>`;
+            }).join('')
+          : `<div style="font-size:10px;color:var(--tx3);padding:8px 0;text-align:center;">✓ Sin tareas pendientes</div>`}
+        ${uPend.length>4?`<div style="font-size:9px;color:var(--tx3);padding-top:4px;text-align:center;">+${uPend.length-4} más</div>`:''}
+        <div style="margin-top:6px;">
+          <div class="prog-bg"><div class="prog-fill" style="width:${pct}%;background:${rm.color};"></div></div>
+          <div style="font-size:9px;color:var(--tx3);margin-top:2px;">${pct}% completado · ${uTasks.length} total</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  lanesEl.innerHTML=`<div class="ops-lanes-grid">${html}</div>`;
+}
+
 function renderGTaskList(){
   const fp=document.getElementById('ft-proj')?.value||'all';
   const fu=document.getElementById('ft-user')?.value||'all';
-  const fa=document.getElementById('ft-area')?.value||'all';
+  const fs=document.getElementById('ft-status')?.value||'all';
   let ts=[..._tasks];
   if(fp!=='all') ts=ts.filter(t=>t.projectId===fp);
   if(fu!=='all') ts=ts.filter(t=>(t.assignedUsers||[]).includes(fu));
-  if(fa!=='all') ts=ts.filter(t=>t.area===fa);
+  if(fs!=='all'){
+    if(fs==='completada') ts=ts.filter(t=>t.status==='done');
+    else ts=ts.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')===fs);
+  }
   const el=document.getElementById('g-task-list');
   if(!ts.length){ el.innerHTML='<div class="empty"><p>Sin tareas con estos filtros.</p></div>'; return; }
   const byP={};
   ts.forEach(t=>{ if(!byP[t.projectId]) byP[t.projectId]=[]; byP[t.projectId].push(t); });
   el.innerHTML=Object.entries(byP).map(([pid,arr])=>{
     const p=_projects.find(x=>x.id===pid);
-    return `<div class="sec-lbl">${p?(p.icon||'📁')+' '+p.name:'Sin proyecto'}</div>
+    return `<div class="sec-lbl">${p?(p.icon||'📁')+' '+esc(p.name):'Sin proyecto'}</div>
     <div style="margin-bottom:8px;">
       ${arr.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;">${taskRowHTML(t)}</div>`).join('')}
     </div>`;
@@ -2426,7 +2558,7 @@ Object.assign(window,{
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openTaskForm, saveTaskForm, toggleTask,
-  openNewTaskForProj, renderGTaskList, populateGestionFilters,
+  openNewTaskForProj, renderGTaskList, populateGestionFilters, renderOpsView,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
