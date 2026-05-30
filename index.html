@@ -542,25 +542,55 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 /* ── TIMELINE STRIP ── */
 .timeline-strip{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;margin-bottom:14px;scrollbar-width:none;}
 .timeline-strip::-webkit-scrollbar{display:none;}
-.tl-month{flex-shrink:0;width:82px;border-radius:12px;padding:10px 10px 8px;background:var(--bg2);border:1px solid var(--bd2);cursor:pointer;transition:all .2s;position:relative;}
-.tl-month:hover{border-color:var(--bd3);transform:translateY(-1px);}
-.tl-month.tl-cur{border-color:var(--orange);background:var(--ac2);box-shadow:0 0 18px rgba(255,122,0,.2);}
-.tl-month.tl-nxt{border-color:var(--bd3);}
-.tl-month.tl-past{opacity:.45;}
-.tl-m-name{font-family:var(--font-display);font-size:13px;letter-spacing:.05em;line-height:1;}
-.tl-m-year{font-size:9px;color:var(--tx3);margin-top:1px;}
-.tl-m-dots{display:flex;gap:3px;flex-wrap:wrap;margin-top:7px;min-height:11px;}
-.tl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.tl-month{flex-shrink:0;width:80px;border-radius:14px;padding:11px 10px 9px;background:rgba(20,24,31,0.65);border:1px solid var(--bd2);cursor:pointer;transition:all .22s;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.tl-month:hover{border-color:var(--bd3);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.tl-month.tl-cur{width:116px;background:var(--orange);border-color:transparent;box-shadow:0 6px 24px rgba(255,122,0,.4);}
+.tl-month.tl-cur .tl-m-name,.tl-month.tl-cur .tl-m-year{color:rgba(255,255,255,.9)!important;}
+.tl-month.tl-cur .tl-m-event{color:rgba(255,255,255,.75);}
+.tl-month.tl-cur .tl-m-dot{background:rgba(255,255,255,.6)!important;}
+.tl-month.tl-nxt{background:var(--ac2);border-color:var(--ac3);}
+.tl-month.tl-nxt .tl-m-name{color:var(--orange);}
+.tl-month.tl-past{opacity:.28;}
+.tl-m-name{font-family:var(--font-display);font-size:13px;letter-spacing:.05em;line-height:1;color:var(--tx);}
+.tl-m-year{font-size:8px;color:var(--tx3);margin-top:1px;letter-spacing:.04em;}
+.tl-m-events{margin-top:7px;display:flex;flex-direction:column;gap:2px;min-height:8px;}
+.tl-m-event{font-size:8.5px;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:3px;line-height:1.3;}
+.tl-m-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
 
 /* ── PULSE WEEK ── */
 .pw-section{margin-bottom:20px;}
 .pw-sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd2);}
-.pw-sec-ttl{font-family:var(--font-display);font-size:13px;letter-spacing:.1em;color:var(--tx3);}
-.pw-divider{height:1px;background:linear-gradient(90deg,var(--orange),transparent 70%);margin:16px 0;opacity:.3;}
-.gn-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg3);border:1px solid var(--grn3);margin-bottom:6px;}
-.gn-bullet{width:7px;height:7px;border-radius:50%;background:var(--grn);flex-shrink:0;margin-top:4px;}
+.pw-sec-ttl{font-family:var(--font-display);font-size:11px;letter-spacing:.14em;color:var(--tx3);}
+.pw-divider{height:1px;background:linear-gradient(90deg,var(--orange),transparent 70%);margin:16px 0;opacity:.25;}
+.gn-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(40,199,111,.05);border:1px solid var(--grn3);margin-bottom:6px;backdrop-filter:blur(8px);}
+.gn-bullet{width:6px;height:6px;border-radius:50%;background:var(--grn);flex-shrink:0;margin-top:5px;}
 .gn-text{font-size:12px;color:var(--tx2);flex:1;line-height:1.5;}
-.gn-date{font-size:10px;color:var(--tx3);flex-shrink:0;}
+.gn-date{font-size:9px;color:var(--tx3);flex-shrink:0;font-variant-numeric:tabular-nums;}
+/* Pulse weekly task cards */
+.pw-wk-section{margin-bottom:14px;}
+.pw-wk-hdr{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;}
+.pw-wk-ttl{font-family:var(--font-display);font-size:13px;letter-spacing:.06em;color:var(--tx2);}
+.pw-wk-cnt{font-size:10px;color:var(--tx3);font-weight:600;padding:1px 7px;border-radius:20px;background:var(--bg4);border:1px solid var(--bd2);}
+.pw-task{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(20,24,31,0.55);border:1px solid var(--bd2);border-radius:10px;margin-bottom:5px;cursor:pointer;transition:all .15s;backdrop-filter:blur(8px);border-left:2.5px solid transparent;}
+.pw-task:hover{background:rgba(20,24,31,0.8);transform:translateX(2px);}
+.pw-task.alta{border-left-color:var(--red);}
+.pw-task.media{border-left-color:var(--yel);}
+.pw-task.baja{border-left-color:var(--grn);}
+.pw-task-info{flex:1;min-width:0;}
+.pw-task-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pw-task-sub{font-size:10px;color:var(--tx3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pw-task-date{font-size:10px;color:var(--tx3);flex-shrink:0;font-variant-numeric:tabular-nums;}
+.pw-delayed{background:rgba(232,64,64,.06);border:1px solid var(--red3);border-radius:14px;padding:14px;margin-bottom:14px;backdrop-filter:blur(8px);}
+.pw-delayed-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.pw-delayed-ttl{font-family:var(--font-display);font-size:13px;letter-spacing:.06em;color:var(--red);}
+.pw-empty{font-size:11px;color:var(--tx3);padding:10px 0;text-align:center;}
+/* iOS-style Live toggle */
+.live-sw{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;padding:3px 0;}
+.lt-track{width:34px;height:19px;border-radius:10px;background:var(--bg5);border:1.5px solid var(--bd2);position:relative;transition:background .22s,border-color .22s;flex-shrink:0;}
+.lt-track.on{background:var(--grn);border-color:transparent;}
+.lt-thumb{width:13px;height:13px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .22s;box-shadow:0 1px 4px rgba(0,0,0,.35);}
+.lt-track.on .lt-thumb{transform:translateX(15px);}
+.lt-lbl{font-size:9px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;}
 
 /* ── PROJ LOCKED TAG (simple task form mode) ── */
 .proj-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:var(--ac2);border:1px solid var(--ac3);color:var(--orange);font-size:12px;font-weight:600;margin-bottom:14px;}
@@ -596,7 +626,10 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <div class="nav-brand">FC<em>NOISE.</em></div>
     <div class="nav-links" id="nav-links"></div>
     <div class="nav-right">
-      <div class="sync-dot" id="sync-dot" onclick="toggleLive()" title="Conectar / desconectar en tiempo real" style="cursor:pointer;">Off Live</div>
+      <div class="live-sw" onclick="toggleLive()" title="Conectar en tiempo real">
+        <div class="lt-track" id="lt-track"><div class="lt-thumb"></div></div>
+        <span class="lt-lbl" id="lt-lbl">Live</span>
+      </div>
       <button class="nav-icon-btn" onclick="openSettingsModal()" title="Configuraciones">⚙️</button>
       <button class="nav-logout" onclick="logout()">Cerrar sesión</button>
       <div class="user-av" id="nav-av" title="Perfil" style="overflow:hidden;padding:0;" onclick="openSettingsModal()"></div>
@@ -645,49 +678,21 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
           <span class="pw-sec-ttl">GOOD NEWS</span>
           <div id="pw-gn-btn"></div>
         </div>
-        <div id="pw-gn-list"><div style="font-size:11px;color:var(--tx3);padding:8px 0;">Sin noticias esta semana.</div></div>
+        <div id="pw-gn-list"></div>
       </div>
 
       <div class="pw-divider"></div>
 
-      <!-- Week analysis -->
-      <div class="pw-section">
-        <div class="pw-sec-hdr"><span class="pw-sec-ttl">ANÁLISIS</span></div>
-        <div id="pw-analysis"></div>
-      </div>
-
-      <div class="pw-divider"></div>
-
-      <!-- Stats -->
-      <div class="home-stats" id="ops-stats" style="margin-bottom:16px;"></div>
-      <!-- Project cards -->
+      <!-- Stats + Project cards -->
+      <div class="home-stats" id="ops-stats" style="margin-bottom:14px;"></div>
       <div id="ops-lanes" style="margin-bottom:16px;"></div>
-      <!-- Full task list -->
-      <div class="panel">
-        <div class="panel-hdr">
-          <span class="panel-ttl">TAREAS</span>
-          <div class="flex gap-6" style="flex-wrap:wrap;">
-            <select id="ft-proj" onchange="renderGTaskList()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:'Inter',sans-serif;">
-              <option value="all">Todos los proyectos</option>
-            </select>
-            <select id="ft-user" onchange="renderGTaskList()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:'Inter',sans-serif;">
-              <option value="all">Todo el equipo</option>
-              <option value="leonardo">Leonardo</option>
-              <option value="veronica">Verónica</option>
-              <option value="laura">Laura</option>
-              <option value="editor">Editor</option>
-            </select>
-            <select id="ft-status" onchange="renderGTaskList()" style="padding:5px 9px;font-size:10px;background:var(--bg4);border:1px solid var(--bd2);border-radius:7px;color:var(--tx);font-family:'Inter',sans-serif;">
-              <option value="all">Todos los estados</option>
-              <option value="pendiente">⬜ Pendiente</option>
-              <option value="en-proceso">🔵 En proceso</option>
-              <option value="revision">🟡 Revisión</option>
-              <option value="completada">✅ Completada</option>
-            </select>
-          </div>
-        </div>
-        <div id="g-task-list"></div>
-      </div>
+
+      <div class="pw-divider"></div>
+
+      <!-- Weekly tasks -->
+      <div id="pw-delayed"></div>
+      <div id="pw-thisweek"></div>
+      <div id="pw-nextweek"></div>
     </div>
 
     <!-- ── REVISIÓN CEO ── -->
@@ -1263,17 +1268,18 @@ window.addEventListener('beforeunload',()=>{
   if(_fbOn && currentUser) fbSetPresence(currentUser.id, false).catch(()=>{});
 });
 function setSyncDot(state){
-  const d=document.getElementById('sync-dot'); if(!d) return;
+  const track=document.getElementById('lt-track');
+  const lbl=document.getElementById('lt-lbl');
+  if(!track) return;
   if(state===true){
-    d.textContent='On Live'; d.style.color='var(--grn)';
-    d.style.background='var(--grn2)'; d.style.borderColor='var(--grn3)';
+    track.classList.add('on');
+    if(lbl){ lbl.textContent='Live'; lbl.style.color='var(--grn)'; }
   } else if(state==='connecting'||state==='uploading'){
-    const lbl=state==='uploading'?'Subiendo…':'Conectando…';
-    d.textContent=lbl; d.style.color='var(--yel)';
-    d.style.background='var(--yel2)'; d.style.borderColor='var(--yel3)';
+    track.classList.remove('on');
+    if(lbl){ lbl.textContent=state==='uploading'?'…sync':'…'; lbl.style.color='var(--yel)'; }
   } else {
-    d.textContent='Off Live'; d.style.color='var(--tx3)';
-    d.style.background='var(--bg3)'; d.style.borderColor='var(--bd2)';
+    track.classList.remove('on');
+    if(lbl){ lbl.textContent='Live'; lbl.style.color=''; }
   }
 }
 
@@ -1282,7 +1288,7 @@ function onDataChange(){
   if(currentView==='tasks')       renderDashboard();
   if(currentView==='projs')       renderProjGrid();
   if(currentView==='proj-detail') renderProjDetail(currentProjId);
-  if(currentView==='gestion')     { renderPulseWeek(); renderGTaskList(); }
+  if(currentView==='gestion')     { renderPulseWeek(); }
   if(currentView==='revision')    renderRevision();
   if(currentView==='eventos')     renderEventos();
   // refresh open detail popup if needed
@@ -1367,7 +1373,7 @@ function navigate(view, projId){
   if(view==='tasks')       renderDashboard();
   if(view==='projs')       renderProjGrid();
   if(view==='proj-detail') renderProjDetail(currentProjId);
-  if(view==='gestion')     { renderPulseWeek(); populateGestionFilters(); renderGTaskList(); }
+  if(view==='gestion')     { renderPulseWeek(); }
   if(view==='revision')    renderRevision();
   if(view==='eventos')     renderEventos();
 }
@@ -1777,7 +1783,7 @@ function renderProjGrid(){
     </div>`:'';
     const bgMap={bo:'var(--org2)',bb:'var(--blu2)',bg:'var(--grn2)',bp:'var(--pur2)',bw:'var(--bg5)'};
     const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
-    const prioMap={alta:'🔴 Alta',media:'🟡 Media',baja:'🟢 Baja'};
+    const prioMap={alta:'Alta',media:'Media',baja:'Baja'};
     const prioCls={alta:'prio-alta',media:'prio-media',baja:'prio-baja'};
     const prioLabel=prioMap[p.priority||'media'];
     const prioCl=prioCls[p.priority||'media'];
@@ -2107,7 +2113,7 @@ function renderOpsView(){
     const pct=pt.length?Math.round(done/pt.length*100):0;
     const fill=fillMap[am.cls]||'var(--tx3)';
     const prioCls={alta:'prio-alta',media:'prio-media',baja:'prio-baja'};
-    const prioLbl={alta:'🔴 Alta',media:'🟡 Media',baja:'🟢 Baja'};
+    const prioLbl={alta:'Alta',media:'Media',baja:'Baja'};
     const pc=prioCls[p.priority||'media'];
     const pl=prioLbl[p.priority||'media'];
     const dateStr=p.endDate?`<span style="font-size:9px;color:var(--tx3);">🔴 ${p.endDate}</span>`:'';
@@ -2137,7 +2143,7 @@ function openOpsProjModal(projId){
   const done=pt.filter(t=>t.status==='done').length;
   const pct =pt.length?Math.round(done/pt.length*100):0;
   const prioCls={alta:'prio-alta',media:'prio-media',baja:'prio-baja'};
-  const prioLbl={alta:'🔴 Alta',media:'🟡 Media',baja:'🟢 Baja'};
+  const prioLbl={alta:'Alta',media:'Media',baja:'Baja'};
   // header
   document.getElementById('opsp-icon').textContent=p.icon||'📁';
   document.getElementById('opsp-name').textContent=p.name;
@@ -2164,9 +2170,9 @@ function openOpsProjModal(projId){
       ${tasks.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;">${taskRowHTML(t)}</div>`).join('')}`;
   }
   const body=
-    section('🔴 Alta prioridad','var(--red)',alta)+
-    section('🟡 Media prioridad','var(--yel)',media)+
-    section('🟢 Baja prioridad','var(--grn)',baja)+
+    section('Alta prioridad','var(--red)',alta)+
+    section('Media prioridad','var(--yel)',media)+
+    section('Baja prioridad','var(--grn)',baja)+
     (doneTks.length?`<div class="ops-prio-lbl" style="color:var(--grn);">✅ Completadas (${doneTks.length})</div>
       ${doneTks.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;opacity:.55;">${taskRowHTML(t)}</div>`).join('')}`:'');
   document.getElementById('opsp-body').innerHTML=body||'<div class="empty"><p>Sin tareas en este proyecto.</p></div>';
@@ -2184,7 +2190,7 @@ function renderGTaskList(){
     if(fs==='completada') ts=ts.filter(t=>t.status==='done');
     else ts=ts.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')===fs);
   }
-  const el=document.getElementById('g-task-list');
+  const el=document.getElementById('g-task-list'); if(!el) return;
   if(!ts.length){ el.innerHTML='<div class="empty"><p>Sin tareas con estos filtros.</p></div>'; return; }
   const byP={};
   ts.forEach(t=>{ if(!byP[t.projectId]) byP[t.projectId]=[]; byP[t.projectId].push(t); });
@@ -2842,11 +2848,9 @@ function renderTimeline(){
   const curYear=now.getFullYear();
   const curMon=now.getMonth(); // 0-based
 
-  // Build list of 13 months: Jan of current year through Jan of next year
+  // 13 months: Jan cur-year → Jan next-year
   const months=[];
-  for(let m=0;m<12;m++){
-    months.push({year:curYear, mon:m});
-  }
+  for(let m=0;m<12;m++) months.push({year:curYear, mon:m});
   months.push({year:curYear+1, mon:0});
 
   const strips=months.map(({year,mon})=>{
@@ -2860,25 +2864,122 @@ function renderTimeline(){
     else if(isPast) cls+=' tl-past';
 
     const mils=_milestones.filter(ms=>ms.monthKey===mk);
-    const dots=mils.map(ms=>{
+    // Show titles (up to 3 for current/next, up to 1 for others)
+    const maxShow=isCur||isNxt?3:1;
+    const events=mils.slice(0,maxShow).map(ms=>{
       const col=MILESTONE_COLORS[ms.color]||'var(--orange)';
-      return `<div class="tl-dot" style="background:${col};" title="${esc(ms.title)}"></div>`;
+      return `<div class="tl-m-event"><div class="tl-m-dot" style="background:${col};"></div>${esc(ms.title)}</div>`;
     }).join('');
+    const extra=mils.length>maxShow?`<div class="tl-m-event" style="opacity:.55;">+${mils.length-maxShow} más</div>`:'';
 
     return `<div class="${cls}" onclick="openMonthModal('${mk}')">
       <div class="tl-m-name">${MONTH_NAMES_SHORT[mon]}</div>
       <div class="tl-m-year">${year}</div>
-      <div class="tl-m-dots">${dots}</div>
+      <div class="tl-m-events">${events}${extra}</div>
     </div>`;
   }).join('');
 
   el.innerHTML=`<div class="timeline-strip">${strips}</div>`;
 
-  // Scroll current month into view
+  // Scroll so current month is roughly centered
   setTimeout(()=>{
     const curEl=el.querySelector('.tl-cur');
     if(curEl) curEl.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  },100);
+  },120);
+}
+
+/* ═══════════════════════════════════════
+   PULSE WEEK TASK SECTIONS
+═══════════════════════════════════════ */
+function getWeekRange(baseDate, offsetWeeks=0){
+  const d=new Date(baseDate);
+  const day=d.getDay(); // 0=Sun
+  const diffToMon=day===0?-6:1-day;
+  const mon=new Date(d);
+  mon.setDate(d.getDate()+diffToMon+offsetWeeks*7);
+  const sun=new Date(mon);
+  sun.setDate(mon.getDate()+6);
+  return{
+    start: mon.toISOString().split('T')[0],
+    end:   sun.toISOString().split('T')[0],
+  };
+}
+
+function pwTaskHTML(t){
+  const proj=_projects.find(p=>p.id===t.projectId);
+  const prio=t.priority||'media';
+  const dots=(t.assignedUsers||[]).map(uid_=>{
+    const u=USERS[uid_]; if(!u) return '';
+    const rm=ROLES[u.role];
+    return `<div class="udot" style="width:16px;height:16px;font-size:6px;background:${rm.bg};color:${rm.color};">${u.name.charAt(0).toUpperCase()}</div>`;
+  }).join('');
+  const dateStr=tEnd(t)?`<span class="pw-task-date">${tEnd(t)}</span>`:'';
+  return `<div class="pw-task ${prio}" onclick="openTaskDetail('${t.id}')">
+    <div class="pw-task-info">
+      <div class="pw-task-name">${esc(t.name)}</div>
+      <div class="pw-task-sub">${proj?(proj.icon||'')+'  '+esc(proj.name):'Sin proyecto'}</div>
+    </div>
+    <div class="flex gap-4" style="flex-shrink:0;">${dots}</div>
+    ${dateStr}
+  </div>`;
+}
+
+function renderPulseTaskSections(){
+  const today=todayStr();
+  const now=new Date();
+  const thisWk=getWeekRange(now,0);
+  const nextWk=getWeekRange(now,1);
+
+  // Retrasadas: end date < today and not done
+  const overdue=_tasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today)
+    .sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
+
+  // Esta semana: end date in current week
+  const thisWeekTasks=_tasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)>=thisWk.start&&tEnd(t)<=thisWk.end)
+    .sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
+
+  // Próxima semana: end date in next week
+  const nextWeekTasks=_tasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)>=nextWk.start&&tEnd(t)<=nextWk.end)
+    .sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
+
+  // Retrasadas card
+  const delEl=document.getElementById('pw-delayed');
+  if(delEl){
+    if(overdue.length){
+      delEl.innerHTML=`<div class="pw-delayed">
+        <div class="pw-delayed-hdr">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
+          <span class="pw-delayed-ttl">Retrasadas</span>
+          <span class="pw-wk-cnt">${overdue.length}</span>
+        </div>
+        ${overdue.map(t=>pwTaskHTML(t)).join('')}
+      </div>`;
+    } else {
+      delEl.innerHTML='';
+    }
+  }
+
+  // Esta semana
+  const twEl=document.getElementById('pw-thisweek');
+  if(twEl) twEl.innerHTML=`<div class="pw-wk-section">
+    <div class="pw-wk-hdr">
+      <span class="pw-wk-ttl">ESTA SEMANA</span>
+      <span class="pw-wk-cnt">${thisWeekTasks.length}</span>
+    </div>
+    ${thisWeekTasks.length?thisWeekTasks.map(t=>pwTaskHTML(t)).join('')
+      :'<div class="pw-empty">Sin tareas esta semana</div>'}
+  </div>`;
+
+  // Próxima semana
+  const nwEl=document.getElementById('pw-nextweek');
+  if(nwEl) nwEl.innerHTML=`<div class="pw-wk-section" style="margin-top:14px;">
+    <div class="pw-wk-hdr">
+      <span class="pw-wk-ttl">PRÓXIMA SEMANA</span>
+      <span class="pw-wk-cnt">${nextWeekTasks.length}</span>
+    </div>
+    ${nextWeekTasks.length?nextWeekTasks.map(t=>pwTaskHTML(t)).join('')
+      :'<div class="pw-empty">Sin tareas la próxima semana</div>'}
+  </div>`;
 }
 
 function openMonthModal(monthKey){
@@ -2960,8 +3061,8 @@ function deleteMilestone(id){
 ═══════════════════════════════════════ */
 function renderPulseWeek(){
   renderGoodNews();
-  renderWeekAnalysis();
   renderOpsView();
+  renderPulseTaskSections();
 }
 
 function renderGoodNews(){
@@ -2987,25 +3088,7 @@ function renderGoodNews(){
 }
 
 function renderWeekAnalysis(){
-  const el=document.getElementById('pw-analysis'); if(!el) return;
-  const today=todayStr();
-  const weekEnd=new Date(); weekEnd.setDate(weekEnd.getDate()+7);
-  const weekEndStr=weekEnd.toISOString().split('T')[0];
-
-  const doneTasks=_tasks.filter(t=>t.status==='done');
-  const nextWeek =_tasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)>=today&&tEnd(t)<=weekEndStr);
-
-  el.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <div class="hstat">
-        <div class="hstat-num" style="color:var(--grn);">${doneTasks.length}</div>
-        <div class="hstat-lbl">Esta semana completadas</div>
-      </div>
-      <div class="hstat">
-        <div class="hstat-num" style="color:var(--yel);">${nextWeek.length}</div>
-        <div class="hstat-lbl">Próxima semana</div>
-      </div>
-    </div>`;
+  // kept for backward compat; actual analysis now in renderPulseTaskSections
 }
 
 function saveGoodNews(){
@@ -3034,7 +3117,7 @@ Object.assign(window,{
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
-  openNewTaskForProj, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal,
+  openNewTaskForProj, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, renderPulseTaskSections, pwTaskHTML,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
