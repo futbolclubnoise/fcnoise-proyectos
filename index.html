@@ -599,6 +599,15 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 
 /* ── PROJ LOCKED TAG (simple task form mode) ── */
 .proj-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:var(--ac2);border:1px solid var(--ac3);color:var(--orange);font-size:12px;font-weight:600;margin-bottom:14px;}
+/* ── TASK RESOURCES (content links) ── */
+.res-block{background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:10px 12px;}
+.res-lbl{font-size:0.68rem;font-weight:600;color:var(--gray-500);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;}
+.res-link{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--bd);font-size:11px;}
+.res-link:last-child{border-bottom:none;}
+.res-link a{color:var(--blu);text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .15s;}
+.res-link a:hover{color:var(--orange);}
+.res-link-dot{width:5px;height:5px;border-radius:50%;background:var(--blu);flex-shrink:0;}
+.res-plain{font-size:11px;color:var(--tx2);word-break:break-all;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -942,6 +951,11 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-cal-pills"></div>
         <input type="hidden" id="tf-calstatus" value="idea">
       </div>
+      <div class="fi">
+        <label>Recursos / Links</label>
+        <textarea id="tf-resources" placeholder="Pega links de carpetas, Google Drive, referencias…" style="min-height:64px;font-size:12px;"></textarea>
+        <div style="font-size:9px;color:var(--tx3);margin-top:4px;">Escribe cada link en una línea separada</div>
+      </div>
     </div>
 
     <div class="fi"><label>Asignar a</label>
@@ -976,6 +990,7 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <div class="tdp-dates" id="tdp-dates"></div>
     <div class="tdp-chips" id="tdp-meta-chips"></div>
     <div class="tdp-desc" id="tdp-desc" style="display:none;"></div>
+    <div id="tdp-resources" style="display:none;margin-bottom:14px;"></div>
 
     <div class="tdp-slbl">Asignados</div>
     <div class="tdp-chips" id="tdp-users"></div>
@@ -1392,8 +1407,8 @@ function renderNav(){
   document.getElementById('nav-links').innerHTML=`
     <button class="nav-link" onclick="navigate('tasks')">Inicio</button>
     <button class="nav-link" onclick="navigate('projs')">Proyectos</button>
-    ${admin?`<button class="nav-link" onclick="navigate('gestion')">Pulse Week</button>
-             <button class="nav-link" onclick="navigate('revision')">Revisión</button>`:''}`;
+    <button class="nav-link" onclick="navigate('gestion')">Pulse Week</button>
+    ${admin?`<button class="nav-link" onclick="navigate('revision')">Revisión</button>`:''}`;
 }
 
 function navigate(view, projId){
@@ -1403,8 +1418,8 @@ function navigate(view, projId){
     document.getElementById('view-'+v)?.classList.add('hidden'));
   document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('on'));
   document.getElementById('view-'+view)?.classList.remove('hidden');
-  // nav link index: 0=Inicio 1=Proyectos 2=Operaciones(admin) 3=Revisión(admin)
-  const map={'tasks':0,'projs':1,'gestion':2,'revision':3};
+  // nav link index: 0=Inicio 1=Proyectos 2=Pulse Week(todos) 3=Revisión(admin)
+  const map={'tasks':0,'projs':1,'gestion':2,'revision':isAdmin()?3:-1};
   const links=document.querySelectorAll('.nav-link');
   const idx=map[view]; if(idx!==undefined && links[idx]) links[idx].classList.add('on');
 
@@ -1683,6 +1698,14 @@ function refreshDetailPopup(){
   const descEl=document.getElementById('tdp-desc');
   if(t.desc){ descEl.textContent=t.desc; descEl.style.display='block'; }
   else { descEl.style.display='none'; }
+
+  // resources
+  const resEl=document.getElementById('tdp-resources');
+  if(resEl){
+    const html=formatResources(t.resources||'');
+    if(html){ resEl.innerHTML=html; resEl.style.display=''; }
+    else { resEl.style.display='none'; }
+  }
 
   // assignees (toggleable)
   document.getElementById('tdp-users').innerHTML=Object.values(USERS).map(u=>{
@@ -2455,13 +2478,14 @@ function openTaskForm(taskId, projId, preDate, forceType){
     switchTaskType(editType);
     if(editType==='tarea') updateTaskFormStates(t.projectId, currentState);
     if(editType==='contenido') populateCalPills(currentState);
-    document.getElementById('tf-id').value   =t.id;
-    document.getElementById('tf-name').value =t.name;
-    document.getElementById('tf-desc').value =t.desc||'';
-    document.getElementById('tf-area').value =t.area||'general';
-    document.getElementById('tf-prio').value =t.priority||'media';
-    document.getElementById('tf-start').value=tStart(t);
-    document.getElementById('tf-end').value  =tEnd(t);
+    document.getElementById('tf-id').value       =t.id;
+    document.getElementById('tf-name').value     =t.name;
+    document.getElementById('tf-desc').value     =t.desc||'';
+    document.getElementById('tf-area').value     =t.area||'general';
+    document.getElementById('tf-prio').value     =t.priority||'media';
+    document.getElementById('tf-start').value    =tStart(t);
+    document.getElementById('tf-end').value      =tEnd(t);
+    document.getElementById('tf-resources').value=t.resources||'';
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>{
       c.classList.toggle('sel', (t.assignedUsers||[]).includes(c.dataset.value));
     });
@@ -2481,6 +2505,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     document.getElementById('tf-start').value=preDate||'';
     document.getElementById('tf-end').value  =preDate||'';
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>c.classList.remove('sel'));
+    document.getElementById('tf-resources').value='';
     document.getElementById('tf-ttl').textContent=defaultType==='contenido'?'Nuevo Contenido':'Nueva Tarea';
     switchTaskType(defaultType);
     if(defaultType==='tarea') updateTaskFormStates(useProjId);
@@ -2540,6 +2565,7 @@ async function saveTaskForm(){
     startDate, endDate, dueDate:endDate,
     assignedUsers:assigned,
     kStatus, calStatus, taskStatus, status,
+    resources: taskType==='contenido'?(document.getElementById('tf-resources').value.trim()||null):existing?.resources||null,
     createdAt:existing?.createdAt||Date.now(),
   };
   await persistTask(t);
@@ -2854,6 +2880,20 @@ document.querySelectorAll('.mov').forEach(m=>m.addEventListener('click',e=>{
 }));
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function formatResources(raw){
+  if(!raw||!raw.trim()) return '';
+  const lines=raw.trim().split('\n').map(l=>l.trim()).filter(Boolean);
+  const URL_RE=/^(https?:\/\/|ftp:\/\/|www\.)\S+/i;
+  const rows=lines.map(l=>{
+    if(URL_RE.test(l)){
+      const href=l.startsWith('www.')?'https://'+l:l;
+      const label=l.replace(/^https?:\/\//i,'').replace(/^www\./i,'').slice(0,60)+(l.length>60?'…':'');
+      return `<div class="res-link"><div class="res-link-dot"></div><a href="${esc(href)}" target="_blank" rel="noopener">${esc(label)}</a></div>`;
+    }
+    return `<div class="res-link"><div class="res-link-dot" style="background:var(--tx3);"></div><span style="font-size:11px;color:var(--tx2);">${esc(l)}</span></div>`;
+  }).join('');
+  return `<div class="res-block"><div class="res-lbl">Recursos</div>${rows}</div>`;
+}
 
 /* ═══════════════════════════════════════
    FEATURE 1 — SIMPLIFIED TASK FORM MODE
@@ -2983,60 +3023,71 @@ function pwTaskHTML(t){
 
 function renderPulseTaskSections(){
   const today=todayStr();
-  const now=new Date();
-  const thisWk=getWeekRange(now,0);
-  const nextWk=getWeekRange(now,1);
+  // Admins ven todo; colaboradores solo ven sus tareas asignadas
+  const srcTasks=isAdmin()?_tasks:_tasks.filter(t=>(t.assignedUsers||[]).includes(currentUser.id));
+  const active=srcTasks.filter(t=>t.status!=='done');
 
-  // Retrasadas: end date < today and not done
-  const overdue=_tasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today)
+  // Retrasadas: vencidas antes de hoy
+  const overdue=active.filter(t=>tEnd(t)&&tEnd(t)<today)
     .sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
 
-  // Esta semana: end date in current week
-  const thisWeekTasks=_tasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)>=thisWk.start&&tEnd(t)<=thisWk.end)
-    .sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
-
-  // Próxima semana: end date in next week
-  const nextWeekTasks=_tasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)>=nextWk.start&&tEnd(t)<=nextWk.end)
-    .sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
+  // Pendientes: no vencidas, agrupadas por área
+  const pending=active.filter(t=>!tEnd(t)||tEnd(t)>=today);
+  const prioOrder={alta:0,media:1,baja:2};
+  const byArea={};
+  pending.forEach(t=>{
+    const k=t.area||'general';
+    if(!byArea[k]) byArea[k]=[];
+    byArea[k].push(t);
+  });
+  // Ordenar tareas dentro de cada área: alta → media → baja, luego por fecha
+  Object.values(byArea).forEach(arr=>arr.sort((a,b)=>{
+    const op=(prioOrder[a.priority??'media']??1)-(prioOrder[b.priority??'media']??1);
+    if(op!==0) return op;
+    return (tEnd(a)||'').localeCompare(tEnd(b)||'');
+  }));
+  // Ordenar áreas: las que tienen tareas alta primero
+  const areaKeys=Object.keys(byArea).sort((a,b)=>{
+    const ha=byArea[a].some(t=>t.priority==='alta')?0:1;
+    const hb=byArea[b].some(t=>t.priority==='alta')?0:1;
+    return ha-hb;
+  });
 
   // Retrasadas card
   const delEl=document.getElementById('pw-delayed');
   if(delEl){
-    if(overdue.length){
-      delEl.innerHTML=`<div class="pw-delayed">
-        <div class="pw-delayed-hdr">
-          <div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
-          <span class="pw-delayed-ttl">Retrasadas</span>
-          <span class="pw-wk-cnt">${overdue.length}</span>
-        </div>
-        ${overdue.map(t=>pwTaskHTML(t)).join('')}
-      </div>`;
-    } else {
-      delEl.innerHTML='';
-    }
+    delEl.innerHTML=overdue.length?`<div class="pw-delayed">
+      <div class="pw-delayed-hdr">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
+        <span class="pw-delayed-ttl">Retrasadas</span>
+        <span class="pw-wk-cnt">${overdue.length}</span>
+      </div>
+      ${overdue.map(t=>pwTaskHTML(t)).join('')}
+    </div>`:'';
   }
 
-  // Esta semana
+  // Secciones por área
   const twEl=document.getElementById('pw-thisweek');
-  if(twEl) twEl.innerHTML=`<div class="pw-wk-section">
-    <div class="pw-wk-hdr">
-      <span class="pw-wk-ttl">ESTA SEMANA</span>
-      <span class="pw-wk-cnt">${thisWeekTasks.length}</span>
-    </div>
-    ${thisWeekTasks.length?thisWeekTasks.map(t=>pwTaskHTML(t)).join('')
-      :'<div class="pw-empty">Sin tareas esta semana</div>'}
-  </div>`;
-
-  // Próxima semana
+  if(twEl){
+    if(!areaKeys.length){
+      twEl.innerHTML=`<div class="pw-empty" style="padding:24px 0;">Sin tareas pendientes</div>`;
+    } else {
+      twEl.innerHTML=areaKeys.map(area=>{
+        const am=AREAS[area]||AREAS.general;
+        const tasks=byArea[area];
+        return `<div class="pw-wk-section">
+          <div class="pw-wk-hdr">
+            <span class="pw-wk-ttl">${esc(am.label.toUpperCase())}</span>
+            <span class="pw-wk-cnt">${tasks.length}</span>
+          </div>
+          ${tasks.map(t=>pwTaskHTML(t)).join('')}
+        </div>`;
+      }).join('');
+    }
+  }
+  // Clear nextweek (no longer used)
   const nwEl=document.getElementById('pw-nextweek');
-  if(nwEl) nwEl.innerHTML=`<div class="pw-wk-section" style="margin-top:14px;">
-    <div class="pw-wk-hdr">
-      <span class="pw-wk-ttl">PRÓXIMA SEMANA</span>
-      <span class="pw-wk-cnt">${nextWeekTasks.length}</span>
-    </div>
-    ${nextWeekTasks.length?nextWeekTasks.map(t=>pwTaskHTML(t)).join('')
-      :'<div class="pw-empty">Sin tareas la próxima semana</div>'}
-  </div>`;
+  if(nwEl) nwEl.innerHTML='';
 }
 
 function openMonthModal(monthKey){
@@ -3174,7 +3225,7 @@ Object.assign(window,{
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
-  openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, renderPulseTaskSections, pwTaskHTML,
+  openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, renderPulseTaskSections, pwTaskHTML, formatResources,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
