@@ -68,60 +68,79 @@
   --card-hover-shadow:0 6px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);
 }
 
-/* Light mode — Apple SF-style system background */
+/* ════ LIGHT MODE — Apple system + FCnoise brand ════ */
 body.light {
-  --bg:#f2f2f7;
-  --bg2:#ffffff;
-  --bg3:#f5f5f7;
-  --bg4:#ebebed;
-  --bg5:#e0e0e4;
-  --bd:rgba(0,0,0,.06);
-  --bd2:rgba(0,0,0,.1);
+  --bg:#f2f2f7;       /* iOS/macOS system background */
+  --bg2:#ffffff;       /* white cards */
+  --bg3:#f5f5f7;       /* secondary surface */
+  --bg4:#eaeaec;       /* tertiary */
+  --bg5:#dddde0;       /* muted */
+  --bd:rgba(0,0,0,.05);
+  --bd2:rgba(0,0,0,.10);
   --bd3:rgba(0,0,0,.18);
   --tx:#0a0a0a;
   --tx2:#2c2c2e;
   --tx3:#6d6d72;
   --card:#ffffff;
   --inp:rgba(0,0,0,.04);
-  --shadow:0 2px 16px rgba(0,0,0,.08);
-  --glass-bd:rgba(0,0,0,.07);
-  --glass-hi:rgba(255,255,255,.9);
-  --card-shadow:0 1px 8px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.06);
-  --card-hover-shadow:0 4px 20px rgba(0,0,0,.12),0 0 0 1px rgba(0,0,0,.08);
+  --shadow:0 2px 20px rgba(0,0,0,.08);
+  --glass-bg:rgba(255,255,255,0.85);
+  --glass-bd:rgba(0,0,0,.08);
+  --glass-hi:rgba(255,255,255,.95);
+  --card-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+  --card-hover-shadow:0 2px 6px rgba(0,0,0,.1),0 8px 24px rgba(0,0,0,.08);
 }
-/* Override glass gradients in light mode */
-body.light .proj-card,
-body.light .hcard,
-body.light .panel,
-body.light .hstat,
-body.light .ops-pcard,
-body.light .area-eval-card,
-body.light .pw-task,
-body.light .task-ticket,
-body.light .team-row,
-body.light .ppr-row{
-  background:rgba(255,255,255,.92)!important;
-  border-color:rgba(0,0,0,.09)!important;
-  border-top-color:rgba(255,255,255,.95)!important;
-  backdrop-filter:blur(10px);
+/* ─ Nav ─ */
+body.light .nav{background:rgba(242,242,247,.94)!important;border-bottom:1px solid rgba(0,0,0,.1)!important;}
+body.light .nav-link{color:rgba(0,0,0,.38)!important;}
+body.light .nav-link:hover{color:rgba(0,0,0,.65)!important;}
+body.light .nav-link.on{color:var(--tx)!important;}
+/* ─ Cards, panels, modals ─ */
+body.light .proj-card,body.light .hcard,body.light .panel,body.light .hstat,
+body.light .ops-pcard,body.light .area-eval-card,body.light .task-ticket,
+body.light .team-row,body.light .ppr-row,body.light .event-row{
+  background:#ffffff!important;
+  border:1px solid rgba(0,0,0,.09)!important;
+  box-shadow:var(--card-shadow)!important;
+  backdrop-filter:none!important;
 }
-body.light .modal{
-  background:rgba(255,255,255,.97)!important;
-  border-color:rgba(0,0,0,.09)!important;
+body.light .modal{background:rgba(255,255,255,.98)!important;border:1px solid rgba(0,0,0,.1)!important;backdrop-filter:blur(20px)!important;}
+body.light .proj-card:hover{border-color:var(--orange)!important;box-shadow:var(--card-hover-shadow)!important;}
+/* ─ Surfaces & sections ─ */
+body.light .board-section{border:1px solid rgba(0,0,0,.08)!important;}
+body.light .board-shdr{background:rgba(0,0,0,.03)!important;border-bottom-color:rgba(0,0,0,.08)!important;}
+body.light .task-row{background:transparent!important;border-top:1px solid rgba(0,0,0,.05)!important;}
+body.light .task-row:hover{background:rgba(0,0,0,.02)!important;}
+body.light .tr-chk{border-color:rgba(0,0,0,.2)!important;}
+body.light .tr-arr{color:rgba(0,0,0,.18)!important;}
+body.light .bscnt{background:rgba(0,0,0,.06)!important;}
+/* ─ Timeline ─ */
+body.light .tl-month{background:#ffffff!important;border:1px solid rgba(0,0,0,.1)!important;box-shadow:0 1px 4px rgba(0,0,0,.06)!important;}
+body.light .tl-month.tl-cur{background:linear-gradient(160deg,rgba(255,122,0,.1) 0%,rgba(255,122,0,.04) 100%)!important;border-color:rgba(255,122,0,.5)!important;box-shadow:0 2px 12px rgba(255,122,0,.15)!important;}
+body.light .tl-month.tl-nxt{background:rgba(255,122,0,.04)!important;border-color:rgba(255,122,0,.2)!important;}
+/* ─ Pulse sections ─ */
+body.light .pw-collapse{background:#ffffff!important;border:1px solid rgba(0,0,0,.09)!important;box-shadow:var(--card-shadow)!important;}
+body.light .pw-collapse-hdr:hover{background:rgba(0,0,0,.02)!important;}
+body.light .pw-c-cnt{background:rgba(0,0,0,.05)!important;color:var(--tx3)!important;}
+body.light .pw-task{border-bottom:1px solid rgba(0,0,0,.05)!important;}
+body.light .pw-task:hover{background:rgba(0,0,0,.02)!important;}
+body.light .pw-delayed{background:rgba(232,64,64,.05)!important;border-color:rgba(232,64,64,.2)!important;}
+body.light .gn-item{background:rgba(40,199,111,.05)!important;border-color:rgba(40,199,111,.2)!important;}
+/* ─ Dots in light mode ─ */
+body.light .dot-pendiente,body.light .dot-gray{background:rgba(0,0,0,.22)!important;}
+/* ─ Inputs, forms ─ */
+body.light .fi input,body.light .fi select,body.light .fi textarea{
+  background:rgba(0,0,0,.04)!important;border-color:rgba(0,0,0,.12)!important;
 }
-body.light .nav{
-  background:rgba(242,242,247,.92)!important;
-  border-bottom-color:rgba(0,0,0,.1)!important;
-}
-body.light .board-section,body.light .task-row{background:rgba(0,0,0,.02)!important;}
-body.light .task-row:hover{background:rgba(0,0,0,.04)!important;}
-body.light .hcard-hdr,body.light .panel-hdr,body.light .ops-pcard-top,body.light .area-eval-card{
-  border-color:rgba(0,0,0,.08)!important;
-}
-body.light .tl-month{background:rgba(255,255,255,.8)!important;border-color:rgba(0,0,0,.1)!important;}
-body.light .tl-month.tl-cur{background:linear-gradient(160deg,rgba(255,122,0,.12),rgba(255,122,0,.05))!important;border-color:rgba(255,122,0,.4)!important;}
-body.light .pw-delayed{background:rgba(232,64,64,.06)!important;}
-body.light .gn-item{background:rgba(40,199,111,.06)!important;}
+/* ─ Misc ─ */
+body.light .area-eval-bar{background:rgba(0,0,0,.08)!important;}
+body.light .kb-hdr{background:rgba(0,0,0,.03)!important;}
+body.light .kb-body{background:rgba(0,0,0,.01)!important;}
+body.light .kb-card{background:#ffffff!important;border-color:rgba(0,0,0,.1)!important;}
+body.light .hcard-hdr{background:rgba(0,0,0,.02)!important;border-bottom-color:rgba(0,0,0,.08)!important;}
+body.light .hcard.urgent .hcard-hdr{background:rgba(232,64,64,.06)!important;}
+body.light .panel-hdr{border-bottom:1px solid rgba(0,0,0,.08);}
+body.light .login-box{background:#ffffff!important;border-color:rgba(0,0,0,.1)!important;}
 
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font-body);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;transition:background .25s,color .25s;}
@@ -193,13 +212,13 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
 .w-full{width:100%;}
 
 /* ── APP BODY ── */
-.app-body{padding:18px;max-width:1120px;margin:0 auto;}
+.app-body{padding:20px;max-width:1140px;margin:0 auto;}
 
 /* ── PAGE HEADER ── */
-.page-hdr{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
-.page-title{font-family:var(--font-display);font-size:26px;letter-spacing:.04em;line-height:1;}
-.back-btn{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;padding:5px 11px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);transition:all .18s;}
-.back-btn:hover{background:var(--bg4);color:var(--tx);}
+.page-hdr{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.page-title{font-family:var(--font-display);font-size:24px;letter-spacing:.06em;line-height:1;text-transform:uppercase;}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:var(--tx3);cursor:pointer;padding:5px 12px;border-radius:8px;border:1px solid var(--bd2);background:transparent;transition:all .18s;letter-spacing:.01em;}
+.back-btn:hover{background:var(--bg4);color:var(--tx);border-color:var(--bd3);}
 
 /* ── BADGE (kept for modals/forms where color helps discoverability) ── */
 .bdg{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:600;letter-spacing:.02em;}
@@ -211,20 +230,28 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
 .by{background:var(--yel2);color:var(--yel);border:1px solid var(--yel3);}
 .bw{background:transparent;color:var(--tx3);border:1px solid var(--bd2);}
 
-/* ── DOT SYSTEM (priority/status indicators, no emoji) ── */
-.dot{display:inline-flex;width:7px;height:7px;border-radius:50%;flex-shrink:0;align-self:center;}
-.dot-alta,.dot-red{background:var(--red);box-shadow:0 0 0 2px rgba(232,64,64,.2);}
-.dot-media,.dot-yel{background:var(--yel);}
-.dot-baja,.dot-grn{background:var(--grn);}
-.dot-pendiente,.dot-gray{background:rgba(255,255,255,.2);}
+/* ── DOT SYSTEM — prioridad visible en ambos modos ── */
+.dot{display:inline-flex;width:8px;height:8px;border-radius:50%;flex-shrink:0;align-self:center;}
+/* Prioridad — colores de marca */
+.dot-alta,.dot-red{background:#e84040;box-shadow:0 0 0 3px rgba(232,64,64,.22);}
+.dot-media,.dot-yel{background:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.18);}
+.dot-baja,.dot-grn{background:#28c76f;box-shadow:0 0 0 2px rgba(40,199,111,.15);}
+/* Estado */
+.dot-pendiente,.dot-gray{background:rgba(120,120,140,.5);}
 .dot-en-proceso,.dot-blu{background:var(--blu);}
 .dot-revision{background:var(--yel);}
-.dot-completada,.dot-done{background:var(--grn);box-shadow:0 0 0 2px rgba(40,199,111,.2);}
+.dot-completada,.dot-done{background:var(--grn);}
+/* Contenido */
 .dot-idea{background:var(--blu);}
 .dot-edicion{background:var(--yel);}
 .dot-ajuste{background:var(--org);}
 .dot-aprobado{background:var(--grn);}
 .dot-publicado{background:var(--pur);}
+/* Prio badge pill — dot + label */
+.prio-pill{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:600;color:var(--tx3);white-space:nowrap;letter-spacing:.01em;}
+.prio-pill.alta{color:var(--red);}
+.prio-pill.media{color:var(--yel);}
+.prio-pill.baja{color:var(--grn);}
 /* Inline tag: dot + text, no border */
 .itag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:500;color:var(--tx3);letter-spacing:.01em;white-space:nowrap;}
 
@@ -282,8 +309,8 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
    PROJECTS GRID
 ══════════════════════════════════════ */
 .proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
-.proj-card{background:linear-gradient(170deg,rgba(28,32,40,0.75) 0%,rgba(20,24,31,0.65) 100%);border:1px solid var(--glass-bd);border-top-color:rgba(255,255,255,.09);border-radius:16px;padding:18px;cursor:pointer;transition:all .22s;position:relative;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--card-shadow);}
-.proj-card:hover{border-color:rgba(255,122,0,.3);border-top-color:rgba(255,122,0,.4);transform:translateY(-2px);box-shadow:var(--card-hover-shadow);}
+.proj-card{background:linear-gradient(160deg,rgba(26,30,38,0.8) 0%,rgba(18,22,30,0.7) 100%);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:18px;cursor:pointer;transition:all .22s;position:relative;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:0 2px 12px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.06);}
+.proj-card:hover{border-color:rgba(255,122,0,.35);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,122,0,.1);}
 .pc-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
 .pc-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .pc-meta{flex:1;min-width:0;}
@@ -3141,18 +3168,19 @@ function getWeekRange(baseDate, offsetWeeks=0){
 function pwTaskHTML(t){
   const proj=_projects.find(p=>p.id===t.projectId);
   const prio=t.priority||'media';
-  const dots=(t.assignedUsers||[]).map(uid_=>{
+  const userDots=(t.assignedUsers||[]).slice(0,3).map(uid_=>{
     const u=USERS[uid_]; if(!u) return '';
     const rm=ROLES[u.role];
-    return `<div class="udot" style="width:16px;height:16px;font-size:6px;background:${rm.bg};color:${rm.color};">${u.name.charAt(0).toUpperCase()}</div>`;
+    return `<div class="udot" style="width:15px;height:15px;font-size:6px;background:${rm.bg};color:${rm.color};" title="${u.name}">${initials(u.name).charAt(0)}</div>`;
   }).join('');
   const dateStr=tEnd(t)?`<span class="pw-task-date">${tEnd(t)}</span>`:'';
-  return `<div class="pw-task ${prio}" onclick="openTaskDetail('${t.id}')">
+  return `<div class="pw-task" onclick="openTaskDetail('${t.id}')">
+    <div class="dot dot-${prio}" title="Prioridad ${prio}"></div>
     <div class="pw-task-info">
       <div class="pw-task-name">${esc(t.name)}</div>
-      <div class="pw-task-sub">${proj?(proj.icon||'')+'  '+esc(proj.name):'Sin proyecto'}</div>
+      <div class="pw-task-sub">${proj?esc(proj.name):'Sin proyecto'}</div>
     </div>
-    <div class="flex gap-4" style="flex-shrink:0;">${dots}</div>
+    <div class="flex gap-3" style="flex-shrink:0;">${userDots}</div>
     ${dateStr}
   </div>`;
 }
