@@ -92,14 +92,16 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 #screen-app,#screen-login{position:relative;z-index:1;}
 
 /* ── NAV ── */
-.nav{height:52px;background:rgba(10,12,18,0.88);border-bottom:1px solid var(--bd2);display:flex;align-items:center;padding:0 18px;gap:6px;position:sticky;top:0;z-index:100;box-shadow:0 1px 0 var(--bd2);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);}
-.nav-brand{font-family:var(--font-display);font-size:22px;letter-spacing:.04em;flex-shrink:0;margin-right:10px;line-height:1;}
+.nav{height:50px;background:rgba(8,10,16,0.92);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;padding:0 20px;gap:6px;position:sticky;top:0;z-index:100;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);}
+.nav-brand{font-family:var(--font-display);font-size:21px;letter-spacing:.06em;flex-shrink:0;margin-right:12px;line-height:1;}
 .nav-brand em{color:var(--accent);font-style:normal;}
-.nav-links{display:flex;gap:2px;flex:1;}
-.nav-link{padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;transition:all .18s;border:none;background:transparent;font-family:var(--font-body);white-space:nowrap;letter-spacing:.02em;}
-.nav-link:hover{background:var(--bg4);color:var(--tx);}
-.nav-link.on{background:var(--bg4);color:var(--tx);}
-.nav-right{display:flex;align-items:center;gap:7px;margin-left:auto;}
+.nav-links{display:flex;gap:0;flex:1;}
+.nav-link{padding:6px 12px;border-radius:0;font-size:11px;font-weight:500;color:rgba(255,255,255,.38);cursor:pointer;transition:color .18s;border:none;background:transparent;font-family:var(--font-body);white-space:nowrap;letter-spacing:.03em;position:relative;}
+.nav-link::after{content:'';position:absolute;bottom:-1px;left:12px;right:12px;height:1.5px;background:var(--orange);transform:scaleX(0);transition:transform .2s;border-radius:2px;}
+.nav-link:hover{color:rgba(255,255,255,.7);}
+.nav-link.on{color:var(--tx);}
+.nav-link.on::after{transform:scaleX(1);}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
 .theme-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
 .theme-btn:hover{background:var(--bg4);}
 .sync-dot{font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--tx3);border:1px solid var(--bd2);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;transition:opacity .18s;}
@@ -162,15 +164,32 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
 .back-btn{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;padding:5px 11px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);transition:all .18s;}
 .back-btn:hover{background:var(--bg4);color:var(--tx);}
 
-/* ── BADGE ── */
-.bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.03em;}
+/* ── BADGE (kept for modals/forms where color helps discoverability) ── */
+.bdg{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:600;letter-spacing:.02em;}
 .br{background:var(--red2);color:var(--red);border:1px solid var(--red3);}
 .bo{background:var(--org2);color:var(--org);border:1px solid var(--org3);}
 .bg{background:var(--grn2);color:var(--grn);border:1px solid var(--grn3);}
 .bb{background:var(--blu2);color:var(--blu);border:1px solid var(--blu3);}
 .bp{background:var(--pur2);color:var(--pur);border:1px solid var(--pur3);}
 .by{background:var(--yel2);color:var(--yel);border:1px solid var(--yel3);}
-.bw{background:var(--bg5);color:var(--tx3);border:1px solid var(--bd2);}
+.bw{background:transparent;color:var(--tx3);border:1px solid var(--bd2);}
+
+/* ── DOT SYSTEM (priority/status indicators, no emoji) ── */
+.dot{display:inline-flex;width:7px;height:7px;border-radius:50%;flex-shrink:0;align-self:center;}
+.dot-alta,.dot-red{background:var(--red);box-shadow:0 0 0 2px rgba(232,64,64,.2);}
+.dot-media,.dot-yel{background:var(--yel);}
+.dot-baja,.dot-grn{background:var(--grn);}
+.dot-pendiente,.dot-gray{background:rgba(255,255,255,.2);}
+.dot-en-proceso,.dot-blu{background:var(--blu);}
+.dot-revision{background:var(--yel);}
+.dot-completada,.dot-done{background:var(--grn);box-shadow:0 0 0 2px rgba(40,199,111,.2);}
+.dot-idea{background:var(--blu);}
+.dot-edicion{background:var(--yel);}
+.dot-ajuste{background:var(--org);}
+.dot-aprobado{background:var(--grn);}
+.dot-publicado{background:var(--pur);}
+/* Inline tag: dot + text, no border */
+.itag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:500;color:var(--tx3);letter-spacing:.01em;white-space:nowrap;}
 
 /* ══════════════════════════════════════
    DASHBOARD BOARD
@@ -193,17 +212,17 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
 .board-shdr.today .board-shdr-lbl{color:var(--orange);}
 .bscnt{padding:1px 7px;border-radius:20px;font-size:9px;font-weight:700;background:rgba(255,255,255,.07);color:var(--tx3);}
 
-.task-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(20,24,31,0.35);border-top:1px solid rgba(255,255,255,.04);cursor:pointer;transition:all .15s;user-select:none;}
-.task-row:hover{background:rgba(36,42,51,0.7);}
-.task-row.done-r{opacity:.4;}
-.tr-chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--bd3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;cursor:pointer;}
+.task-row{display:flex;align-items:center;gap:10px;padding:9px 14px;background:transparent;border-top:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .12s;user-select:none;}
+.task-row:hover{background:rgba(255,255,255,.03);}
+.task-row.done-r{opacity:.35;}
+.tr-chk{width:16px;height:16px;border-radius:50%;border:1.5px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;cursor:pointer;}
 .tr-chk.on{background:var(--grn);border-color:var(--grn);}
-.tr-chk svg{width:10px;height:10px;stroke:#fff;opacity:0;transition:opacity .18s;}
+.tr-chk svg{width:9px;height:9px;stroke:#fff;opacity:0;transition:opacity .18s;}
 .tr-chk.on svg{opacity:1;}
-.tr-name{font-size:13px;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tr-name{font-size:12.5px;font-weight:450;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.01em;}
 .tr-name.done{text-decoration:line-through;color:var(--tx3);}
-.tr-meta{display:flex;gap:5px;align-items:center;flex-shrink:0;}
-.tr-arr{color:var(--tx3);font-size:11px;padding-left:4px;}
+.tr-meta{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.tr-arr{color:rgba(255,255,255,.15);font-size:11px;padding-left:2px;}
 
 /* ══════════════════════════════════════
    TASK DETAIL POPUP
@@ -392,6 +411,21 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 /* ── THEME BUTTONS ── */
 .theme-pair{display:flex;gap:6px;}
 .theme-pair button{flex:1;padding:8px 0;border-radius:10px;font-family:var(--font-body);font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;letter-spacing:.02em;}
+
+/* ── AREA EVAL CARDS (Pulse Week) ── */
+.area-eval-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:16px;}
+.area-eval-card{background:linear-gradient(160deg,rgba(28,32,40,0.7) 0%,rgba(20,24,31,0.55) 100%);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;backdrop-filter:var(--blur);box-shadow:var(--card-shadow);}
+.area-eval-card:hover{transform:translateY(-2px);box-shadow:var(--card-hover-shadow);}
+.area-eval-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.area-eval-stripe{width:4px;height:32px;border-radius:2px;flex-shrink:0;}
+.area-eval-name{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx2);flex:1;}
+.area-eval-cnt{font-family:var(--font-display);font-size:22px;letter-spacing:.02em;line-height:1;margin-bottom:2px;}
+.area-eval-sub{font-size:9px;color:var(--tx3);letter-spacing:.04em;margin-bottom:8px;}
+.area-eval-bar{height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.area-eval-fill{height:100%;border-radius:2px;transition:width .5s;}
+.area-eval-tasks{margin-top:8px;display:flex;flex-direction:column;gap:3px;}
+.aet{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--tx3);line-height:1.4;}
+.aet-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 /* ── OPS LANES (Operaciones) ── */
 .ops-lanes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
@@ -947,14 +981,18 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <!-- Contenido-only fields -->
     <div id="tf-contenido-fields" style="display:none;">
       <div class="fi">
-        <label>Estado del contenido</label>
+        <label>Descripción del contenido</label>
+        <textarea id="tf-content-desc" placeholder="¿De qué trata este contenido? Contexto, objetivo, formato…" style="min-height:60px;font-size:12px;"></textarea>
+      </div>
+      <div class="fi">
+        <label>Estado</label>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-cal-pills"></div>
         <input type="hidden" id="tf-calstatus" value="idea">
       </div>
       <div class="fi">
         <label>Recursos / Links</label>
-        <textarea id="tf-resources" placeholder="Pega links de carpetas, Google Drive, referencias…" style="min-height:64px;font-size:12px;"></textarea>
-        <div style="font-size:9px;color:var(--tx3);margin-top:4px;">Escribe cada link en una línea separada</div>
+        <textarea id="tf-resources" placeholder="Pega links de carpetas, Google Drive, referencias…" style="min-height:52px;font-size:12px;"></textarea>
+        <div style="font-size:9px;color:var(--tx3);margin-top:4px;">Un link por línea</div>
       </div>
     </div>
 
@@ -1555,16 +1593,13 @@ function renderDashboard(){
 function taskTicketHTML(t){
   const proj=_projects.find(p=>p.id===t.projectId);
   const am=AREAS[t.area]||AREAS.general;
-  const ttype=t.taskType||'tarea';
-  const stateColorMap={pendiente:'var(--tx3)','en-proceso':'var(--blu)',revision:'var(--yel)',completada:'var(--grn)'};
-  const calColorMap={idea:'var(--blu)',edicion:'var(--yel)',ajuste:'var(--org)',aprobado:'var(--grn)',publicado:'var(--pur)'};
-  const dotColor=ttype==='contenido'?(calColorMap[t.calStatus||'idea']||'var(--tx3)'):(stateColorMap[t.taskStatus||'pendiente']||'var(--tx3)');
+  const prio=t.priority||'media';
   const done=t.status==='done';
   return `<div class="task-ticket" onclick="openTaskDetail('${t.id}')">
-    <div class="tt-dot" style="background:${dotColor};"></div>
+    <div class="dot dot-${prio}" title="${prio}"></div>
     <div class="tt-info">
       <div class="tt-name">${esc(t.name)}</div>
-      <div class="tt-sub">${proj?(proj.icon||'📁')+' '+esc(proj.name):'Sin proyecto'} · <span class="bdg ${am.cls}" style="padding:1px 5px;font-size:8px;">${am.icon}</span></div>
+      <div class="tt-sub" style="color:${am.color};opacity:.8;">${am.label}${proj?' · '+esc(proj.name):''}</div>
     </div>
     <div class="tt-chk ${done?'done':''}" onclick="event.stopPropagation();toggleTask('${t.id}')">
       <svg viewBox="0 0 12 10" fill="none" stroke-width="2.5"><polyline points="1,5 4.5,8.5 11,1"/></svg>
@@ -1622,36 +1657,35 @@ function taskRowHTML(t){
   const done=t.status==='done';
   const proj=_projects.find(p=>p.id===t.projectId);
   const am=AREAS[t.area]||AREAS.general;
-  const pm=PRIOS[t.priority]||PRIOS.media;
-  const s=tStart(t), e=tEnd(t);
-  const dateStr=s&&e&&s!==e?`${s} → ${e}`:e||s||'';
+  const prio=t.priority||'media';
+  const e=tEnd(t);
   const dots=(t.assignedUsers||[]).map(uid_=>{
     const u=USERS[uid_]; if(!u) return '';
     const rm=ROLES[u.role];
-    return `<div class="udot" style="width:18px;height:18px;font-size:7px;background:${rm.bg};color:${rm.color};" title="${u.name}">${u.name.charAt(0).toUpperCase()}</div>`;
+    return `<div class="udot" style="width:16px;height:16px;font-size:7px;background:${rm.bg};color:${rm.color};" title="${u.name}">${u.name.charAt(0).toUpperCase()}</div>`;
   }).join('');
-  // state badge depending on task type
+  // status dot: use priority color as primary indicator
   const projMeth=proj?.meth||'lista';
   const taskType_=t.taskType||(projMeth==='calendario'?'contenido':'tarea');
-  let stateBdg='';
+  let statusLabel='';
   if(taskType_==='contenido'){
     const ccol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
-    stateBdg=`<span class="bdg ${ccol.cls}">${ccol.icon} ${ccol.label}</span>`;
+    statusLabel=`<span class="itag"><span class="dot dot-${t.calStatus||'idea'}"></span>${ccol.label}</span>`;
   } else {
     const ts=TASK_STATES.find(s=>s.id===(t.taskStatus||'pendiente'))||TASK_STATES[0];
-    stateBdg=`<span class="bdg ${ts.cls}">${ts.icon} ${ts.label}</span>`;
+    statusLabel=`<span class="itag"><span class="dot dot-${t.taskStatus||'pendiente'}"></span>${ts.label}</span>`;
   }
 
   return `<div class="task-row ${done?'done-r':''}" onclick="openTaskDetail('${t.id}')">
+    <div class="dot dot-${prio}" style="flex-shrink:0;" title="Prioridad ${prio}"></div>
     <div class="tr-chk ${done?'on':''}" onclick="event.stopPropagation();toggleTask('${t.id}')">
       <svg viewBox="0 0 12 10" fill="none" stroke-width="2.5"><polyline points="1,5 4.5,8.5 11,1"/></svg>
     </div>
     <div class="tr-name ${done?'done':''}">${esc(t.name)}</div>
     <div class="tr-meta">
-      <span class="bdg ${am.cls}">${am.icon}</span>
-      ${stateBdg}
-      <span class="bdg ${pm.cls}">${pm.label}</span>
-      ${dateStr?`<span class="txt-xs txt-muted" style="white-space:nowrap;">📅 ${dateStr}</span>`:''}
+      <span class="itag" style="color:${am.color};">${am.label}</span>
+      ${statusLabel}
+      ${e?`<span class="itag">${e}</span>`:''}
       <div class="flex" style="gap:2px;">${dots}</div>
       <span class="tr-arr">›</span>
     </div>
@@ -1696,7 +1730,9 @@ function refreshDetailPopup(){
 
   // description
   const descEl=document.getElementById('tdp-desc');
-  if(t.desc){ descEl.textContent=t.desc; descEl.style.display='block'; }
+  // For contenido tasks, show contentDesc as primary description
+  const displayDesc=(t.taskType==='contenido'&&t.contentDesc)?t.contentDesc:(t.desc||'');
+  if(displayDesc){ descEl.textContent=displayDesc; descEl.style.display='block'; }
   else { descEl.style.display='none'; }
 
   // resources
@@ -2166,47 +2202,49 @@ function renderOpsView(){
       <div class="hstat-num" style="color:var(--grn);">${doneTd.length}</div>
       <div class="hstat-lbl">Completadas</div>
     </div>`;
-  // ── Project Cards ──
+  // ── Area Evaluation Cards ──
   const lanesEl=document.getElementById('ops-lanes');
   if(!lanesEl) return;
-  const projs=visibleProjects();
-  if(!projs.length){ lanesEl.innerHTML=''; return; }
-  // Sort projects: alta → media → baja
-  const prioOrder={alta:0,media:1,baja:2};
-  const sorted=[...projs].sort((a,b)=>{
-    const oa=prioOrder[a.priority??'media']??1;
-    const ob=prioOrder[b.priority??'media']??1;
-    return oa-ob;
+  // Group all active tasks by area
+  const areaMap={};
+  allT.forEach(t=>{
+    const k=t.area||'general';
+    if(!areaMap[k]) areaMap[k]={total:0,done:0,pending:[],alta:0};
+    areaMap[k].total++;
+    if(t.status==='done') areaMap[k].done++;
+    else{
+      areaMap[k].pending.push(t);
+      if((t.priority||'media')==='alta') areaMap[k].alta++;
+    }
   });
-  const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
-  const html=sorted.map(p=>{
-    const am=AREAS[p.area]||AREAS.general;
-    const pt=allT.filter(t=>t.projectId===p.id);
-    const pend=pt.filter(t=>t.status!=='done').length;
-    const done=pt.filter(t=>t.status==='done').length;
-    const pct=pt.length?Math.round(done/pt.length*100):0;
-    const fill=fillMap[am.cls]||'var(--tx3)';
-    const prioCls={alta:'prio-alta',media:'prio-media',baja:'prio-baja'};
-    const prioLbl={alta:'Alta',media:'Media',baja:'Baja'};
-    const pc=prioCls[p.priority||'media'];
-    const pl=prioLbl[p.priority||'media'];
-    const dateStr=p.endDate?`<span style="font-size:9px;color:var(--tx3);">🔴 ${p.endDate}</span>`:'';
-    return `<div class="ops-pcard" onclick="openOpsProjModal('${p.id}')">
-      <div class="ops-pcard-top">
-        <div class="ops-pcard-icon">${p.icon||'📁'}</div>
-        <div class="ops-pcard-name">${esc(p.name)}</div>
-        <div class="ops-pcard-desc">${esc(p.desc)||'Sin descripción'}</div>
+  const areaKeys=Object.keys(areaMap).filter(k=>areaMap[k].total>0)
+    .sort((a,b)=>areaMap[b].alta-areaMap[a].alta); // áreas con más urgentes primero
+  if(!areaKeys.length){ lanesEl.innerHTML=''; return; }
+  const html=areaKeys.map(k=>{
+    const am=AREAS[k]||AREAS.general;
+    const d=areaMap[k];
+    const pct=d.total?Math.round(d.done/d.total*100):0;
+    const topTasks=d.pending.sort((a,b)=>{
+      const po={alta:0,media:1,baja:2};
+      return (po[a.priority??'media']??1)-(po[b.priority??'media']??1);
+    }).slice(0,3);
+    const taskList=topTasks.map(t=>
+      `<div class="aet"><span class="dot dot-${t.priority||'media'}" style="flex-shrink:0;"></span><span class="aet-name">${esc(t.name)}</span></div>`
+    ).join('');
+    const extra=d.pending.length>3?`<div class="aet" style="padding-top:2px;color:var(--tx3);font-size:9px;">+${d.pending.length-3} más</div>`:'';
+    return `<div class="area-eval-card" onclick="openAreaModal('${k}')">
+      <div class="area-eval-top">
+        <div class="area-eval-stripe" style="background:${am.color};"></div>
+        <span class="area-eval-name">${am.label}</span>
+        ${d.alta?`<span class="dot dot-alta" title="${d.alta} urgentes"></span>`:''}
       </div>
-      <div class="ops-pcard-foot">
-        <span class="bdg ${am.cls}">${am.icon}</span>
-        <span class="${pc}">${pl}</span>
-        ${dateStr}
-        <span style="margin-left:auto;font-size:9px;color:var(--tx3);">${pend} pendientes</span>
-      </div>
-      <div class="ops-pcard-bar"><div class="ops-pcard-fill" style="width:${pct}%;background:${fill};"></div></div>
+      <div class="area-eval-cnt" style="color:${am.color};">${d.pending.length}</div>
+      <div class="area-eval-sub">pendientes · ${pct}% completado</div>
+      <div class="area-eval-bar"><div class="area-eval-fill" style="width:${pct}%;background:${am.color};"></div></div>
+      <div class="area-eval-tasks">${taskList}${extra}</div>
     </div>`;
   }).join('');
-  lanesEl.innerHTML=`<div class="ops-proj-grid">${html}</div>`;
+  lanesEl.innerHTML=`<div class="area-eval-grid">${html}</div>`;
 }
 
 function openOpsProjModal(projId){
@@ -2250,6 +2288,43 @@ function openOpsProjModal(projId){
     (doneTks.length?`<div class="ops-prio-lbl" style="color:var(--grn);">✅ Completadas (${doneTks.length})</div>
       ${doneTks.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;opacity:.55;">${taskRowHTML(t)}</div>`).join('')}`:'');
   document.getElementById('opsp-body').innerHTML=body||'<div class="empty"><p>Sin tareas en este proyecto.</p></div>';
+  openMod('m-ops-proj');
+}
+
+function openAreaModal(areaKey){
+  const am=AREAS[areaKey]||AREAS.general;
+  const tasks=_tasks.filter(t=>(t.area||'general')===areaKey);
+  const pend=tasks.filter(t=>t.status!=='done')
+    .sort((a,b)=>{const po={alta:0,media:1,baja:2};return (po[a.priority??'media']??1)-(po[b.priority??'media']??1);});
+  const done=tasks.filter(t=>t.status==='done');
+  const pct=tasks.length?Math.round(done.length/tasks.length*100):0;
+
+  // Re-use m-ops-proj modal
+  document.getElementById('opsp-icon').textContent='';
+  document.getElementById('opsp-icon').style.cssText=`width:14px;height:14px;border-radius:50%;background:${am.color};flex-shrink:0;`;
+  document.getElementById('opsp-name').textContent=am.label;
+  document.getElementById('opsp-meta').innerHTML=`<span style="font-size:10px;color:var(--tx3);">${tasks.length} tareas en total</span>`;
+  document.getElementById('opsp-total').textContent=tasks.length;
+  document.getElementById('opsp-pending').textContent=pend.length;
+  document.getElementById('opsp-done').textContent=done.length;
+  document.getElementById('opsp-pct').textContent=pct+'%';
+  document.getElementById('opsp-goto-btn').style.display='none';
+
+  function sec(lbl, color, arr){
+    if(!arr.length) return '';
+    return `<div class="ops-prio-lbl" style="color:${color};">${lbl}</div>
+      ${arr.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;">${taskRowHTML(t)}</div>`).join('')}`;
+  }
+  const alta=pend.filter(t=>(t.priority||'media')==='alta');
+  const media=pend.filter(t=>(t.priority||'media')==='media');
+  const baja=pend.filter(t=>(t.priority||'media')==='baja');
+  document.getElementById('opsp-body').innerHTML=
+    sec('Alta prioridad','var(--red)',alta)+
+    sec('Media prioridad','var(--yel)',media)+
+    sec('Baja prioridad','var(--grn)',baja)+
+    (done.length?`<div class="ops-prio-lbl" style="color:var(--grn);">Completadas (${done.length})</div>
+      ${done.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;opacity:.5;">${taskRowHTML(t)}</div>`).join('')}`:'')
+    ||'<div class="empty"><p>Sin tareas en esta área.</p></div>';
   openMod('m-ops-proj');
 }
 
@@ -2478,14 +2553,15 @@ function openTaskForm(taskId, projId, preDate, forceType){
     switchTaskType(editType);
     if(editType==='tarea') updateTaskFormStates(t.projectId, currentState);
     if(editType==='contenido') populateCalPills(currentState);
-    document.getElementById('tf-id').value       =t.id;
-    document.getElementById('tf-name').value     =t.name;
-    document.getElementById('tf-desc').value     =t.desc||'';
-    document.getElementById('tf-area').value     =t.area||'general';
-    document.getElementById('tf-prio').value     =t.priority||'media';
-    document.getElementById('tf-start').value    =tStart(t);
-    document.getElementById('tf-end').value      =tEnd(t);
-    document.getElementById('tf-resources').value=t.resources||'';
+    document.getElementById('tf-id').value            =t.id;
+    document.getElementById('tf-name').value          =t.name;
+    document.getElementById('tf-desc').value          =t.desc||'';
+    document.getElementById('tf-content-desc').value  =t.contentDesc||'';
+    document.getElementById('tf-area').value          =t.area||'general';
+    document.getElementById('tf-prio').value          =t.priority||'media';
+    document.getElementById('tf-start').value         =tStart(t);
+    document.getElementById('tf-end').value           =tEnd(t);
+    document.getElementById('tf-resources').value     =t.resources||'';
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>{
       c.classList.toggle('sel', (t.assignedUsers||[]).includes(c.dataset.value));
     });
@@ -2506,6 +2582,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     document.getElementById('tf-end').value  =preDate||'';
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>c.classList.remove('sel'));
     document.getElementById('tf-resources').value='';
+    document.getElementById('tf-content-desc').value='';
     document.getElementById('tf-ttl').textContent=defaultType==='contenido'?'Nuevo Contenido':'Nueva Tarea';
     switchTaskType(defaultType);
     if(defaultType==='tarea') updateTaskFormStates(useProjId);
@@ -2565,7 +2642,8 @@ async function saveTaskForm(){
     startDate, endDate, dueDate:endDate,
     assignedUsers:assigned,
     kStatus, calStatus, taskStatus, status,
-    resources: taskType==='contenido'?(document.getElementById('tf-resources').value.trim()||null):existing?.resources||null,
+    resources:    taskType==='contenido'?(document.getElementById('tf-resources').value.trim()||null):existing?.resources||null,
+    contentDesc:  taskType==='contenido'?(document.getElementById('tf-content-desc').value.trim()||null):null,
     createdAt:existing?.createdAt||Date.now(),
   };
   await persistTask(t);
@@ -3225,7 +3303,7 @@ Object.assign(window,{
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
-  openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, renderPulseTaskSections, pwTaskHTML, formatResources,
+  openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, openAreaModal, renderPulseTaskSections, pwTaskHTML, formatResources,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
