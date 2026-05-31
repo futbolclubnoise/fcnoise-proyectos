@@ -68,23 +68,60 @@
   --card-hover-shadow:0 6px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);
 }
 
-/* Light mode = Brand OS soft-gray (B2B visual register) */
+/* Light mode — Apple SF-style system background */
 body.light {
-  --bg:#d4d4d4;
-  --bg2:#f5f5f5;
-  --bg3:#ebebeb;
-  --bg4:#e0e0e0;
-  --bg5:#d8d8d8;
-  --bd:rgba(0,0,0,.07);
-  --bd2:rgba(0,0,0,.12);
-  --bd3:rgba(0,0,0,.2);
-  --tx:#1a1a1a;
-  --tx2:#2a2a2a;
-  --tx3:#666666;
+  --bg:#f2f2f7;
+  --bg2:#ffffff;
+  --bg3:#f5f5f7;
+  --bg4:#ebebed;
+  --bg5:#e0e0e4;
+  --bd:rgba(0,0,0,.06);
+  --bd2:rgba(0,0,0,.1);
+  --bd3:rgba(0,0,0,.18);
+  --tx:#0a0a0a;
+  --tx2:#2c2c2e;
+  --tx3:#6d6d72;
   --card:#ffffff;
   --inp:rgba(0,0,0,.04);
-  --shadow:0 2px 14px rgba(0,0,0,.1);
+  --shadow:0 2px 16px rgba(0,0,0,.08);
+  --glass-bd:rgba(0,0,0,.07);
+  --glass-hi:rgba(255,255,255,.9);
+  --card-shadow:0 1px 8px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.06);
+  --card-hover-shadow:0 4px 20px rgba(0,0,0,.12),0 0 0 1px rgba(0,0,0,.08);
 }
+/* Override glass gradients in light mode */
+body.light .proj-card,
+body.light .hcard,
+body.light .panel,
+body.light .hstat,
+body.light .ops-pcard,
+body.light .area-eval-card,
+body.light .pw-task,
+body.light .task-ticket,
+body.light .team-row,
+body.light .ppr-row{
+  background:rgba(255,255,255,.92)!important;
+  border-color:rgba(0,0,0,.09)!important;
+  border-top-color:rgba(255,255,255,.95)!important;
+  backdrop-filter:blur(10px);
+}
+body.light .modal{
+  background:rgba(255,255,255,.97)!important;
+  border-color:rgba(0,0,0,.09)!important;
+}
+body.light .nav{
+  background:rgba(242,242,247,.92)!important;
+  border-bottom-color:rgba(0,0,0,.1)!important;
+}
+body.light .board-section,body.light .task-row{background:rgba(0,0,0,.02)!important;}
+body.light .task-row:hover{background:rgba(0,0,0,.04)!important;}
+body.light .hcard-hdr,body.light .panel-hdr,body.light .ops-pcard-top,body.light .area-eval-card{
+  border-color:rgba(0,0,0,.08)!important;
+}
+body.light .tl-month{background:rgba(255,255,255,.8)!important;border-color:rgba(0,0,0,.1)!important;}
+body.light .tl-month.tl-cur{background:linear-gradient(160deg,rgba(255,122,0,.12),rgba(255,122,0,.05))!important;border-color:rgba(255,122,0,.4)!important;}
+body.light .pw-delayed{background:rgba(232,64,64,.06)!important;}
+body.light .gn-item{background:rgba(40,199,111,.06)!important;}
 
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font-body);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;transition:background .25s,color .25s;}
@@ -605,24 +642,32 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 .gn-bullet{width:6px;height:6px;border-radius:50%;background:var(--grn);flex-shrink:0;margin-top:5px;}
 .gn-text{font-size:12px;color:var(--tx2);flex:1;line-height:1.5;}
 .gn-date{font-size:9px;color:var(--tx3);flex-shrink:0;font-variant-numeric:tabular-nums;}
-/* Pulse weekly task cards */
-.pw-wk-section{margin-bottom:14px;}
-.pw-wk-hdr{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;}
-.pw-wk-ttl{font-family:var(--font-display);font-size:13px;letter-spacing:.06em;color:var(--tx2);}
-.pw-wk-cnt{font-size:10px;color:var(--tx3);font-weight:600;padding:1px 7px;border-radius:20px;background:var(--bg4);border:1px solid var(--bd2);}
-.pw-task{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(20,24,31,0.55);border:1px solid var(--bd2);border-radius:10px;margin-bottom:5px;cursor:pointer;transition:all .15s;backdrop-filter:blur(8px);border-left:2.5px solid transparent;}
-.pw-task:hover{background:rgba(20,24,31,0.8);transform:translateX(2px);}
-.pw-task.alta{border-left-color:var(--red);}
-.pw-task.media{border-left-color:var(--yel);}
-.pw-task.baja{border-left-color:var(--grn);}
+/* Pulse weekly collapsible sections */
+.pw-wk-section{margin-bottom:6px;}
+.pw-collapse{border-radius:12px;overflow:hidden;background:rgba(20,24,31,0.45);border:1px solid var(--bd2);backdrop-filter:blur(10px);margin-bottom:8px;}
+.pw-collapse-hdr{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;transition:background .12s;user-select:none;}
+.pw-collapse-hdr:hover{background:rgba(255,255,255,.03);}
+.pw-c-label{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--tx2);flex:1;}
+.pw-c-range{font-size:10px;color:var(--tx3);}
+.pw-c-dots{display:flex;gap:3px;align-items:center;}
+.pw-c-cnt{font-size:10px;color:var(--tx3);font-weight:500;padding:1px 8px;border-radius:10px;background:rgba(255,255,255,.06);}
+.pw-c-arrow{color:var(--tx3);font-size:9px;transition:transform .22s;flex-shrink:0;margin-left:4px;}
+.pw-collapse-hdr.open .pw-c-arrow{transform:rotate(90deg);}
+.pw-c-body{max-height:0;overflow:hidden;transition:max-height .32s ease;}
+.pw-c-body.open{max-height:4000px;}
+.pw-c-inner{padding:8px 12px 12px;}
+/* Individual task row inside collapse */
+.pw-task{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:background .12s;border-bottom:1px solid rgba(255,255,255,.04);}
+.pw-task:last-child{border-bottom:none;}
+.pw-task:hover{background:rgba(255,255,255,.04);}
 .pw-task-info{flex:1;min-width:0;}
-.pw-task-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.pw-task-sub{font-size:10px;color:var(--tx3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.pw-task-date{font-size:10px;color:var(--tx3);flex-shrink:0;font-variant-numeric:tabular-nums;}
-.pw-delayed{background:rgba(232,64,64,.06);border:1px solid var(--red3);border-radius:14px;padding:14px;margin-bottom:14px;backdrop-filter:blur(8px);}
-.pw-delayed-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.pw-delayed-ttl{font-family:var(--font-display);font-size:13px;letter-spacing:.06em;color:var(--red);}
-.pw-empty{font-size:11px;color:var(--tx3);padding:10px 0;text-align:center;}
+.pw-task-name{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.01em;}
+.pw-task-sub{font-size:9.5px;color:var(--tx3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pw-task-date{font-size:9.5px;color:var(--tx3);flex-shrink:0;font-variant-numeric:tabular-nums;}
+.pw-delayed{background:rgba(232,64,64,.06);border:1px solid var(--red3);border-radius:12px;padding:12px 14px;margin-bottom:10px;backdrop-filter:blur(8px);}
+.pw-delayed-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.pw-delayed-ttl{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--red);}
+.pw-empty{font-size:11px;color:var(--tx3);padding:16px 0;text-align:center;}
 /* iOS-style Live toggle */
 .live-sw{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;padding:3px 0;}
 .lt-track{width:34px;height:19px;border-radius:10px;background:var(--bg5);border:1.5px solid var(--bd2);position:relative;transition:background .22s,border-color .22s;flex-shrink:0;}
@@ -674,9 +719,12 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <div class="nav-brand">FC<em>NOISE.</em></div>
     <div class="nav-links" id="nav-links"></div>
     <div class="nav-right">
-      <div class="live-sw" onclick="toggleLive()" title="Conectar en tiempo real">
+      <div class="live-sw" onclick="toggleLive()" title="Activar para sincronizar con el equipo en tiempo real">
         <div class="lt-track" id="lt-track"><div class="lt-thumb"></div></div>
-        <span class="lt-lbl" id="lt-lbl">Live</span>
+        <div style="display:flex;flex-direction:column;line-height:1;">
+          <span class="lt-lbl" id="lt-lbl">Local</span>
+          <span id="lt-sub" style="font-size:8px;color:var(--tx3);letter-spacing:.02em;margin-top:1px;">Sin sync</span>
+        </div>
       </div>
       <button class="nav-icon-btn" onclick="openSettingsModal()" title="Configuraciones"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <button class="nav-logout" onclick="logout()">Cerrar sesión</button>
@@ -1361,16 +1409,20 @@ window.addEventListener('beforeunload',()=>{
 function setSyncDot(state){
   const track=document.getElementById('lt-track');
   const lbl=document.getElementById('lt-lbl');
+  const sub=document.getElementById('lt-sub');
   if(!track) return;
   if(state===true){
     track.classList.add('on');
-    if(lbl){ lbl.textContent='Live'; lbl.style.color='var(--grn)'; }
+    if(lbl){lbl.textContent='En Vivo';lbl.style.color='var(--grn)';}
+    if(sub){sub.textContent='Sincronizado';sub.style.color='var(--grn)';}
   } else if(state==='connecting'||state==='uploading'){
     track.classList.remove('on');
-    if(lbl){ lbl.textContent=state==='uploading'?'…sync':'…'; lbl.style.color='var(--yel)'; }
+    if(lbl){lbl.textContent='Conectando';lbl.style.color='var(--yel)';}
+    if(sub){sub.textContent=state==='uploading'?'Subiendo datos…':'Esperando…';sub.style.color='var(--yel)';}
   } else {
     track.classList.remove('on');
-    if(lbl){ lbl.textContent='Live'; lbl.style.color=''; }
+    if(lbl){lbl.textContent='Local';lbl.style.color='';}
+    if(sub){sub.textContent='Sin sync';sub.style.color='';}
   }
 }
 
@@ -1428,6 +1480,10 @@ function showApp(){
 /* ═══════════════════════════════════════
    NAV
 ═══════════════════════════════════════ */
+function initials(name){
+  const parts=name.trim().split(/\s+/);
+  return parts.length>1?(parts[0][0]+parts[parts.length-1][0]).toUpperCase():parts[0].slice(0,2).toUpperCase();
+}
 function renderNav(){
   const u=currentUser, rm=ROLES[u.role];
   const av=document.getElementById('nav-av');
@@ -1436,8 +1492,8 @@ function renderNav(){
     av.innerHTML=`<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">`;
     av.style.background='transparent';
   } else {
-    av.innerHTML=`<span style="font-size:11px;font-weight:700;">${u.name.charAt(0).toUpperCase()}</span>`;
-    av.style.background=rm.bg;
+    av.innerHTML=`<span style="font-size:10px;font-weight:700;letter-spacing:-.02em;">${initials(u.name)}</span>`;
+    av.style.background=`linear-gradient(135deg,${rm.brd},${rm.bg})`;
     av.style.color=rm.color;
   }
   av.style.borderColor=rm.brd;
@@ -2980,12 +3036,14 @@ function setTaskFormMode(simple){
   const show=(id,visible)=>{ const el=document.getElementById(id); if(el) el.style.display=visible?'':'none'; };
   // In simple mode for calendar projects, keep type toggle visible so user can pick tarea/contenido
   const isCalProj=simple&&_taskFromProjId&&(_projects.find(p=>p.id===_taskFromProjId)?.meth||'lista')==='calendario';
+  const taskType=document.getElementById('tf-type')?.value||'tarea';
+  const isContenido=taskType==='contenido';
   show('tf-type-toggle',   !simple||isCalProj);
-  show('tf-desc-wrap',     !simple);
+  show('tf-desc-wrap',     !simple&&!isContenido); // desc hidden for contenido (uses tf-content-desc)
   show('tf-proj-fi',       !simple);
   show('tf-area-fi',       !simple);
-  show('tf-state-wrap',    !simple);
-  show('tf-start-fi',      !simple);
+  show('tf-state-wrap',    !simple&&!isContenido); // estado hidden for contenido in simple mode
+  show('tf-start-fi',      !simple||isContenido);  // SIEMPRE visible para contenido — fecha de entrega
   // contenido-fields: always respect switchTaskType, don't force-hide
 
   // The proj-tag banner
@@ -3099,71 +3157,81 @@ function pwTaskHTML(t){
   </div>`;
 }
 
+let _pwOpenSections={overdue:true, thisweek:false, nextweek:false, later:false};
+
+function togglePwSection(id){
+  _pwOpenSections[id]=!_pwOpenSections[id];
+  const hdr=document.getElementById('pw-hdr-'+id);
+  const body=document.getElementById('pw-body-'+id);
+  if(hdr) hdr.classList.toggle('open',_pwOpenSections[id]);
+  if(body) body.classList.toggle('open',_pwOpenSections[id]);
+}
+
+function pwCollapseSection(id, label, range, tasks, colorClass, initOpen){
+  if(!tasks.length) return '';
+  const alta=tasks.filter(t=>t.priority==='alta').length;
+  const media=tasks.filter(t=>(t.priority||'media')==='media').length;
+  const dotRow=[
+    alta?`<span class="dot dot-alta" title="${alta} alta"></span>`:'',
+    media?`<span class="dot dot-media" title="${media} media"></span>`:'',
+  ].filter(Boolean).join('');
+  _pwOpenSections[id]=initOpen;
+  return `<div class="pw-collapse">
+    <div class="pw-collapse-hdr ${initOpen?'open':''}" id="pw-hdr-${id}" onclick="togglePwSection('${id}')">
+      <div class="dot ${colorClass}" style="flex-shrink:0;"></div>
+      <span class="pw-c-label">${label}</span>
+      <span class="pw-c-range">${range}</span>
+      <div class="pw-c-dots">${dotRow}</div>
+      <span class="pw-c-cnt">${tasks.length}</span>
+      <span class="pw-c-arrow">›</span>
+    </div>
+    <div class="pw-c-body ${initOpen?'open':''}" id="pw-body-${id}">
+      <div class="pw-c-inner">${tasks.map(t=>pwTaskHTML(t)).join('')}</div>
+    </div>
+  </div>`;
+}
+
+function fmtRange(d1, d2){
+  const fmt=d=>{ const [y,m,dd]=d.split('-'); return `${dd}/${m}`; };
+  return d1&&d2?`${fmt(d1)} – ${fmt(d2)}`:'';
+}
+
 function renderPulseTaskSections(){
   const today=todayStr();
-  // Admins ven todo; colaboradores solo ven sus tareas asignadas
+  const now=new Date();
+  const thisWk=getWeekRange(now,0);
+  const nextWk=getWeekRange(now,1);
+
   const srcTasks=isAdmin()?_tasks:_tasks.filter(t=>(t.assignedUsers||[]).includes(currentUser.id));
-  const active=srcTasks.filter(t=>t.status!=='done');
-
-  // Retrasadas: vencidas antes de hoy
-  const overdue=active.filter(t=>tEnd(t)&&tEnd(t)<today)
-    .sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
-
-  // Pendientes: no vencidas, agrupadas por área
-  const pending=active.filter(t=>!tEnd(t)||tEnd(t)>=today);
   const prioOrder={alta:0,media:1,baja:2};
-  const byArea={};
-  pending.forEach(t=>{
-    const k=t.area||'general';
-    if(!byArea[k]) byArea[k]=[];
-    byArea[k].push(t);
-  });
-  // Ordenar tareas dentro de cada área: alta → media → baja, luego por fecha
-  Object.values(byArea).forEach(arr=>arr.sort((a,b)=>{
+  const sortPrio=arr=>[...arr].sort((a,b)=>{
     const op=(prioOrder[a.priority??'media']??1)-(prioOrder[b.priority??'media']??1);
-    if(op!==0) return op;
-    return (tEnd(a)||'').localeCompare(tEnd(b)||'');
-  }));
-  // Ordenar áreas: las que tienen tareas alta primero
-  const areaKeys=Object.keys(byArea).sort((a,b)=>{
-    const ha=byArea[a].some(t=>t.priority==='alta')?0:1;
-    const hb=byArea[b].some(t=>t.priority==='alta')?0:1;
-    return ha-hb;
+    return op!==0?op:(tEnd(a)||'').localeCompare(tEnd(b)||'');
   });
 
-  // Retrasadas card
-  const delEl=document.getElementById('pw-delayed');
-  if(delEl){
-    delEl.innerHTML=overdue.length?`<div class="pw-delayed">
-      <div class="pw-delayed-hdr">
-        <div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
-        <span class="pw-delayed-ttl">Retrasadas</span>
-        <span class="pw-wk-cnt">${overdue.length}</span>
-      </div>
-      ${overdue.map(t=>pwTaskHTML(t)).join('')}
-    </div>`:'';
-  }
+  const overdue=sortPrio(srcTasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today));
+  const thisWkT=sortPrio(srcTasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)>=thisWk.start&&tEnd(t)<=thisWk.end));
+  const nextWkT=sortPrio(srcTasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)>=nextWk.start&&tEnd(t)<=nextWk.end));
+  const laterT =sortPrio(srcTasks.filter(t=>t.status!=='done'&&(!tEnd(t)||(tEnd(t)>nextWk.end&&tEnd(t)>=today))));
 
-  // Secciones por área
+  // Retrasadas (siempre visible, sin colapso)
+  const delEl=document.getElementById('pw-delayed');
+  if(delEl) delEl.innerHTML=overdue.length?`<div class="pw-delayed">
+    <div class="pw-delayed-hdr">
+      <div class="dot dot-alta"></div>
+      <span class="pw-delayed-ttl">Retrasadas · ${overdue.length}</span>
+    </div>
+    ${overdue.map(t=>pwTaskHTML(t)).join('')}
+  </div>`:'';
+
+  // Secciones colapsables por semana
   const twEl=document.getElementById('pw-thisweek');
-  if(twEl){
-    if(!areaKeys.length){
-      twEl.innerHTML=`<div class="pw-empty" style="padding:24px 0;">Sin tareas pendientes</div>`;
-    } else {
-      twEl.innerHTML=areaKeys.map(area=>{
-        const am=AREAS[area]||AREAS.general;
-        const tasks=byArea[area];
-        return `<div class="pw-wk-section">
-          <div class="pw-wk-hdr">
-            <span class="pw-wk-ttl">${esc(am.label.toUpperCase())}</span>
-            <span class="pw-wk-cnt">${tasks.length}</span>
-          </div>
-          ${tasks.map(t=>pwTaskHTML(t)).join('')}
-        </div>`;
-      }).join('');
-    }
-  }
-  // Clear nextweek (no longer used)
+  if(twEl) twEl.innerHTML=
+    pwCollapseSection('thisweek','Esta semana',fmtRange(thisWk.start,thisWk.end),thisWkT,'dot-en-proceso',true)+
+    pwCollapseSection('nextweek','Próxima semana',fmtRange(nextWk.start,nextWk.end),nextWkT,'dot-media',false)+
+    pwCollapseSection('later','Más adelante','',laterT,'dot-gray',false)||
+    (!thisWkT.length&&!nextWkT.length&&!laterT.length?`<div class="pw-empty">Sin tareas pendientes</div>`:'');
+
   const nwEl=document.getElementById('pw-nextweek');
   if(nwEl) nwEl.innerHTML='';
 }
@@ -3303,7 +3371,7 @@ Object.assign(window,{
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
-  openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, openAreaModal, renderPulseTaskSections, pwTaskHTML, formatResources,
+  openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, openAreaModal, renderPulseTaskSections, pwTaskHTML, formatResources, togglePwSection,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
