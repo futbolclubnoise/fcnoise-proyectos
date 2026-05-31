@@ -134,13 +134,29 @@ body.light .fi input,body.light .fi select,body.light .fi textarea{
 }
 /* ─ Misc ─ */
 body.light .area-eval-bar{background:rgba(0,0,0,.08)!important;}
-body.light .kb-hdr{background:rgba(0,0,0,.03)!important;}
-body.light .kb-body{background:rgba(0,0,0,.01)!important;}
-body.light .kb-card{background:#ffffff!important;border-color:rgba(0,0,0,.1)!important;}
-body.light .hcard-hdr{background:rgba(0,0,0,.02)!important;border-bottom-color:rgba(0,0,0,.08)!important;}
+/* ─ Kanban ─ */
+body.light .kanban-col{background:rgba(0,0,0,.04)!important;border:1px solid rgba(0,0,0,.08);}
+body.light .kb-hdr{background:rgba(0,0,0,.04)!important;border-bottom-color:rgba(0,0,0,.08)!important;}
+body.light .kb-body{background:transparent!important;}
+body.light .kb-card{background:#ffffff!important;border:1px solid rgba(0,0,0,.1)!important;box-shadow:0 1px 4px rgba(0,0,0,.06)!important;}
+body.light .kb-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.1)!important;}
+/* ─ Calendar ─ */
+body.light .cal-cell{background:rgba(0,0,0,.03)!important;border:1px solid rgba(0,0,0,.06)!important;}
+body.light .cal-cell.today{border-color:var(--orange)!important;background:rgba(255,122,0,.04)!important;}
+body.light .cal-cell:hover{border-color:rgba(0,0,0,.15)!important;background:rgba(0,0,0,.05)!important;}
+body.light .cal-day-hdr{color:rgba(0,0,0,.45)!important;}
+body.light .cal-date{color:rgba(0,0,0,.55)!important;}
+body.light .cal-date.is-today{background:var(--orange)!important;color:#fff!important;}
+body.light .cal-no-date{background:rgba(0,0,0,.04)!important;border:1px solid rgba(0,0,0,.08)!important;}
+/* ─ Misc surfaces ─ */
+body.light .hcard-hdr{background:rgba(0,0,0,.02)!important;border-bottom-color:rgba(0,0,0,.07)!important;}
 body.light .hcard.urgent .hcard-hdr{background:rgba(232,64,64,.06)!important;}
+body.light .board-shdr{background:rgba(0,0,0,.03)!important;}
 body.light .panel-hdr{border-bottom:1px solid rgba(0,0,0,.08);}
 body.light .login-box{background:#ffffff!important;border-color:rgba(0,0,0,.1)!important;}
+body.light .proj-detail-hdr{background:#ffffff!important;border:1px solid rgba(0,0,0,.09)!important;}
+body.light .pdh-chips .bdg{border-color:rgba(0,0,0,.1)!important;}
+body.light .section-sep{background:rgba(0,0,0,.08)!important;}
 
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font-body);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;transition:background .25s,color .25s;}
@@ -491,6 +507,15 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 .aet{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--tx3);line-height:1.4;}
 .aet-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
+/* ── PROJECT PRIORITY SECTIONS ── */
+.proj-prio-section{margin-bottom:24px;}
+.proj-prio-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd2);}
+.proj-prio-lbl{font-family:var(--font-display);font-size:13px;letter-spacing:.08em;flex:1;}
+.proj-grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+@media(max-width:640px){.proj-grid-inner{grid-template-columns:1fr;}}
+/* The outer proj-grid is now just a container */
+#proj-grid{display:block;}
+
 /* ── OPS LANES (Operaciones) ── */
 .ops-lanes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
 .ops-lane{background:var(--bg2);border:1px solid var(--bd2);border-radius:12px;overflow:hidden;}
@@ -786,10 +811,11 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
       <div id="meth-content"></div>
     </div>
 
-    <!-- ── PULSE WEEK (Admin) ── -->
+    <!-- ── PULSE WEEK ── -->
     <div id="view-gestion" class="hidden">
       <div class="page-hdr">
-        <div class="page-title">PULSE WEEK</div>
+        <div class="back-btn" onclick="navigate('tasks')">← Inicio</div>
+        <div class="page-title" style="font-size:18px;">PULSE WEEK</div>
         <div class="ml-auto">
           <button class="btn btn-p btn-sm" onclick="openNewTask()">+ Nueva Tarea</button>
         </div>
@@ -820,7 +846,10 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 
     <!-- ── REVISIÓN CEO ── -->
     <div id="view-revision" class="hidden">
-      <div class="page-hdr"><div class="page-title">Revisión</div></div>
+      <div class="page-hdr">
+        <div class="back-btn" onclick="navigate('tasks')">← Inicio</div>
+        <div class="page-title">Revisión</div>
+      </div>
       <div class="stats-row" id="rev-stats"></div>
       <div class="panel"><div class="panel-hdr"><span class="panel-ttl">Proyectos — % Ejecución</span></div><div id="rev-projs"></div></div>
       <div class="panel"><div class="panel-hdr"><span class="panel-ttl">Carga por Usuario</span></div><div id="rev-users"></div></div>
@@ -829,6 +858,7 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
     <!-- ── EVENTOS ── -->
     <div id="view-eventos" class="hidden">
       <div class="page-hdr">
+        <div class="back-btn" onclick="navigate('tasks')">← Inicio</div>
         <div class="page-title">Eventos</div>
         <div class="ml-auto" id="btn-new-event-wrap"></div>
       </div>
@@ -1937,6 +1967,48 @@ async function tdpDelete(){
 /* ═══════════════════════════════════════
    PROJECTS GRID
 ═══════════════════════════════════════ */
+function projCardHTML(p, admin){
+  const pt=_tasks.filter(t=>t.projectId===p.id);
+  const done=pt.filter(t=>t.status==='done').length;
+  const pct=pt.length?Math.round(done/pt.length*100):0;
+  const am=AREAS[p.area]||AREAS.general;
+  const methLabel={lista:'Lista',kanban:'Kanban',calendario:'Calendario'}[p.meth||'lista']||'Lista';
+  const teamDots=(p.team||[]).map(uid_=>{
+    const u=USERS[uid_]; if(!u) return '';
+    const rm=ROLES[u.role];
+    return `<div class="udot" style="background:${rm.bg};color:${rm.color};" title="${u.name}">${initials(u.name).charAt(0)}</div>`;
+  }).join('');
+  const editBtns=admin?`<div class="pc-actions">
+    <button class="btn-icon" onclick="event.stopPropagation();openEditProj('${p.id}')" title="Editar"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+    <button class="btn-icon btn-del" onclick="event.stopPropagation();deleteProject('${p.id}')">✕</button>
+  </div>`:'';
+  const bgMap={bo:'var(--org2)',bb:'var(--blu2)',bg:'var(--grn2)',bp:'var(--pur2)',bw:'var(--bg5)'};
+  const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
+  const dateStr=p.startDate||p.endDate
+    ?`<div class="proj-dates">${p.startDate?`<span>${p.startDate}</span>`:''}${p.endDate?`<span style="color:var(--red);">${p.endDate}</span>`:''}</div>`:'';
+  return `<div class="proj-card" onclick="navigate('proj-detail','${p.id}')">
+    ${editBtns}
+    <div class="pc-top">
+      <div class="pc-icon" style="background:${bgMap[am.cls]||'var(--bg5)'};">${p.icon||'📁'}</div>
+      <div class="pc-meta">
+        <div class="pc-name">${esc(p.name)}</div>
+        <div class="pc-desc">${esc(p.desc)||'Sin descripción'}</div>
+      </div>
+    </div>
+    <div class="pc-foot">
+      <span class="itag" style="color:${am.color};">${am.label}</span>
+      <span class="itag">${methLabel}</span>
+      ${p.type==='cyclic'?`<span class="itag">Cíclico</span>`:''}
+      <div class="flex" style="gap:2px;margin-left:auto;">${teamDots}</div>
+    </div>
+    ${dateStr}
+    <div style="display:flex;justify-content:space-between;margin-top:10px;" class="txt-xs txt-muted">
+      <span>${pt.length} tareas</span><span>${pct}%</span>
+    </div>
+    <div class="prog-bg"><div class="prog-fill" style="width:${pct}%;background:${fillMap[am.cls]||'var(--tx3)'};"></div></div>
+  </div>`;
+}
+
 function renderProjGrid(){
   const admin=isAdmin();
   const wrap=document.getElementById('btn-new-proj-wrap');
@@ -1946,52 +2018,28 @@ function renderProjGrid(){
   if(!projs.length){
     el.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-ico">📂</div><p>Sin proyectos todavía</p></div>'; return;
   }
-  el.innerHTML=projs.map(p=>{
-    const pt=_tasks.filter(t=>t.projectId===p.id);
-    const done=pt.filter(t=>t.status==='done').length;
-    const pct=pt.length?Math.round(done/pt.length*100):0;
-    const am=AREAS[p.area]||AREAS.general;
-    const methIcon={lista:'📋',kanban:'🗂',calendario:'📅'}[p.meth||'lista']||'📋';
-    const methLabel={lista:'Lista',kanban:'Kanban',calendario:'Calendario'}[p.meth||'lista']||'Lista';
-    const teamDots=(p.team||[]).map(uid_=>{
-      const u=USERS[uid_]; if(!u) return '';
-      const rm=ROLES[u.role];
-      return `<div class="udot" style="background:${rm.bg};color:${rm.color};">${u.name.charAt(0).toUpperCase()}</div>`;
-    }).join('');
-    const editBtns=admin?`<div class="pc-actions">
-      <button class="btn-icon" onclick="event.stopPropagation();openEditProj('${p.id}')" title="Editar">·</button>
-      <button class="btn-icon btn-del" onclick="event.stopPropagation();deleteProject('${p.id}')">✕</button>
-    </div>`:'';
-    const bgMap={bo:'var(--org2)',bb:'var(--blu2)',bg:'var(--grn2)',bp:'var(--pur2)',bw:'var(--bg5)'};
-    const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
-    const prioMap={alta:'Alta',media:'Media',baja:'Baja'};
-    const prioCls={alta:'prio-alta',media:'prio-media',baja:'prio-baja'};
-    const prioLabel=prioMap[p.priority||'media'];
-    const prioCl=prioCls[p.priority||'media'];
-    const dateStr=p.startDate||p.endDate
-      ?`<div class="proj-dates">${p.startDate?`<span>🟢 ${p.startDate}</span>`:''}${p.endDate?`<span>🔴 ${p.endDate}</span>`:''}</div>`:'';
-    return `<div class="proj-card" onclick="navigate('proj-detail','${p.id}')">
-      ${editBtns}
-      <div class="pc-top">
-        <div class="pc-icon" style="background:${bgMap[am.cls]||'var(--bg5)'};">${p.icon||'📁'}</div>
-        <div class="pc-meta">
-          <div class="pc-name">${esc(p.name)}</div>
-          <div class="pc-desc">${esc(p.desc)||'Sin descripción'}</div>
-        </div>
+
+  // Segmentar por prioridad
+  const alta  = projs.filter(p=>(p.priority||'media')==='alta');
+  const media = projs.filter(p=>(p.priority||'media')==='media');
+  const baja  = projs.filter(p=>(p.priority||'media')==='baja');
+
+  function prioSection(label, color, dotCls, list){
+    if(!list.length) return '';
+    return `<div class="proj-prio-section">
+      <div class="proj-prio-hdr">
+        <div class="dot ${dotCls}"></div>
+        <span class="proj-prio-lbl" style="color:${color};">${label}</span>
+        <span class="bscnt">${list.length}</span>
       </div>
-      <div class="pc-foot">
-        <span class="bdg ${am.cls}">${am.icon} ${am.label}</span>
-        <span class="${prioCl}">${prioLabel}</span>
-        ${p.type==='cyclic'?`<span class="bdg bb">Cíclico</span>`:''}
-        <div class="flex" style="gap:2px;margin-left:auto;">${teamDots}</div>
-      </div>
-      ${dateStr}
-      <div style="display:flex;justify-content:space-between;margin-top:10px;" class="txt-xs txt-muted">
-        <span>${pt.length} tareas</span><span>${pct}%</span>
-      </div>
-      <div class="prog-bg"><div class="prog-fill" style="width:${pct}%;background:${fillMap[am.cls]||'var(--tx3)'};"></div></div>
+      <div class="proj-grid-inner">${list.map(p=>projCardHTML(p,admin)).join('')}</div>
     </div>`;
-  }).join('');
+  }
+
+  el.innerHTML=
+    prioSection('Alta prioridad','var(--red)','dot-alta',alta)+
+    prioSection('Media prioridad','var(--yel)','dot-media',media)+
+    prioSection('Baja prioridad','var(--grn)','dot-baja',baja);
 }
 
 /* ═══════════════════════════════════════
@@ -2599,6 +2647,8 @@ function switchTaskType(type){
   } else {
     updateTaskFormStates(document.getElementById('tf-proj').value);
   }
+  // Re-apply simple mode so date visibility updates when type changes
+  if(_taskFromProjId) setTaskFormMode(true);
 }
 
 /* ── State options by methodology ── */
