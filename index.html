@@ -816,7 +816,8 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
       <div class="page-hdr">
         <div class="back-btn" onclick="navigate('tasks')">← Inicio</div>
         <div class="page-title" style="font-size:18px;">PULSE WEEK</div>
-        <div class="ml-auto">
+        <div class="ml-auto flex gap-6">
+          <div id="pw-access-btn"></div>
           <button class="btn btn-p btn-sm" onclick="openNewTask()">+ Nueva Tarea</button>
         </div>
       </div>
@@ -927,6 +928,23 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
           <div style="font-size:10px;color:var(--tx3);margin-top:1px;">Con flujo Idea → Edición → Publicado</div>
         </div>
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL PULSE ACCESS ═══ -->
+<div class="mov" id="m-pulse-access">
+  <div class="modal" style="max-width:400px;">
+    <div class="mhdr">
+      <div>
+        <div class="mttl">Acceso Pulse Week</div>
+        <div style="font-size:10px;color:var(--tx3);margin-top:2px;">Los admins siempre tienen acceso</div>
+      </div>
+      <button class="mclose" onclick="closeMod('m-pulse-access')">✕</button>
+    </div>
+    <div id="pulse-access-list"></div>
+    <div style="margin-top:14px;">
+      <button class="btn btn-p w-full" onclick="closeMod('m-pulse-access')">Listo</button>
     </div>
   </div>
 </div>
@@ -1353,8 +1371,12 @@ let _editEventId   = null; // event currently being edited
 let _milestones    = []; // brand timeline milestones
 let _goodnews      = []; // pulse week good news items
 let _openMilestoneMonth = null; // currently open month key in milestone modal
+let _pulseAccess   = []; // user IDs who can see Pulse Week (admins always have access)
 
-const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews' };
+const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulseAccess:'fcn_pulse_access' };
+
+function canSeePulse(){ return isAdmin()||_pulseAccess.includes(currentUser?.id); }
+function canEditProject(p){ return isAdmin()||(p&&p.createdBy===currentUser?.id); }
 
 /* ═══════════════════════════════════════
    DATA HELPERS
@@ -1404,8 +1426,9 @@ async function initData(){
   _projects  =JSON.parse(localStorage.getItem(LS.proj)||'[]');
   _tasks     =JSON.parse(localStorage.getItem(LS.task)||'[]');
   _events    =JSON.parse(localStorage.getItem(LS.events)||'[]');
-  _milestones=JSON.parse(localStorage.getItem(LS.milestones)||'[]');
-  _goodnews  =JSON.parse(localStorage.getItem(LS.goodnews)||'[]');
+  _milestones  =JSON.parse(localStorage.getItem(LS.milestones)||'[]');
+  _goodnews    =JSON.parse(localStorage.getItem(LS.goodnews)||'[]');
+  _pulseAccess =JSON.parse(localStorage.getItem(LS.pulseAccess)||'[]');
 }
 
 async function toggleLive(){
@@ -1558,8 +1581,38 @@ function renderNav(){
   document.getElementById('nav-links').innerHTML=`
     <button class="nav-link" onclick="navigate('tasks')">Inicio</button>
     <button class="nav-link" onclick="navigate('projs')">Proyectos</button>
-    <button class="nav-link" onclick="navigate('gestion')">Pulse Week</button>
+    ${canSeePulse()?`<button class="nav-link" onclick="navigate('gestion')">Pulse Week</button>`:''}
     ${admin?`<button class="nav-link" onclick="navigate('revision')">Revisión</button>`:''}`;
+}
+// Save pulse access list
+function savePulseAccess(){
+  localStorage.setItem(LS.pulseAccess, JSON.stringify(_pulseAccess));
+}
+function togglePulseUser(uid_){
+  if(_pulseAccess.includes(uid_)) _pulseAccess=_pulseAccess.filter(x=>x!==uid_);
+  else _pulseAccess=[..._pulseAccess, uid_];
+  savePulseAccess();
+  renderPulseAccessModal();
+  renderNav(); // re-render nav so link appears/disappears
+}
+function renderPulseAccessModal(){
+  const el=document.getElementById('pulse-access-list'); if(!el) return;
+  const nonAdmins=Object.values(USERS).filter(u=>u.role!=='admin');
+  el.innerHTML=nonAdmins.map(u=>{
+    const has=_pulseAccess.includes(u.id);
+    const rm=ROLES[u.role];
+    return `<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd);">
+      <div class="udot" style="width:28px;height:28px;font-size:10px;background:${rm.bg};color:${rm.color};">${initials(u.name)}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:500;">${u.name}</div>
+        <div style="font-size:10px;color:var(--tx3);">${rm.label}</div>
+      </div>
+      <div class="live-sw" onclick="togglePulseUser('${u.id}')" style="cursor:pointer;">
+        <div class="lt-track ${has?'on':''}"><div class="lt-thumb"></div></div>
+        <span style="font-size:9px;color:${has?'var(--grn)':'var(--tx3)'};">${has?'Acceso':'Sin acceso'}</span>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function navigate(view, projId){
@@ -1569,8 +1622,11 @@ function navigate(view, projId){
     document.getElementById('view-'+v)?.classList.add('hidden'));
   document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('on'));
   document.getElementById('view-'+view)?.classList.remove('hidden');
-  // nav link index: 0=Inicio 1=Proyectos 2=Pulse Week(todos) 3=Revisión(admin)
-  const map={'tasks':0,'projs':1,'gestion':2,'revision':isAdmin()?3:-1};
+  // nav link index: dynamic — Pulse Week only shows if canSeePulse()
+  let linkIdx=2;
+  const map={'tasks':0,'projs':1};
+  if(canSeePulse()) { map['gestion']=linkIdx++; }
+  if(isAdmin())     { map['revision']=linkIdx; }
   const links=document.querySelectorAll('.nav-link');
   const idx=map[view]; if(idx!==undefined && links[idx]) links[idx].classList.add('on');
 
@@ -1967,7 +2023,8 @@ async function tdpDelete(){
 /* ═══════════════════════════════════════
    PROJECTS GRID
 ═══════════════════════════════════════ */
-function projCardHTML(p, admin){
+function projCardHTML(p, _admin){
+  const admin=canEditProject(p); // admins + project creator can edit
   const pt=_tasks.filter(t=>t.projectId===p.id);
   const done=pt.filter(t=>t.status==='done').length;
   const pct=pt.length?Math.round(done/pt.length*100):0;
@@ -2012,7 +2069,7 @@ function projCardHTML(p, admin){
 function renderProjGrid(){
   const admin=isAdmin();
   const wrap=document.getElementById('btn-new-proj-wrap');
-  if(wrap) wrap.innerHTML=admin?`<button class="btn btn-p btn-sm" onclick="openNewProj()">+ Proyecto</button>`:'';
+  if(wrap) wrap.innerHTML=`<button class="btn btn-p btn-sm" onclick="openNewProj()">+ Proyecto</button>`;
   const el=document.getElementById('proj-grid');
   const projs=visibleProjects();
   if(!projs.length){
@@ -2082,10 +2139,11 @@ function renderProjDetail(id){
     <div class="prog-bg" style="height:8px;margin-top:6px;border-radius:6px;">
       <div class="prog-fill" style="width:${pct}%;background:${fillMap[am.cls]||'var(--tx3)'};border-radius:6px;"></div>
     </div>`;
-  const canAddTask=isCeo||(p.team||[]).includes(currentUser.id)||p.createdBy===currentUser.id;
+  const canAddTask=(p.team||[]).includes(currentUser.id)||p.createdBy===currentUser.id||isCeo;
+  const canEdit=canEditProject(p); // admin or creator
   const isCalendar=(meth==='calendario');
   document.getElementById('detail-actions').innerHTML=`
-    ${isCeo?`<button class="btn btn-g btn-sm" onclick="openEditProj('${id}')">Editar proyecto</button>`:''}
+    ${canEdit?`<button class="btn btn-g btn-sm" onclick="openEditProj('${id}')">Editar proyecto</button>`:''}
     ${canAddTask&&isCalendar?`
       <button class="btn btn-g btn-sm" onclick="openNewTaskForProjTyped('${id}','tarea')">+ Tarea</button>
       <button class="btn btn-p btn-sm" onclick="openNewTaskForProjTyped('${id}','contenido')">+ Contenido</button>
@@ -2563,7 +2621,10 @@ async function saveProject(){
   if(!name) return alert('Nombre requerido.');
   const id=document.getElementById('mp-id').value||uid();
   const cyclic=document.getElementById('mp-type').value==='cyclic';
-  const team=[...document.querySelectorAll('#mp-assign .a-chip.sel')].map(c=>c.dataset.value);
+  let team=[...document.querySelectorAll('#mp-assign .a-chip.sel')].map(c=>c.dataset.value);
+  // Auto-add creator to team so they can always see their own project
+  const isNewProj=!document.getElementById('mp-id').value;
+  if(isNewProj&&!team.includes(currentUser.id)) team=[...team, currentUser.id];
   const proj={
     id, name,
     desc:      document.getElementById('mp-desc').value.trim(),
@@ -3076,7 +3137,10 @@ function populateProjSels(targetId, selectedId){
   });
 }
 
-function openMod(id){ document.getElementById(id)?.classList.add('open'); }
+function openMod(id){
+  document.getElementById(id)?.classList.add('open');
+  if(id==='m-pulse-access') renderPulseAccessModal();
+}
 function closeMod(id){
   document.getElementById(id)?.classList.remove('open');
   if(id==='m-task-detail') _tdpId=null;
@@ -3392,6 +3456,10 @@ function deleteMilestone(id){
    FEATURE 3 — PULSE WEEK
 ═══════════════════════════════════════ */
 function renderPulseWeek(){
+  // Admin access button
+  const accBtn=document.getElementById('pw-access-btn');
+  if(accBtn) accBtn.innerHTML=isAdmin()
+    ?`<button class="btn btn-g btn-sm" onclick="openMod('m-pulse-access')">Gestionar acceso</button>`:'';
   renderGoodNews();
   renderOpsView();
   renderPulseTaskSections();
@@ -3446,6 +3514,7 @@ function deleteGoodNews(id){
 ═══════════════════════════════════════ */
 Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
+  togglePulseUser, renderPulseAccessModal,
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
