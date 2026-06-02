@@ -932,19 +932,19 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
   </div>
 </div>
 
-<!-- ═══ MODAL PULSE ACCESS ═══ -->
+<!-- ═══ MODAL PULSE ACCESS (Super Admin) ═══ -->
 <div class="mov" id="m-pulse-access">
-  <div class="modal" style="max-width:400px;">
+  <div class="modal" style="max-width:440px;">
     <div class="mhdr">
       <div>
-        <div class="mttl">Acceso Pulse Week</div>
-        <div style="font-size:10px;color:var(--tx3);margin-top:2px;">Los admins siempre tienen acceso</div>
+        <div class="mttl">Asignar Pulse por Área</div>
+        <div style="font-size:10px;color:var(--tx3);margin-top:2px;">Elige qué áreas ve cada persona</div>
       </div>
       <button class="mclose" onclick="closeMod('m-pulse-access')">✕</button>
     </div>
-    <div id="pulse-access-list"></div>
+    <div id="pulse-access-list" style="max-height:60vh;overflow-y:auto;"></div>
     <div style="margin-top:14px;">
-      <button class="btn btn-p w-full" onclick="closeMod('m-pulse-access')">Listo</button>
+      <button class="btn btn-p w-full" onclick="closeMod('m-pulse-access');renderNav();">Guardar y cerrar</button>
     </div>
   </div>
 </div>
@@ -1290,14 +1290,15 @@ import { firebaseInit, isConnected,
    CONSTANTS
 ═══════════════════════════════════════ */
 const USERS = {
-  leonardo:{ id:'leonardo', name:'Leonardo', pass:'123456', role:'admin' },
+  leonardo:{ id:'leonardo', name:'Leonardo', pass:'123456', role:'superadmin' },
   veronica:{ id:'veronica', name:'Verónica',  pass:'123456', role:'admin' },
   laura:   { id:'laura',    name:'Laura',     pass:'123456', role:'colaborador' },
   editor:  { id:'editor',   name:'Editor',    pass:'123456', role:'colaborador' },
 };
 const ROLES = {
-  admin:      {label:'Administrador', color:'var(--org)',bg:'var(--org2)',brd:'var(--org3)'},
-  colaborador:{label:'Colaborador',   color:'var(--blu)',bg:'var(--blu2)',brd:'var(--blu3)'},
+  superadmin:  {label:'Super Admin',   color:'var(--orange)',bg:'var(--ac2)', brd:'var(--ac3)'},
+  admin:       {label:'Administrador', color:'var(--org)',   bg:'var(--org2)',brd:'var(--org3)'},
+  colaborador: {label:'Colaborador',   color:'var(--blu)',   bg:'var(--blu2)',brd:'var(--blu3)'},
 };
 const AREAS = {
   marketing:  {label:'Marketing',   icon:'📣', cls:'bo', color:'var(--org)'},
@@ -1347,11 +1348,35 @@ const DAYS_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const DAYS_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
 /* ── ROLE HELPERS ── */
-function isAdmin(){ return currentUser?.role==='admin'; }
+function isSuperAdmin(){ return currentUser?.role==='superadmin'; }
+function isAdmin(){ return ['admin','superadmin'].includes(currentUser?.role); }
 function visibleProjects(){
   if(isAdmin()) return _projects;
-  // colaborador: only sees projects they created or are in the team
+  // colaboradores: proyectos donde están en el team o los crearon
   return _projects.filter(p=>(p.team||[]).includes(currentUser.id)||p.createdBy===currentUser.id);
+}
+function canEditProject(p){
+  // superadmin, admin, creador, o miembro del equipo pueden editar
+  if(!p) return false;
+  if(isAdmin()) return true;
+  if(p.createdBy===currentUser.id) return true;
+  return (p.team||[]).includes(currentUser.id);
+}
+
+/* ── PULSE AREA ACCESS ── */
+// _pulseAreaAccess: { userId: [areaKey, ...] }
+// Superadmin ve todo. Admins ven todo. Colaboradores ven áreas asignadas.
+function getMyPulseAreas(){
+  if(isSuperAdmin()||isAdmin()) return Object.keys(AREAS);
+  // Colaboradores: áreas explícitas + áreas de proyectos/tareas asignados
+  const explicit=(_pulseAreaAccess[currentUser.id]||[]);
+  const fromProjects=_projects
+    .filter(p=>(p.team||[]).includes(currentUser.id)||p.createdBy===currentUser.id)
+    .map(p=>p.area||'general');
+  const fromTasks=_tasks
+    .filter(t=>(t.assignedUsers||[]).includes(currentUser.id))
+    .map(t=>t.area||'general');
+  return [...new Set([...explicit,...fromProjects,...fromTasks])];
 }
 
 /* ═══════════════════════════════════════
@@ -1371,12 +1396,16 @@ let _editEventId   = null; // event currently being edited
 let _milestones    = []; // brand timeline milestones
 let _goodnews      = []; // pulse week good news items
 let _openMilestoneMonth = null; // currently open month key in milestone modal
-let _pulseAccess   = []; // user IDs who can see Pulse Week (admins always have access)
+let _pulseAccess     = []; // (legacy, kept for compat)
+let _pulseAreaAccess = {}; // {userId: [areaKey, ...]} — explicit area access
 
-const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulseAccess:'fcn_pulse_access' };
+const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulseAccess:'fcn_pulse_access', pulseAreaAccess:'fcn_pulse_area_access' };
 
-function canSeePulse(){ return isAdmin()||_pulseAccess.includes(currentUser?.id); }
-function canEditProject(p){ return isAdmin()||(p&&p.createdBy===currentUser?.id); }
+function canSeePulse(){
+  if(isAdmin()) return true;
+  // Colaboradores: si tienen algún área asignada o tienen proyectos/tareas asignados
+  return getMyPulseAreas().length>0;
+}
 
 /* ═══════════════════════════════════════
    DATA HELPERS
@@ -1428,7 +1457,8 @@ async function initData(){
   _events    =JSON.parse(localStorage.getItem(LS.events)||'[]');
   _milestones  =JSON.parse(localStorage.getItem(LS.milestones)||'[]');
   _goodnews    =JSON.parse(localStorage.getItem(LS.goodnews)||'[]');
-  _pulseAccess =JSON.parse(localStorage.getItem(LS.pulseAccess)||'[]');
+  _pulseAccess     =JSON.parse(localStorage.getItem(LS.pulseAccess)||'[]');
+  _pulseAreaAccess =JSON.parse(localStorage.getItem(LS.pulseAreaAccess)||'{}');
 }
 
 async function toggleLive(){
@@ -1584,33 +1614,52 @@ function renderNav(){
     ${canSeePulse()?`<button class="nav-link" onclick="navigate('gestion')">Pulse Week</button>`:''}
     ${admin?`<button class="nav-link" onclick="navigate('revision')">Revisión</button>`:''}`;
 }
-// Save pulse access list
-function savePulseAccess(){
-  localStorage.setItem(LS.pulseAccess, JSON.stringify(_pulseAccess));
+function savePulseAreaAccess(){
+  localStorage.setItem(LS.pulseAreaAccess, JSON.stringify(_pulseAreaAccess));
 }
-function togglePulseUser(uid_){
-  if(_pulseAccess.includes(uid_)) _pulseAccess=_pulseAccess.filter(x=>x!==uid_);
-  else _pulseAccess=[..._pulseAccess, uid_];
-  savePulseAccess();
+function togglePulseAreaUser(uid_, areaKey){
+  if(!_pulseAreaAccess[uid_]) _pulseAreaAccess[uid_]=[];
+  if(_pulseAreaAccess[uid_].includes(areaKey))
+    _pulseAreaAccess[uid_]=_pulseAreaAccess[uid_].filter(a=>a!==areaKey);
+  else _pulseAreaAccess[uid_]=[..._pulseAreaAccess[uid_], areaKey];
+  savePulseAreaAccess();
   renderPulseAccessModal();
-  renderNav(); // re-render nav so link appears/disappears
+  renderNav();
 }
+// Legacy (kept for compat with old modal)
+function togglePulseUser(uid_){ renderPulseAccessModal(); }
+
 function renderPulseAccessModal(){
   const el=document.getElementById('pulse-access-list'); if(!el) return;
-  const nonAdmins=Object.values(USERS).filter(u=>u.role!=='admin');
-  el.innerHTML=nonAdmins.map(u=>{
-    const has=_pulseAccess.includes(u.id);
+  // Show all non-superadmin users with per-area assignment
+  const users=Object.values(USERS).filter(u=>u.role!=='superadmin');
+  const areaList=Object.entries(AREAS).filter(([,a])=>a.label!=='General');
+  el.innerHTML=users.map(u=>{
     const rm=ROLES[u.role];
-    return `<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd);">
-      <div class="udot" style="width:28px;height:28px;font-size:10px;background:${rm.bg};color:${rm.color};">${initials(u.name)}</div>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:500;">${u.name}</div>
-        <div style="font-size:10px;color:var(--tx3);">${rm.label}</div>
+    const userAreas=_pulseAreaAccess[u.id]||[];
+    const hasAny=isAdmin()?true:userAreas.length>0;
+    // For admin users, they always have full access
+    if(u.role==='admin'){
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);">
+        <div class="udot" style="width:26px;height:26px;font-size:9px;background:${rm.bg};color:${rm.color};">${initials(u.name)}</div>
+        <div style="flex:1;"><div style="font-size:12px;font-weight:600;">${u.name}</div></div>
+        <span style="font-size:10px;color:var(--grn);font-weight:600;">Acceso completo</span>
+      </div>`;
+    }
+    // Colaboradores: per-area toggles
+    const areaToggles=areaList.map(([k,a])=>{
+      const has=userAreas.includes(k);
+      return `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;cursor:pointer;" onclick="togglePulseAreaUser('${u.id}','${k}')">
+        <div class="lt-track ${has?'on':''}" style="width:28px;height:16px;"><div class="lt-thumb" style="width:10px;height:10px;top:2px;left:2px;"></div></div>
+        <span style="font-size:10px;color:${a.color};">${a.label}</span>
+      </div>`;
+    }).join('');
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--bd);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <div class="udot" style="width:26px;height:26px;font-size:9px;background:${rm.bg};color:${rm.color};">${initials(u.name)}</div>
+        <div style="font-size:12px;font-weight:600;">${u.name}</div>
       </div>
-      <div class="live-sw" onclick="togglePulseUser('${u.id}')" style="cursor:pointer;">
-        <div class="lt-track ${has?'on':''}"><div class="lt-thumb"></div></div>
-        <span style="font-size:9px;color:${has?'var(--grn)':'var(--tx3)'};">${has?'Acceso':'Sin acceso'}</span>
-      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px 16px;padding-left:36px;">${areaToggles}</div>
     </div>`;
   }).join('');
 }
@@ -2367,8 +2416,11 @@ function populateGestionFilters(){
 
 function renderOpsView(){
   const today=new Date().toISOString().slice(0,10);
-  // ── Stats ──
-  const allT=_tasks;
+  const myAreas=getMyPulseAreas();
+  // Stats y area cards filtradas por áreas del usuario
+  const allT=isSuperAdmin()||isAdmin()
+    ? _tasks
+    : _tasks.filter(t=>myAreas.includes(t.area||'general')&&(t.assignedUsers||[]).includes(currentUser.id));
   const urgent  =allT.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today);
   const inProc  =allT.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='en-proceso');
   const inRev   =allT.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='revision');
@@ -2406,8 +2458,9 @@ function renderOpsView(){
       if((t.priority||'media')==='alta') areaMap[k].alta++;
     }
   });
-  const areaKeys=Object.keys(areaMap).filter(k=>areaMap[k].total>0)
-    .sort((a,b)=>areaMap[b].alta-areaMap[a].alta); // áreas con más urgentes primero
+  const areaKeys=Object.keys(areaMap)
+    .filter(k=>areaMap[k].total>0 && (isSuperAdmin()||isAdmin()||myAreas.includes(k)))
+    .sort((a,b)=>areaMap[b].alta-areaMap[a].alta);
   if(!areaKeys.length){ lanesEl.innerHTML=''; return; }
   const html=areaKeys.map(k=>{
     const am=AREAS[k]||AREAS.general;
@@ -3344,7 +3397,15 @@ function renderPulseTaskSections(){
   const thisWk=getWeekRange(now,0);
   const nextWk=getWeekRange(now,1);
 
-  const srcTasks=isAdmin()?_tasks:_tasks.filter(t=>(t.assignedUsers||[]).includes(currentUser.id));
+  const myAreas=getMyPulseAreas();
+  // Superadmin ve todo; admin ve todo; colaboradores ven sus áreas asignadas
+  const srcTasks=isSuperAdmin()||isAdmin()
+    ? _tasks
+    : _tasks.filter(t=>{
+        const areaOk=myAreas.includes(t.area||'general');
+        const assignedOk=(t.assignedUsers||[]).includes(currentUser.id);
+        return areaOk&&assignedOk;
+      });
   const prioOrder={alta:0,media:1,baja:2};
   const sortPrio=arr=>[...arr].sort((a,b)=>{
     const op=(prioOrder[a.priority??'media']??1)-(prioOrder[b.priority??'media']??1);
@@ -3456,10 +3517,10 @@ function deleteMilestone(id){
    FEATURE 3 — PULSE WEEK
 ═══════════════════════════════════════ */
 function renderPulseWeek(){
-  // Admin access button
+  // Solo superadmin puede asignar pulses a personas
   const accBtn=document.getElementById('pw-access-btn');
-  if(accBtn) accBtn.innerHTML=isAdmin()
-    ?`<button class="btn btn-g btn-sm" onclick="openMod('m-pulse-access')">Gestionar acceso</button>`:'';
+  if(accBtn) accBtn.innerHTML=isSuperAdmin()
+    ?`<button class="btn btn-g btn-sm" onclick="openMod('m-pulse-access')">Asignar Pulse</button>`:'';
   renderGoodNews();
   renderOpsView();
   renderPulseTaskSections();
@@ -3514,7 +3575,7 @@ function deleteGoodNews(id){
 ═══════════════════════════════════════ */
 Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
-  togglePulseUser, renderPulseAccessModal,
+  togglePulseUser, togglePulseAreaUser, renderPulseAccessModal,
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
