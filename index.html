@@ -507,6 +507,25 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 .aet{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--tx3);line-height:1.4;}
 .aet-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
+/* ── PULSE CARDS ── */
+.pulse-card{background:linear-gradient(160deg,rgba(26,30,38,0.8) 0%,rgba(18,22,30,0.7) 100%);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all .22s;backdrop-filter:var(--blur);box-shadow:var(--card-shadow);}
+.pulse-card:hover{border-color:rgba(255,122,0,.3);transform:translateY(-1px);box-shadow:var(--card-hover-shadow);}
+.pulse-card-hdr{display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;}
+.pulse-card-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.pulse-card-name{font-family:var(--font-display);font-size:15px;letter-spacing:.04em;line-height:1.2;flex:1;}
+.pulse-card-assignee{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--tx3);margin-bottom:6px;}
+.pulse-card-desc{font-size:11px;color:var(--tx3);line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.pulse-card-projs{display:flex;flex-wrap:wrap;gap:4px;}
+.pulse-card-proj{font-size:9px;font-weight:600;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--tx3);}
+.pulse-card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);}
+/* Admin badge on pulse */
+.pulse-admin-actions{display:flex;gap:4px;opacity:0;transition:opacity .15s;}
+.pulse-card:hover .pulse-admin-actions{opacity:1;}
+body.light .pulse-card{background:#ffffff!important;border:1px solid rgba(0,0,0,.09)!important;box-shadow:var(--card-shadow)!important;}
+body.light .pulse-card:hover{border-color:rgba(255,122,0,.35)!important;}
+body.light .pulse-card-proj{background:rgba(0,0,0,.06)!important;}
+body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
+
 /* ── PROJECT PRIORITY SECTIONS ── */
 .proj-prio-section{margin-bottom:24px;}
 .proj-prio-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd2);}
@@ -817,8 +836,7 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
         <div class="back-btn" onclick="navigate('tasks')">← Inicio</div>
         <div class="page-title" style="font-size:18px;">PULSE WEEK</div>
         <div class="ml-auto flex gap-6">
-          <div id="pw-access-btn"></div>
-          <button class="btn btn-p btn-sm" onclick="openNewTask()">+ Nueva Tarea</button>
+          <div id="pw-create-btn"></div>
         </div>
       </div>
 
@@ -833,16 +851,14 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 
       <div class="pw-divider"></div>
 
-      <!-- Stats + Project cards -->
-      <div class="home-stats" id="ops-stats" style="margin-bottom:14px;"></div>
-      <div id="ops-lanes" style="margin-bottom:16px;"></div>
+      <!-- Stats (admins only) -->
+      <div class="home-stats" id="ops-stats" style="margin-bottom:16px;display:none;"></div>
 
-      <div class="pw-divider"></div>
-
-      <!-- Weekly tasks -->
-      <div id="pw-delayed"></div>
-      <div id="pw-thisweek"></div>
-      <div id="pw-nextweek"></div>
+      <!-- Pulses list -->
+      <div class="pw-sec-hdr" style="margin-bottom:12px;">
+        <span class="pw-sec-ttl" id="pw-pulses-label">PULSES</span>
+      </div>
+      <div id="pw-pulses-list"></div>
     </div>
 
     <!-- ── REVISIÓN CEO ── -->
@@ -928,6 +944,57 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
           <div style="font-size:10px;color:var(--tx3);margin-top:1px;">Con flujo Idea → Edición → Publicado</div>
         </div>
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL CREAR / EDITAR PULSE ═══ -->
+<div class="mov" id="m-pulse">
+  <div class="modal" style="max-width:500px;">
+    <div class="mhdr"><span class="mttl" id="mpulse-ttl">Crear Pulse</span><button class="mclose" onclick="closeMod('m-pulse')">✕</button></div>
+    <input type="hidden" id="mpulse-id">
+    <div class="fi"><label>Nombre del Pulse</label><input type="text" id="mpulse-name" placeholder="Ej. Pulse Semana — Marketing"></div>
+    <div class="fi"><label>Asignar a</label>
+      <select id="mpulse-assignto">
+        <option value="">Selecciona persona…</option>
+        <option value="leonardo">Leonardo</option>
+        <option value="veronica">Verónica</option>
+        <option value="laura">Laura</option>
+        <option value="editor">Editor</option>
+      </select>
+    </div>
+    <div class="fi"><label>Descripción / Instrucciones</label>
+      <textarea id="mpulse-desc" placeholder="¿En qué debe enfocarse? ¿Qué quieres que revise esta semana?" style="min-height:72px;"></textarea>
+    </div>
+    <div class="fi"><label>Proyectos a incluir</label>
+      <div id="mpulse-projects" class="assign-grid" style="margin-top:6px;"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-pulse')">Cancelar</button>
+      <button class="btn btn-p btn-sm" onclick="savePulse()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL DETALLE PULSE ═══ -->
+<div class="mov" id="m-pulse-detail">
+  <div class="modal" style="max-width:580px;">
+    <div class="mhdr">
+      <div style="flex:1;min-width:0;">
+        <div class="mttl" id="mpd-name"></div>
+        <div id="mpd-meta" style="font-size:10px;color:var(--tx3);margin-top:3px;display:flex;gap:8px;align-items:center;"></div>
+      </div>
+      <button class="mclose" onclick="closeMod('m-pulse-detail')">✕</button>
+    </div>
+    <!-- Instrucciones del admin -->
+    <div id="mpd-desc" style="display:none;background:var(--bg3);border-radius:10px;padding:11px 13px;font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:14px;white-space:pre-wrap;border-left:3px solid var(--orange);"></div>
+    <!-- Progreso de proyectos incluidos -->
+    <div id="mpd-projects" style="margin-bottom:14px;"></div>
+    <!-- Tareas de los proyectos -->
+    <div id="mpd-tasks" style="max-height:50vh;overflow-y:auto;"></div>
+    <div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-pulse-detail')">Cerrar</button>
+      <div id="mpd-admin-btns" class="flex gap-6"></div>
     </div>
   </div>
 </div>
@@ -1396,15 +1463,19 @@ let _editEventId   = null; // event currently being edited
 let _milestones    = []; // brand timeline milestones
 let _goodnews      = []; // pulse week good news items
 let _openMilestoneMonth = null; // currently open month key in milestone modal
-let _pulseAccess     = []; // (legacy, kept for compat)
-let _pulseAreaAccess = {}; // {userId: [areaKey, ...]} — explicit area access
+let _pulses          = []; // pulses creados manualmente por admins
 
-const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulseAccess:'fcn_pulse_access', pulseAreaAccess:'fcn_pulse_area_access' };
+const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulses:'fcn_pulses' };
 
 function canSeePulse(){
   if(isAdmin()) return true;
-  // Colaboradores: si tienen algún área asignada o tienen proyectos/tareas asignados
-  return getMyPulseAreas().length>0;
+  // Colaboradores: ven Pulse si tienen al menos un pulse asignado
+  return _pulses.some(p=>p.assignedTo===currentUser.id);
+}
+function getMyPulses(){
+  if(isSuperAdmin()) return _pulses;
+  if(isAdmin()) return _pulses; // todos los admins ven todos los pulses
+  return _pulses.filter(p=>p.assignedTo===currentUser.id);
 }
 
 /* ═══════════════════════════════════════
@@ -1457,8 +1528,7 @@ async function initData(){
   _events    =JSON.parse(localStorage.getItem(LS.events)||'[]');
   _milestones  =JSON.parse(localStorage.getItem(LS.milestones)||'[]');
   _goodnews    =JSON.parse(localStorage.getItem(LS.goodnews)||'[]');
-  _pulseAccess     =JSON.parse(localStorage.getItem(LS.pulseAccess)||'[]');
-  _pulseAreaAccess =JSON.parse(localStorage.getItem(LS.pulseAreaAccess)||'{}');
+  _pulses =JSON.parse(localStorage.getItem(LS.pulses)||'[]');
 }
 
 async function toggleLive(){
@@ -3516,28 +3586,196 @@ function deleteMilestone(id){
 /* ═══════════════════════════════════════
    FEATURE 3 — PULSE WEEK
 ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   PULSE WEEK — RENDER PRINCIPAL
+═══════════════════════════════════════ */
 function renderPulseWeek(){
-  // Solo superadmin puede asignar pulses a personas
-  const accBtn=document.getElementById('pw-access-btn');
-  if(accBtn) accBtn.innerHTML=isSuperAdmin()
-    ?`<button class="btn btn-g btn-sm" onclick="openMod('m-pulse-access')">Asignar Pulse</button>`:'';
+  // Botón crear (solo admins)
+  const createBtn=document.getElementById('pw-create-btn');
+  if(createBtn) createBtn.innerHTML=isAdmin()
+    ?`<button class="btn btn-p btn-sm" onclick="openNewPulse()">+ Crear Pulse</button>`:'';
+
+  // Stats rápidos (solo admins)
+  const statsEl=document.getElementById('ops-stats');
+  if(statsEl){
+    if(isAdmin()){
+      statsEl.style.display='';
+      const today=todayStr();
+      const atrasadas=_tasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today).length;
+      const enProc=_tasks.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='en-proceso').length;
+      const revision=_tasks.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='revision').length;
+      const doneTot=_tasks.filter(t=>t.status==='done').length;
+      statsEl.innerHTML=`
+        <div class="hstat"><div class="hstat-num" style="color:var(--red);">${atrasadas}</div><div class="hstat-lbl">Atrasadas</div></div>
+        <div class="hstat"><div class="hstat-num" style="color:var(--blu);">${enProc}</div><div class="hstat-lbl">En proceso</div></div>
+        <div class="hstat"><div class="hstat-num" style="color:var(--yel);">${revision}</div><div class="hstat-lbl">En revisión</div></div>
+        <div class="hstat"><div class="hstat-num" style="color:var(--grn);">${doneTot}</div><div class="hstat-lbl">Completadas</div></div>`;
+    } else {
+      statsEl.style.display='none';
+    }
+  }
+
+  // Label dinámico
+  const lbl=document.getElementById('pw-pulses-label');
+  if(lbl) lbl.textContent=isAdmin()?'PULSES ACTIVOS':'MIS PULSES';
+
   renderGoodNews();
-  renderOpsView();
-  renderPulseTaskSections();
+  renderPulseList();
+}
+
+function renderPulseList(){
+  const el=document.getElementById('pw-pulses-list'); if(!el) return;
+  const pulses=getMyPulses();
+  if(!pulses.length){
+    el.innerHTML=`<div class="pw-empty" style="padding:32px 0;">
+      ${isAdmin()?'Todavía no has creado ningún pulse.<br><br><button class="btn btn-p btn-sm" onclick="openNewPulse()">Crear el primer Pulse</button>':'Sin pulses asignados aún.'}
+    </div>`;
+    return;
+  }
+  // Sort newest first
+  const sorted=[...pulses].sort((a,b)=>b.createdAt-a.createdAt);
+  el.innerHTML=sorted.map(pulse=>{
+    const assignee=USERS[pulse.assignedTo];
+    const creator=USERS[pulse.createdBy];
+    const rm=assignee?ROLES[assignee.role]:null;
+    const projList=(pulse.projectIds||[]).map(pid=>{
+      const p=_projects.find(x=>x.id===pid);
+      return p?`<span class="pulse-card-proj">${p.icon||'📁'} ${esc(p.name)}</span>`:'';
+    }).filter(Boolean).join('');
+    const totalTasks=(pulse.projectIds||[]).reduce((n,pid)=>n+_tasks.filter(t=>t.projectId===pid&&t.status!=='done').length,0);
+    return `<div class="pulse-card" onclick="openPulseDetail('${pulse.id}')">
+      <div class="pulse-card-hdr">
+        <div class="pulse-card-dot" style="background:var(--orange);box-shadow:0 0 0 3px var(--ac2);"></div>
+        <div class="pulse-card-name">${esc(pulse.name)}</div>
+        ${isAdmin()?`<div class="pulse-admin-actions">
+          <button class="btn-icon" onclick="event.stopPropagation();openEditPulse('${pulse.id}')" title="Editar"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="btn-icon btn-del" onclick="event.stopPropagation();deletePulse('${pulse.id}')">✕</button>
+        </div>`:''}
+      </div>
+      ${assignee?`<div class="pulse-card-assignee">
+        <div class="udot" style="width:16px;height:16px;font-size:6px;background:${rm.bg};color:${rm.color};">${initials(assignee.name).charAt(0)}</div>
+        Para <strong>${assignee.name}</strong>
+        ${creator&&creator.id!==assignee.id?`· de ${creator.name}`:''}
+      </div>`:''}
+      ${pulse.desc?`<div class="pulse-card-desc">${esc(pulse.desc)}</div>`:''}
+      <div class="pulse-card-projs">${projList||'<span class="pulse-card-proj">Sin proyectos</span>'}</div>
+      <div class="pulse-card-foot">
+        <span style="font-size:10px;color:var(--tx3);">${(pulse.projectIds||[]).length} proyecto${(pulse.projectIds||[]).length!==1?'s':''} · ${totalTasks} tareas pendientes</span>
+        <span style="font-size:10px;color:var(--orange);font-weight:600;">Ver pulse →</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Open pulse detail ── */
+function openPulseDetail(id){
+  const pulse=_pulses.find(p=>p.id===id); if(!pulse) return;
+  const assignee=USERS[pulse.assignedTo];
+  const creator=USERS[pulse.createdBy];
+  document.getElementById('mpd-name').textContent=pulse.name;
+  const rm=assignee?ROLES[assignee.role]:null;
+  document.getElementById('mpd-meta').innerHTML=`
+    ${assignee?`<div class="udot" style="width:16px;height:16px;font-size:6px;background:${rm.bg};color:${rm.color};">${initials(assignee.name).charAt(0)}</div><span>Para <strong>${assignee.name}</strong></span>`:''}
+    ${creator?`<span style="color:var(--tx3);">· Creado por ${creator.name}</span>`:''}
+    <span style="color:var(--tx3);">· ${new Date(pulse.createdAt).toLocaleDateString('es')}</span>`;
+  const descEl=document.getElementById('mpd-desc');
+  if(pulse.desc){ descEl.textContent=pulse.desc; descEl.style.display='block'; }
+  else { descEl.style.display='none'; }
+  // Projects
+  const projsEl=document.getElementById('mpd-projects');
+  projsEl.innerHTML=(pulse.projectIds||[]).map(pid=>{
+    const p=_projects.find(x=>x.id===pid); if(!p) return '';
+    const pt=_tasks.filter(t=>t.projectId===pid);
+    const dn=pt.filter(t=>t.status==='done').length;
+    const pct=pt.length?Math.round(dn/pt.length*100):0;
+    const am=AREAS[p.area]||AREAS.general;
+    const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
+    const fill=fillMap[am.cls]||'var(--tx3)';
+    return `<div class="ppr-row" onclick="closeMod('m-pulse-detail');navigate('proj-detail','${p.id}')">
+      <div class="ppr-icon">${p.icon||'📁'}</div>
+      <div class="ppr-info"><div class="ppr-name">${esc(p.name)}</div>
+        <div class="ppr-bar"><div class="ppr-fill" style="width:${pct}%;background:${fill};"></div></div>
+      </div>
+      <div class="ppr-pct" style="color:${fill};">${pct}%</div>
+    </div>`;
+  }).join('')||'<div style="font-size:11px;color:var(--tx3);padding:6px 0;">Sin proyectos asignados.</div>';
+  // Tasks de los proyectos del pulse
+  const tasksEl=document.getElementById('mpd-tasks');
+  const allPulseTasks=_tasks.filter(t=>(pulse.projectIds||[]).includes(t.projectId)&&t.status!=='done')
+    .sort((a,b)=>{const po={alta:0,media:1,baja:2};return (po[a.priority??'media']??1)-(po[b.priority??'media']??1);});
+  tasksEl.innerHTML=allPulseTasks.length
+    ?`<div style="font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--tx3);margin-bottom:8px;text-transform:uppercase;">Tareas pendientes (${allPulseTasks.length})</div>`
+    +allPulseTasks.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;">${taskRowHTML(t)}</div>`).join('')
+    :`<div class="pw-empty">Sin tareas pendientes en estos proyectos</div>`;
+  // Admin actions
+  document.getElementById('mpd-admin-btns').innerHTML=isAdmin()
+    ?`<button class="btn btn-g btn-sm" onclick="closeMod('m-pulse-detail');openEditPulse('${id}')">Editar Pulse</button>`:'';
+  openMod('m-pulse-detail');
+}
+
+/* ── Crear / Editar Pulse ── */
+function openNewPulse(){
+  document.getElementById('mpulse-id').value='';
+  document.getElementById('mpulse-name').value='';
+  document.getElementById('mpulse-assignto').value='';
+  document.getElementById('mpulse-desc').value='';
+  document.getElementById('mpulse-ttl').textContent='Crear Pulse';
+  _populatePulseProjects([]);
+  openMod('m-pulse');
+}
+function openEditPulse(id){
+  const pulse=_pulses.find(p=>p.id===id); if(!pulse) return;
+  document.getElementById('mpulse-id').value=pulse.id;
+  document.getElementById('mpulse-name').value=pulse.name;
+  document.getElementById('mpulse-assignto').value=pulse.assignedTo||'';
+  document.getElementById('mpulse-desc').value=pulse.desc||'';
+  document.getElementById('mpulse-ttl').textContent='Editar Pulse';
+  _populatePulseProjects(pulse.projectIds||[]);
+  openMod('m-pulse');
+}
+function _populatePulseProjects(selected){
+  const cont=document.getElementById('mpulse-projects'); if(!cont) return;
+  cont.innerHTML=_projects.map(p=>`
+    <div class="a-chip ${selected.includes(p.id)?'sel':''}" onclick="toggleChip(this)" data-value="${p.id}">
+      <span class="a-chip-dot"></span>${p.icon||'📁'} ${esc(p.name)}
+    </div>`).join('');
+}
+async function savePulse(){
+  const name=document.getElementById('mpulse-name').value.trim();
+  if(!name) return alert('Nombre requerido.');
+  const id=document.getElementById('mpulse-id').value||uid();
+  const assignedTo=document.getElementById('mpulse-assignto').value;
+  const desc=document.getElementById('mpulse-desc').value.trim();
+  const projectIds=[...document.querySelectorAll('#mpulse-projects .a-chip.sel')].map(c=>c.dataset.value);
+  const existing=_pulses.find(p=>p.id===id);
+  const pulse={
+    id, name, assignedTo, desc, projectIds,
+    createdBy: existing?.createdBy||currentUser.id,
+    createdAt: existing?.createdAt||Date.now(),
+  };
+  _pulses=[..._pulses.filter(p=>p.id!==id), pulse];
+  localStorage.setItem(LS.pulses, JSON.stringify(_pulses));
+  closeMod('m-pulse');
+  renderPulseWeek();
+  renderNav(); // update pulse nav link visibility
+}
+async function deletePulse(id){
+  if(!confirm('¿Eliminar este pulse?')) return;
+  _pulses=_pulses.filter(p=>p.id!==id);
+  localStorage.setItem(LS.pulses, JSON.stringify(_pulses));
+  renderPulseWeek();
+  renderNav();
 }
 
 function renderGoodNews(){
-  // Button
   const btnWrap=document.getElementById('pw-gn-btn');
   if(btnWrap) btnWrap.innerHTML=isAdmin()
     ?`<button class="btn btn-p btn-sm" onclick="openMod('m-goodnews')">+ Agregar</button>`:'';
-
   const el=document.getElementById('pw-gn-list'); if(!el) return;
   if(!_goodnews.length){
     el.innerHTML='<div style="font-size:11px;color:var(--tx3);padding:8px 0;">Sin noticias esta semana.</div>';
     return;
   }
-  // Show up to 5 most recent
   const sorted=[..._goodnews].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   el.innerHTML=sorted.slice(0,10).map(gn=>`
     <div class="gn-item">
@@ -3547,10 +3785,7 @@ function renderGoodNews(){
       ${isAdmin()?`<button class="btn-icon btn-del" style="flex-shrink:0;" onclick="deleteGoodNews('${gn.id}')">✕</button>`:''}
     </div>`).join('');
 }
-
-function renderWeekAnalysis(){
-  // kept for backward compat; actual analysis now in renderPulseTaskSections
-}
+function renderWeekAnalysis(){ /* no-op */ }
 
 function saveGoodNews(){
   const text=document.getElementById('gn-text').value.trim();
@@ -3575,7 +3810,7 @@ function deleteGoodNews(id){
 ═══════════════════════════════════════ */
 Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
-  togglePulseUser, togglePulseAreaUser, renderPulseAccessModal,
+  openNewPulse, openEditPulse, savePulse, deletePulse, openPulseDetail,
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
@@ -3595,7 +3830,7 @@ Object.assign(window,{
   // Feature 2
   renderTimeline, openMonthModal, toggleMilestoneForm, saveMilestone, deleteMilestone,
   // Feature 3
-  renderPulseWeek, renderGoodNews, renderWeekAnalysis, saveGoodNews, deleteGoodNews,
+  renderPulseWeek, renderPulseList, renderGoodNews, renderWeekAnalysis, saveGoodNews, deleteGoodNews,
 });
 
 /* ═══════════════════════════════════════
