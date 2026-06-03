@@ -1569,12 +1569,21 @@ async function initData(){
   _pulses =JSON.parse(localStorage.getItem(LS.pulses)||'[]');
 }
 
-async function goLive(){
-  if(_fbOn) return; // ya está conectado
-  if(!isConnected()){
-    console.warn('[FCN] Firebase no disponible');
-    return;
+/* Sube al vuelo los items locales que no están en Firebase (merge por ID).
+   Así cada dispositivo aporta sus datos únicos sin pisar los de otros. */
+async function mergeLocalToFb(localArr, fbDocs, saveFn){
+  const fbIds=new Set(fbDocs.map(d=>d.id));
+  const missing=localArr.filter(x=>x.id&&!fbIds.has(x.id));
+  if(missing.length){
+    setSyncDot('uploading');
+    console.log(`[FCN] Subiendo ${missing.length} items locales…`);
+    for(const x of missing) await saveFn(x);
   }
+}
+
+async function goLive(){
+  if(_fbOn) return;
+  if(!isConnected()){ console.warn('[FCN] Firebase no disponible'); return; }
   _fbOn=true;
   setSyncDot('connecting');
   if(currentUser) fbSetPresence(currentUser.id, true).catch(()=>{});
@@ -1582,69 +1591,64 @@ async function goLive(){
   // Presence
   listenPresence(data=>{ _presence=data; if(currentView==='tasks') renderDashboard(); });
 
-  // Helper: primera vez — si Firebase vacío, sube datos locales
-  async function firstSync(col, localArr, saveFn) {
-    return new Promise(resolve => {
-      const unsub = listenProjects; // usamos directo abajo
-      resolve();
-    });
-  }
-
-  // Projects
+  // ── Projects: merge local → Firebase ──
   let pSynced=false;
   listenProjects(async docs=>{
     if(!pSynced){ pSynced=true;
-      if(!docs.length && _projects.length){ setSyncDot('uploading'); for(const x of _projects) await fbSaveProject(x); }
+      await mergeLocalToFb(_projects, docs, fbSaveProject);
     }
-    _projects=docs; localStorage.setItem(LS.proj,JSON.stringify(docs)); onDataChange(); setSyncDot(true);
+    _projects=docs; localStorage.setItem(LS.proj,JSON.stringify(docs));
+    onDataChange(); setSyncDot(true);
   });
 
-  // Tasks
+  // ── Tasks: merge ──
   let tSynced=false;
   listenTasks(async docs=>{
     if(!tSynced){ tSynced=true;
-      if(!docs.length && _tasks.length){ for(const x of _tasks) await fbSaveTask(x); }
+      await mergeLocalToFb(_tasks, docs, fbSaveTask);
     }
-    _tasks=docs; localStorage.setItem(LS.task,JSON.stringify(docs)); onDataChange(); setSyncDot(true);
+    _tasks=docs; localStorage.setItem(LS.task,JSON.stringify(docs));
+    onDataChange(); setSyncDot(true);
   });
 
-  // Events
+  // ── Events: merge ──
   let eSynced=false;
   listenEvents(async docs=>{
     if(!eSynced){ eSynced=true;
-      if(!docs.length && _events.length){ for(const x of _events) await fbSaveEvent(x); }
+      await mergeLocalToFb(_events, docs, fbSaveEvent);
     }
-    _events=docs; localStorage.setItem(LS.events,JSON.stringify(docs)); onDataChange();
+    _events=docs; localStorage.setItem(LS.events,JSON.stringify(docs));
+    onDataChange();
   });
 
-  // Milestones
+  // ── Milestones: merge ──
   let mSynced=false;
   listenMilestones(async docs=>{
     if(!mSynced){ mSynced=true;
-      if(!docs.length && _milestones.length){ for(const x of _milestones) await fbSaveMilestone(x); }
+      await mergeLocalToFb(_milestones, docs, fbSaveMilestone);
     }
     _milestones=docs; localStorage.setItem(LS.milestones,JSON.stringify(docs));
     if(currentView==='tasks') renderTimeline();
   });
 
-  // Good News
+  // ── Good News: merge ──
   let gnSynced=false;
   listenGoodnews(async docs=>{
     if(!gnSynced){ gnSynced=true;
-      if(!docs.length && _goodnews.length){ for(const x of _goodnews) await fbSaveGoodnews(x); }
+      await mergeLocalToFb(_goodnews, docs, fbSaveGoodnews);
     }
     _goodnews=docs; localStorage.setItem(LS.goodnews,JSON.stringify(docs));
     if(currentView==='gestion') renderGoodNews();
   });
 
-  // Pulses
+  // ── Pulses: merge ──
   let puSynced=false;
   listenPulses(async docs=>{
     if(!puSynced){ puSynced=true;
-      if(!docs.length && _pulses.length){ for(const x of _pulses) await fbSavePulse(x); }
+      await mergeLocalToFb(_pulses, docs, fbSavePulse);
     }
     _pulses=docs; localStorage.setItem(LS.pulses,JSON.stringify(docs));
-    renderNav(); // link Pulse puede aparecer/desaparecer
+    renderNav();
     if(currentView==='gestion') renderPulseList();
   });
 }
