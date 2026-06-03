@@ -1349,8 +1349,12 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
 <script type="module">
 import { firebaseInit, isConnected,
          listenProjects, listenTasks, listenEvents, listenPresence,
+         listenMilestones, listenGoodnews, listenPulses,
          fbSaveProject, fbDeleteProject, fbSaveTask, fbDeleteTask,
          fbSaveEvent, fbDeleteEvent, fbSetPresence,
+         fbSaveMilestone, fbDeleteMilestone,
+         fbSaveGoodnews, fbDeleteGoodnews,
+         fbSavePulse, fbDeletePulse,
          fbStopListening } from './firebase.js';
 
 /* ═══════════════════════════════════════
@@ -1513,6 +1517,40 @@ async function removeEvent(id){
   saveEvents(_events.filter(e=>e.id!==id));
   if(_fbOn) await fbDeleteEvent(id);
 }
+
+/* ── Milestones ── */
+function saveMilestonesLocal(d){ _milestones=d; localStorage.setItem(LS.milestones,JSON.stringify(d)); }
+async function persistMilestone(ms){
+  saveMilestonesLocal([..._milestones.filter(x=>x.id!==ms.id),ms]);
+  if(_fbOn) await fbSaveMilestone(ms);
+}
+async function removeMilestone(id){
+  saveMilestonesLocal(_milestones.filter(x=>x.id!==id));
+  if(_fbOn) await fbDeleteMilestone(id);
+}
+
+/* ── Good News ── */
+function saveGoodnewsLocal(d){ _goodnews=d; localStorage.setItem(LS.goodnews,JSON.stringify(d)); }
+async function persistGoodnews(gn){
+  saveGoodnewsLocal([..._goodnews.filter(x=>x.id!==gn.id),gn]);
+  if(_fbOn) await fbSaveGoodnews(gn);
+}
+async function removeGoodnews(id){
+  saveGoodnewsLocal(_goodnews.filter(x=>x.id!==id));
+  if(_fbOn) await fbDeleteGoodnews(id);
+}
+
+/* ── Pulses ── */
+function savePulsesLocal(d){ _pulses=d; localStorage.setItem(LS.pulses,JSON.stringify(d)); }
+async function persistPulse(pulse){
+  savePulsesLocal([..._pulses.filter(x=>x.id!==pulse.id),pulse].sort((a,b)=>b.createdAt-a.createdAt));
+  if(_fbOn) await fbSavePulse(pulse);
+}
+async function removePulse(id){
+  savePulsesLocal(_pulses.filter(x=>x.id!==id));
+  if(_fbOn) await fbDeletePulse(id);
+}
+
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function todayStr(){ return new Date().toISOString().split('T')[0]; }
 
@@ -1531,6 +1569,86 @@ async function initData(){
   _pulses =JSON.parse(localStorage.getItem(LS.pulses)||'[]');
 }
 
+async function goLive(){
+  if(_fbOn) return; // ya está conectado
+  if(!isConnected()){
+    console.warn('[FCN] Firebase no disponible');
+    return;
+  }
+  _fbOn=true;
+  setSyncDot('connecting');
+  if(currentUser) fbSetPresence(currentUser.id, true).catch(()=>{});
+
+  // Presence
+  listenPresence(data=>{ _presence=data; if(currentView==='tasks') renderDashboard(); });
+
+  // Helper: primera vez — si Firebase vacío, sube datos locales
+  async function firstSync(col, localArr, saveFn) {
+    return new Promise(resolve => {
+      const unsub = listenProjects; // usamos directo abajo
+      resolve();
+    });
+  }
+
+  // Projects
+  let pSynced=false;
+  listenProjects(async docs=>{
+    if(!pSynced){ pSynced=true;
+      if(!docs.length && _projects.length){ setSyncDot('uploading'); for(const x of _projects) await fbSaveProject(x); }
+    }
+    _projects=docs; localStorage.setItem(LS.proj,JSON.stringify(docs)); onDataChange(); setSyncDot(true);
+  });
+
+  // Tasks
+  let tSynced=false;
+  listenTasks(async docs=>{
+    if(!tSynced){ tSynced=true;
+      if(!docs.length && _tasks.length){ for(const x of _tasks) await fbSaveTask(x); }
+    }
+    _tasks=docs; localStorage.setItem(LS.task,JSON.stringify(docs)); onDataChange(); setSyncDot(true);
+  });
+
+  // Events
+  let eSynced=false;
+  listenEvents(async docs=>{
+    if(!eSynced){ eSynced=true;
+      if(!docs.length && _events.length){ for(const x of _events) await fbSaveEvent(x); }
+    }
+    _events=docs; localStorage.setItem(LS.events,JSON.stringify(docs)); onDataChange();
+  });
+
+  // Milestones
+  let mSynced=false;
+  listenMilestones(async docs=>{
+    if(!mSynced){ mSynced=true;
+      if(!docs.length && _milestones.length){ for(const x of _milestones) await fbSaveMilestone(x); }
+    }
+    _milestones=docs; localStorage.setItem(LS.milestones,JSON.stringify(docs));
+    if(currentView==='tasks') renderTimeline();
+  });
+
+  // Good News
+  let gnSynced=false;
+  listenGoodnews(async docs=>{
+    if(!gnSynced){ gnSynced=true;
+      if(!docs.length && _goodnews.length){ for(const x of _goodnews) await fbSaveGoodnews(x); }
+    }
+    _goodnews=docs; localStorage.setItem(LS.goodnews,JSON.stringify(docs));
+    if(currentView==='gestion') renderGoodNews();
+  });
+
+  // Pulses
+  let puSynced=false;
+  listenPulses(async docs=>{
+    if(!puSynced){ puSynced=true;
+      if(!docs.length && _pulses.length){ for(const x of _pulses) await fbSavePulse(x); }
+    }
+    _pulses=docs; localStorage.setItem(LS.pulses,JSON.stringify(docs));
+    renderNav(); // link Pulse puede aparecer/desaparecer
+    if(currentView==='gestion') renderPulseList();
+  });
+}
+
 async function toggleLive(){
   if(_fbOn){
     // ── GO OFFLINE ──
@@ -1541,45 +1659,12 @@ async function toggleLive(){
     _projects=JSON.parse(localStorage.getItem(LS.proj)||'[]');
     _tasks   =JSON.parse(localStorage.getItem(LS.task)||'[]');
     _events  =JSON.parse(localStorage.getItem(LS.events)||'[]');
+    _milestones=JSON.parse(localStorage.getItem(LS.milestones)||'[]');
+    _goodnews  =JSON.parse(localStorage.getItem(LS.goodnews)||'[]');
+    _pulses    =JSON.parse(localStorage.getItem(LS.pulses)||'[]');
     onDataChange();
   } else {
-    // ── GO LIVE ──
-    if(!isConnected()){
-      alert('Firebase no disponible. Revisa la configuración.');
-      return;
-    }
-    _fbOn=true;
-    setSyncDot('connecting');
-    // Mark user as online
-    if(currentUser) fbSetPresence(currentUser.id, true).catch(()=>{});
-    // Listen to presence
-    listenPresence(data=>{ _presence=data; if(currentView==='tasks') renderDashboard(); });
-    // First load — if Firebase is empty, upload local data (one-time sync-up)
-    let projSynced=false, taskSynced=false;
-    listenProjects(async docs=>{
-      if(!projSynced){
-        projSynced=true;
-        if(docs.length===0 && _projects.length>0){
-          setSyncDot('uploading');
-          for(const p of _projects) await fbSaveProject(p);
-        }
-      }
-      _projects=docs; onDataChange(); setSyncDot(true);
-    });
-    listenTasks(async docs=>{
-      if(!taskSynced){
-        taskSynced=true;
-        if(docs.length===0 && _tasks.length>0){
-          for(const t of _tasks) await fbSaveTask(t);
-        }
-      }
-      _tasks=docs; onDataChange(); setSyncDot(true);
-    });
-    listenEvents(docs=>{
-      _events=docs;
-      localStorage.setItem(LS.events, JSON.stringify(docs));
-      onDataChange();
-    });
+    await goLive();
   }
 }
 // Mark offline on page close
@@ -1655,6 +1740,8 @@ function showApp(){
   renderNav();
   navigate('tasks');
   setTimeout(showAlerts,700);
+  // Auto-connect a Firebase al iniciar sesión
+  setTimeout(()=>{ if(!_fbOn) goLive(); }, 400);
 }
 
 /* ═══════════════════════════════════════
@@ -3555,7 +3642,7 @@ function toggleMilestoneForm(){
   if(wrap) wrap.style.display=wrap.style.display==='none'?'block':'none';
 }
 
-function saveMilestone(){
+async function saveMilestone(){
   const name=document.getElementById('ms-name').value.trim();
   if(!name) return alert('Título requerido.');
   const ms={
@@ -3566,8 +3653,7 @@ function saveMilestone(){
     desc: document.getElementById('ms-desc').value.trim()||null,
     color: document.getElementById('ms-color').value||'orange',
   };
-  _milestones=[..._milestones, ms];
-  localStorage.setItem(LS.milestones, JSON.stringify(_milestones));
+  await persistMilestone(ms);
   document.getElementById('ms-form-wrap').style.display='none';
   document.getElementById('ms-name').value='';
   document.getElementById('ms-desc').value='';
@@ -3575,10 +3661,9 @@ function saveMilestone(){
   renderTimeline();
 }
 
-function deleteMilestone(id){
+async function deleteMilestone(id){
   if(!confirm('¿Eliminar este hito?')) return;
-  _milestones=_milestones.filter(ms=>ms.id!==id);
-  localStorage.setItem(LS.milestones, JSON.stringify(_milestones));
+  await removeMilestone(id);
   renderMilestoneList();
   renderTimeline();
 }
@@ -3753,16 +3838,14 @@ async function savePulse(){
     createdBy: existing?.createdBy||currentUser.id,
     createdAt: existing?.createdAt||Date.now(),
   };
-  _pulses=[..._pulses.filter(p=>p.id!==id), pulse];
-  localStorage.setItem(LS.pulses, JSON.stringify(_pulses));
+  await persistPulse(pulse);
   closeMod('m-pulse');
   renderPulseWeek();
-  renderNav(); // update pulse nav link visibility
+  renderNav();
 }
 async function deletePulse(id){
   if(!confirm('¿Eliminar este pulse?')) return;
-  _pulses=_pulses.filter(p=>p.id!==id);
-  localStorage.setItem(LS.pulses, JSON.stringify(_pulses));
+  await removePulse(id);
   renderPulseWeek();
   renderNav();
 }
@@ -3791,17 +3874,15 @@ function saveGoodNews(){
   const text=document.getElementById('gn-text').value.trim();
   if(!text) return alert('Escribe una noticia.');
   const gn={id:uid(), text, date:todayStr()};
-  _goodnews=[..._goodnews, gn];
-  localStorage.setItem(LS.goodnews, JSON.stringify(_goodnews));
+  await persistGoodnews(gn);
   document.getElementById('gn-text').value='';
   closeMod('m-goodnews');
   renderGoodNews();
 }
 
-function deleteGoodNews(id){
+async function deleteGoodNews(id){
   if(!confirm('¿Eliminar esta noticia?')) return;
-  _goodnews=_goodnews.filter(g=>g.id!==id);
-  localStorage.setItem(LS.goodnews, JSON.stringify(_goodnews));
+  await removeGoodnews(id);
   renderGoodNews();
 }
 

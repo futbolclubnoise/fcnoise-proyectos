@@ -1,11 +1,11 @@
 /* ─────────────────────────────────────────────
    FCNOISE Proyectos — Firebase / Firestore layer
-   Proyecto independiente: fcnoise-proyectos
+   Todas las colecciones sincronizadas en tiempo real
    ───────────────────────────────────────────── */
 import { initializeApp }        from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import { getFirestore,
          collection, doc,
-         addDoc, setDoc, deleteDoc,
+         setDoc, deleteDoc,
          onSnapshot, query, orderBy,
          serverTimestamp }       from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
@@ -20,22 +20,28 @@ const FIREBASE_CONFIG = {
 };
 
 /* ── COLECCIONES ── */
-const COL_PROJ     = "fcn_projects";
-const COL_TASKS    = "fcn_tasks";
-const COL_EVENTS   = "fcn_events";
-const COL_PRESENCE = "fcn_presence";
+const COL_PROJ       = "fcn_projects";
+const COL_TASKS      = "fcn_tasks";
+const COL_EVENTS     = "fcn_events";
+const COL_PRESENCE   = "fcn_presence";
+const COL_MILESTONES = "fcn_milestones";
+const COL_GOODNEWS   = "fcn_goodnews";
+const COL_PULSES     = "fcn_pulses";
 
 let db = null;
-let _projUnsub     = null;
-let _taskUnsub     = null;
-let _eventsUnsub   = null;
-let _presenceUnsub = null;
+let _projUnsub       = null;
+let _taskUnsub       = null;
+let _eventsUnsub     = null;
+let _presenceUnsub   = null;
+let _milestonesUnsub = null;
+let _goodnewsUnsub   = null;
+let _pulsesUnsub     = null;
 
 /* ── INIT ── */
 export function firebaseInit() {
   try {
     if (FIREBASE_CONFIG.apiKey === "PASTE_API_KEY") {
-      console.warn("[FCN] Firebase no configurado — usando localStorage");
+      console.warn("[FCN] Firebase no configurado");
       return false;
     }
     if (db) return true;
@@ -44,28 +50,29 @@ export function firebaseInit() {
     console.log("[FCN] Firebase SDK listo ✓");
     return true;
   } catch (e) {
-    console.warn("[FCN] Firebase init:", e.message||e);
+    console.warn("[FCN] Firebase init:", e.message || e);
     return db !== null;
   }
 }
 
 /* ── STOP ALL LISTENERS ── */
 export function fbStopListening() {
-  if (_projUnsub)     { _projUnsub();     _projUnsub     = null; }
-  if (_taskUnsub)     { _taskUnsub();     _taskUnsub     = null; }
-  if (_eventsUnsub)   { _eventsUnsub();   _eventsUnsub   = null; }
-  if (_presenceUnsub) { _presenceUnsub(); _presenceUnsub = null; }
+  [_projUnsub, _taskUnsub, _eventsUnsub, _presenceUnsub,
+   _milestonesUnsub, _goodnewsUnsub, _pulsesUnsub].forEach(fn => fn && fn());
+  _projUnsub = _taskUnsub = _eventsUnsub = _presenceUnsub =
+  _milestonesUnsub = _goodnewsUnsub = _pulsesUnsub = null;
   console.log("[FCN] Firebase listeners detenidos");
 }
 
-/* ── LISTENERS en tiempo real ── */
+/* ─────────────────────────────────────────────
+   LISTENERS — tiempo real
+   ───────────────────────────────────────────── */
 export function listenProjects(callback) {
   if (!db) return;
   if (_projUnsub) _projUnsub();
   const q = query(collection(db, COL_PROJ), orderBy("createdAt", "asc"));
   _projUnsub = onSnapshot(q, snap => {
-    const docs = snap.docs.map(d => ({ ...d.data(), _fbId: d.id }));
-    callback(docs);
+    callback(snap.docs.map(d => ({ ...d.data(), _fbId: d.id })));
   });
 }
 
@@ -74,8 +81,7 @@ export function listenTasks(callback) {
   if (_taskUnsub) _taskUnsub();
   const q = query(collection(db, COL_TASKS), orderBy("createdAt", "asc"));
   _taskUnsub = onSnapshot(q, snap => {
-    const docs = snap.docs.map(d => ({ ...d.data(), _fbId: d.id }));
-    callback(docs);
+    callback(snap.docs.map(d => ({ ...d.data(), _fbId: d.id })));
   });
 }
 
@@ -84,8 +90,7 @@ export function listenEvents(callback) {
   if (_eventsUnsub) _eventsUnsub();
   const q = query(collection(db, COL_EVENTS), orderBy("date", "asc"));
   _eventsUnsub = onSnapshot(q, snap => {
-    const docs = snap.docs.map(d => ({ ...d.data(), _fbId: d.id }));
-    callback(docs);
+    callback(snap.docs.map(d => ({ ...d.data(), _fbId: d.id })));
   });
 }
 
@@ -99,67 +104,136 @@ export function listenPresence(callback) {
   });
 }
 
-/* ── WRITE: Proyectos ── */
+export function listenMilestones(callback) {
+  if (!db) return;
+  if (_milestonesUnsub) _milestonesUnsub();
+  const q = query(collection(db, COL_MILESTONES), orderBy("monthKey", "asc"));
+  _milestonesUnsub = onSnapshot(q, snap => {
+    callback(snap.docs.map(d => ({ ...d.data(), _fbId: d.id })));
+  });
+}
+
+export function listenGoodnews(callback) {
+  if (!db) return;
+  if (_goodnewsUnsub) _goodnewsUnsub();
+  const q = query(collection(db, COL_GOODNEWS), orderBy("date", "asc"));
+  _goodnewsUnsub = onSnapshot(q, snap => {
+    callback(snap.docs.map(d => ({ ...d.data(), _fbId: d.id })));
+  });
+}
+
+export function listenPulses(callback) {
+  if (!db) return;
+  if (_pulsesUnsub) _pulsesUnsub();
+  const q = query(collection(db, COL_PULSES), orderBy("createdAt", "asc"));
+  _pulsesUnsub = onSnapshot(q, snap => {
+    callback(snap.docs.map(d => ({ ...d.data(), _fbId: d.id })));
+  });
+}
+
+/* ─────────────────────────────────────────────
+   WRITE — Proyectos
+   ───────────────────────────────────────────── */
 export async function fbSaveProject(proj) {
   if (!db) return;
   try {
     const { id, ...data } = proj;
-    await setDoc(doc(db, COL_PROJ, id), {
-      ...data, id,
-      createdAt: data.createdAt || serverTimestamp()
-    });
+    await setDoc(doc(db, COL_PROJ, id), { ...data, id, createdAt: data.createdAt || serverTimestamp() });
   } catch (e) { console.error("[FCN] saveProject:", e); }
 }
-
 export async function fbDeleteProject(id) {
   if (!db) return;
   try { await deleteDoc(doc(db, COL_PROJ, id)); }
   catch (e) { console.error("[FCN] deleteProject:", e); }
 }
 
-/* ── WRITE: Tareas ── */
+/* ─────────────────────────────────────────────
+   WRITE — Tareas
+   ───────────────────────────────────────────── */
 export async function fbSaveTask(task) {
   if (!db) return;
   try {
     const { id, ...data } = task;
-    await setDoc(doc(db, COL_TASKS, id), {
-      ...data, id,
-      createdAt: data.createdAt || serverTimestamp()
-    });
+    await setDoc(doc(db, COL_TASKS, id), { ...data, id, createdAt: data.createdAt || serverTimestamp() });
   } catch (e) { console.error("[FCN] saveTask:", e); }
 }
-
 export async function fbDeleteTask(id) {
   if (!db) return;
   try { await deleteDoc(doc(db, COL_TASKS, id)); }
   catch (e) { console.error("[FCN] deleteTask:", e); }
 }
 
-/* ── WRITE: Eventos ── */
+/* ─────────────────────────────────────────────
+   WRITE — Eventos
+   ───────────────────────────────────────────── */
 export async function fbSaveEvent(event) {
   if (!db) return;
   try {
     const { id, ...data } = event;
-    await setDoc(doc(db, COL_EVENTS, id), {
-      ...data, id,
-      createdAt: data.createdAt || serverTimestamp()
-    });
+    await setDoc(doc(db, COL_EVENTS, id), { ...data, id, createdAt: data.createdAt || serverTimestamp() });
   } catch (e) { console.error("[FCN] saveEvent:", e); }
 }
-
 export async function fbDeleteEvent(id) {
   if (!db) return;
   try { await deleteDoc(doc(db, COL_EVENTS, id)); }
   catch (e) { console.error("[FCN] deleteEvent:", e); }
 }
 
-/* ── WRITE: Presence ── */
+/* ─────────────────────────────────────────────
+   WRITE — Milestones (calendario anual)
+   ───────────────────────────────────────────── */
+export async function fbSaveMilestone(ms) {
+  if (!db) return;
+  try {
+    const { id, ...data } = ms;
+    await setDoc(doc(db, COL_MILESTONES, id), { ...data, id });
+  } catch (e) { console.error("[FCN] saveMilestone:", e); }
+}
+export async function fbDeleteMilestone(id) {
+  if (!db) return;
+  try { await deleteDoc(doc(db, COL_MILESTONES, id)); }
+  catch (e) { console.error("[FCN] deleteMilestone:", e); }
+}
+
+/* ─────────────────────────────────────────────
+   WRITE — Good News
+   ───────────────────────────────────────────── */
+export async function fbSaveGoodnews(gn) {
+  if (!db) return;
+  try {
+    const { id, ...data } = gn;
+    await setDoc(doc(db, COL_GOODNEWS, id), { ...data, id });
+  } catch (e) { console.error("[FCN] saveGoodnews:", e); }
+}
+export async function fbDeleteGoodnews(id) {
+  if (!db) return;
+  try { await deleteDoc(doc(db, COL_GOODNEWS, id)); }
+  catch (e) { console.error("[FCN] deleteGoodnews:", e); }
+}
+
+/* ─────────────────────────────────────────────
+   WRITE — Pulses
+   ───────────────────────────────────────────── */
+export async function fbSavePulse(pulse) {
+  if (!db) return;
+  try {
+    const { id, ...data } = pulse;
+    await setDoc(doc(db, COL_PULSES, id), { ...data, id, createdAt: data.createdAt || serverTimestamp() });
+  } catch (e) { console.error("[FCN] savePulse:", e); }
+}
+export async function fbDeletePulse(id) {
+  if (!db) return;
+  try { await deleteDoc(doc(db, COL_PULSES, id)); }
+  catch (e) { console.error("[FCN] deletePulse:", e); }
+}
+
+/* ─────────────────────────────────────────────
+   WRITE — Presence
+   ───────────────────────────────────────────── */
 export async function fbSetPresence(userId, online) {
   if (!db) return;
   try {
-    await setDoc(doc(db, COL_PRESENCE, userId), {
-      userId, online, lastSeen: serverTimestamp()
-    });
+    await setDoc(doc(db, COL_PRESENCE, userId), { userId, online, lastSeen: serverTimestamp() });
   } catch (e) { console.error("[FCN] presence:", e); }
 }
 
