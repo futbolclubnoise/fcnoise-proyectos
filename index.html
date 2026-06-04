@@ -739,13 +739,14 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
 .pw-delayed-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .pw-delayed-ttl{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--red);}
 .pw-empty{font-size:11px;color:var(--tx3);padding:16px 0;text-align:center;}
-/* iOS-style Live toggle */
-.live-sw{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;padding:3px 0;}
-.lt-track{width:34px;height:19px;border-radius:10px;background:var(--bg5);border:1.5px solid var(--bd2);position:relative;transition:background .22s,border-color .22s;flex-shrink:0;}
-.lt-track.on{background:var(--grn);border-color:transparent;}
-.lt-thumb{width:13px;height:13px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .22s;box-shadow:0 1px 4px rgba(0,0,0,.35);}
-.lt-track.on .lt-thumb{transform:translateX(15px);}
-.lt-lbl{font-size:9px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;}
+/* Sync status indicator (read-only, automático) */
+.sync-status{display:flex;align-items:center;gap:5px;padding:3px 0;user-select:none;}
+.ss-dot{width:7px;height:7px;border-radius:50%;background:var(--tx3);flex-shrink:0;transition:background .3s;}
+.ss-dot.live{background:var(--grn);box-shadow:0 0 0 3px rgba(40,199,111,.2);}
+.ss-dot.syncing{background:var(--yel);animation:pulse-dot 1s ease-in-out infinite;}
+.ss-dot.error{background:var(--red);}
+@keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.4;}}
+.ss-lbl{font-size:9px;font-weight:600;color:var(--tx3);letter-spacing:.04em;text-transform:uppercase;}
 
 /* ── PROJ LOCKED TAG (simple task form mode) ── */
 .proj-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:var(--ac2);border:1px solid var(--ac3);color:var(--orange);font-size:12px;font-weight:600;margin-bottom:14px;}
@@ -790,12 +791,9 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
     <div class="nav-brand">FC<em>NOISE.</em></div>
     <div class="nav-links" id="nav-links"></div>
     <div class="nav-right">
-      <div class="live-sw" onclick="toggleLive()" title="Activar para sincronizar con el equipo en tiempo real">
-        <div class="lt-track" id="lt-track"><div class="lt-thumb"></div></div>
-        <div style="display:flex;flex-direction:column;line-height:1;">
-          <span class="lt-lbl" id="lt-lbl">Local</span>
-          <span id="lt-sub" style="font-size:8px;color:var(--tx3);letter-spacing:.02em;margin-top:1px;">Sin sync</span>
-        </div>
+      <div class="sync-status" id="sync-status" title="Estado de sincronización">
+        <div class="ss-dot" id="ss-dot"></div>
+        <span class="ss-lbl" id="ss-lbl">Conectando…</span>
       </div>
       <button class="nav-icon-btn" onclick="openSettingsModal()" title="Configuraciones"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <button class="nav-logout" onclick="logout()">Cerrar sesión</button>
@@ -1468,8 +1466,9 @@ let _milestones    = []; // brand timeline milestones
 let _goodnews      = []; // pulse week good news items
 let _openMilestoneMonth = null; // currently open month key in milestone modal
 let _pulses          = []; // pulses creados manualmente por admins
+let _pulseAreaAccess = {}; // (legacy, sistema viejo de áreas — mantenido para compat)
 
-const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulses:'fcn_pulses' };
+const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulses:'fcn_pulses', pulseAreaAccess:'fcn_pulse_area_access' };
 
 function canSeePulse(){
   if(isAdmin()) return true;
@@ -1491,64 +1490,69 @@ function tEnd(t)  { return t.endDate || t.dueDate || ''; }
 function saveProjects(d){ _projects=d; localStorage.setItem(LS.proj,JSON.stringify(d)); }
 function saveTasks(d)   { _tasks=d;    localStorage.setItem(LS.task,JSON.stringify(d)); }
 
+/* Gate: escribe en Firebase siempre que el SDK esté listo (no depende de listeners) */
 async function persistProject(p){
   saveProjects([..._projects.filter(x=>x.id!==p.id),p].sort((a,b)=>a.createdAt-b.createdAt));
-  if(_fbOn) await fbSaveProject(p);
+  if(isConnected()) await fbSaveProject(p);
 }
 async function persistTask(t){
   saveTasks([..._tasks.filter(x=>x.id!==t.id),t].sort((a,b)=>a.createdAt-b.createdAt));
-  if(_fbOn) await fbSaveTask(t);
+  if(isConnected()) await fbSaveTask(t);
 }
 async function removeProject(id){
   saveProjects(_projects.filter(p=>p.id!==id));
+  const childTasks=_tasks.filter(t=>t.projectId===id);
   saveTasks(_tasks.filter(t=>t.projectId!==id));
-  if(_fbOn) await fbDeleteProject(id);
+  if(isConnected()){
+    await fbDeleteProject(id);
+    for(const t of childTasks) await fbDeleteTask(t.id); // borra tareas hijas en Firebase
+  }
 }
 async function removeTask(id){
   saveTasks(_tasks.filter(t=>t.id!==id));
-  if(_fbOn) await fbDeleteTask(id);
+  if(isConnected()) await fbDeleteTask(id);
 }
 function saveEvents(d){ _events=d; localStorage.setItem(LS.events,JSON.stringify(d)); }
 async function persistEvent(ev){
   saveEvents([..._events.filter(x=>x.id!==ev.id),ev].sort((a,b)=>(a.date||'').localeCompare(b.date||'')));
-  if(_fbOn) await fbSaveEvent(ev);
+  if(isConnected()) await fbSaveEvent(ev);
 }
 async function removeEvent(id){
   saveEvents(_events.filter(e=>e.id!==id));
-  if(_fbOn) await fbDeleteEvent(id);
+  if(isConnected()) await fbDeleteEvent(id);
 }
 
 /* ── Milestones ── */
 function saveMilestonesLocal(d){ _milestones=d; localStorage.setItem(LS.milestones,JSON.stringify(d)); }
 async function persistMilestone(ms){
   saveMilestonesLocal([..._milestones.filter(x=>x.id!==ms.id),ms]);
-  if(_fbOn) await fbSaveMilestone(ms);
+  if(isConnected()) await fbSaveMilestone(ms);
 }
 async function removeMilestone(id){
   saveMilestonesLocal(_milestones.filter(x=>x.id!==id));
-  if(_fbOn) await fbDeleteMilestone(id);
+  if(isConnected()) await fbDeleteMilestone(id);
 }
 
 /* ── Good News ── */
 function saveGoodnewsLocal(d){ _goodnews=d; localStorage.setItem(LS.goodnews,JSON.stringify(d)); }
 async function persistGoodnews(gn){
   saveGoodnewsLocal([..._goodnews.filter(x=>x.id!==gn.id),gn]);
-  if(_fbOn) await fbSaveGoodnews(gn);
+  if(isConnected()) await fbSaveGoodnews(gn);
 }
 async function removeGoodnews(id){
   saveGoodnewsLocal(_goodnews.filter(x=>x.id!==id));
-  if(_fbOn) await fbDeleteGoodnews(id);
+  if(isConnected()) await fbDeleteGoodnews(id);
 }
 
 /* ── Pulses ── */
 function savePulsesLocal(d){ _pulses=d; localStorage.setItem(LS.pulses,JSON.stringify(d)); }
 async function persistPulse(pulse){
   savePulsesLocal([..._pulses.filter(x=>x.id!==pulse.id),pulse].sort((a,b)=>b.createdAt-a.createdAt));
-  if(_fbOn) await fbSavePulse(pulse);
+  if(isConnected()) await fbSavePulse(pulse);
 }
 async function removePulse(id){
   savePulsesLocal(_pulses.filter(x=>x.id!==id));
-  if(_fbOn) await fbDeletePulse(id);
+  if(isConnected()) await fbDeletePulse(id);
 }
 
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
@@ -1560,7 +1564,7 @@ function todayStr(){ return new Date().toISOString().split('T')[0]; }
 async function initData(){
   firebaseInit();
   _fbOn=false;
-  setSyncDot(false);
+  setSyncDot('connecting'); // arranca conectando, no en error
   _projects  =JSON.parse(localStorage.getItem(LS.proj)||'[]');
   _tasks     =JSON.parse(localStorage.getItem(LS.task)||'[]');
   _events    =JSON.parse(localStorage.getItem(LS.events)||'[]');
@@ -1583,7 +1587,13 @@ async function mergeLocalToFb(localArr, fbDocs, saveFn){
 
 async function goLive(){
   if(_fbOn) return;
-  if(!isConnected()){ console.warn('[FCN] Firebase no disponible'); return; }
+  // Reintenta inicializar el SDK por si el primer intento falló (CDN/red)
+  if(!isConnected()) firebaseInit();
+  if(!isConnected()){
+    console.warn('[FCN] Firebase no disponible — reintentando');
+    setSyncDot(false); // marca error + agenda reintento automático
+    return;
+  }
   _fbOn=true;
   setSyncDot('connecting');
   if(currentUser) fbSetPresence(currentUser.id, true).catch(()=>{});
@@ -1676,22 +1686,21 @@ window.addEventListener('beforeunload',()=>{
   if(_fbOn && currentUser) fbSetPresence(currentUser.id, false).catch(()=>{});
 });
 function setSyncDot(state){
-  const track=document.getElementById('lt-track');
-  const lbl=document.getElementById('lt-lbl');
-  const sub=document.getElementById('lt-sub');
-  if(!track) return;
+  const dot=document.getElementById('ss-dot');
+  const lbl=document.getElementById('ss-lbl');
+  if(!dot) return;
+  dot.className='ss-dot';
   if(state===true){
-    track.classList.add('on');
-    if(lbl){lbl.textContent='En Vivo';lbl.style.color='var(--grn)';}
-    if(sub){sub.textContent='Sincronizado';sub.style.color='var(--grn)';}
+    dot.classList.add('live');
+    if(lbl){lbl.textContent='En vivo';lbl.style.color='var(--grn)';}
   } else if(state==='connecting'||state==='uploading'){
-    track.classList.remove('on');
-    if(lbl){lbl.textContent='Conectando';lbl.style.color='var(--yel)';}
-    if(sub){sub.textContent=state==='uploading'?'Subiendo datos…':'Esperando…';sub.style.color='var(--yel)';}
+    dot.classList.add('syncing');
+    if(lbl){lbl.textContent=state==='uploading'?'Subiendo…':'Sync…';lbl.style.color='var(--yel)';}
   } else {
-    track.classList.remove('on');
-    if(lbl){lbl.textContent='Local';lbl.style.color='';}
-    if(sub){sub.textContent='Sin sync';sub.style.color='';}
+    dot.classList.add('error');
+    if(lbl){lbl.textContent='Sin conexión';lbl.style.color='var(--red)';}
+    // Retry auto-connect after 5 seconds
+    setTimeout(()=>{ if(!_fbOn&&currentUser) goLive(); }, 5000);
   }
 }
 
