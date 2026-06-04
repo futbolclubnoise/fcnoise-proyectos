@@ -3883,7 +3883,7 @@ function renderGoodNews(){
 }
 function renderWeekAnalysis(){ /* no-op */ }
 
-function saveGoodNews(){
+async function saveGoodNews(){
   const text=document.getElementById('gn-text').value.trim();
   if(!text) return alert('Escribe una noticia.');
   const gn={id:uid(), text, date:todayStr()};
