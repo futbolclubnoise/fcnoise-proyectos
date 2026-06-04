@@ -27,6 +27,7 @@ const COL_PRESENCE   = "fcn_presence";
 const COL_MILESTONES = "fcn_milestones";
 const COL_GOODNEWS   = "fcn_goodnews";
 const COL_PULSES     = "fcn_pulses";
+const COL_PROFILES   = "fcn_profiles";
 
 let db = null;
 let _projUnsub       = null;
@@ -36,6 +37,7 @@ let _presenceUnsub   = null;
 let _milestonesUnsub = null;
 let _goodnewsUnsub   = null;
 let _pulsesUnsub     = null;
+let _profilesUnsub   = null;
 
 /* ── INIT ── */
 export function firebaseInit() {
@@ -58,9 +60,9 @@ export function firebaseInit() {
 /* ── STOP ALL LISTENERS ── */
 export function fbStopListening() {
   [_projUnsub, _taskUnsub, _eventsUnsub, _presenceUnsub,
-   _milestonesUnsub, _goodnewsUnsub, _pulsesUnsub].forEach(fn => fn && fn());
+   _milestonesUnsub, _goodnewsUnsub, _pulsesUnsub, _profilesUnsub].forEach(fn => fn && fn());
   _projUnsub = _taskUnsub = _eventsUnsub = _presenceUnsub =
-  _milestonesUnsub = _goodnewsUnsub = _pulsesUnsub = null;
+  _milestonesUnsub = _goodnewsUnsub = _pulsesUnsub = _profilesUnsub = null;
   console.log("[FCN] Firebase listeners detenidos");
 }
 
@@ -129,6 +131,23 @@ export function listenPulses(callback) {
   _pulsesUnsub = onSnapshot(q, snap => {
     callback(snap.docs.map(d => ({ ...d.data(), _fbId: d.id })));
   });
+}
+
+export function listenProfiles(callback) {
+  if (!db) return;
+  if (_profilesUnsub) _profilesUnsub();
+  _profilesUnsub = onSnapshot(collection(db, COL_PROFILES), snap => {
+    const data = {};
+    snap.docs.forEach(d => { data[d.id] = d.data(); });
+    callback(data);
+  });
+}
+
+/* ── WRITE — Perfiles (nombre + foto compartidos) ── */
+export async function fbSaveProfile(userId, profile) {
+  if (!db) return;
+  try { await setDoc(doc(db, COL_PROFILES, userId), { userId, ...profile }, { merge: true }); }
+  catch (e) { console.error("[FCN] saveProfile:", e); }
 }
 
 /* ─────────────────────────────────────────────

@@ -1347,12 +1347,12 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
 <script type="module">
 import { firebaseInit, isConnected,
          listenProjects, listenTasks, listenEvents, listenPresence,
-         listenMilestones, listenGoodnews, listenPulses,
+         listenMilestones, listenGoodnews, listenPulses, listenProfiles,
          fbSaveProject, fbDeleteProject, fbSaveTask, fbDeleteTask,
          fbSaveEvent, fbDeleteEvent, fbSetPresence,
          fbSaveMilestone, fbDeleteMilestone,
          fbSaveGoodnews, fbDeleteGoodnews,
-         fbSavePulse, fbDeletePulse,
+         fbSavePulse, fbDeletePulse, fbSaveProfile,
          fbStopListening } from './firebase.js';
 
 /* ═══════════════════════════════════════
@@ -1467,6 +1467,7 @@ let _goodnews      = []; // pulse week good news items
 let _openMilestoneMonth = null; // currently open month key in milestone modal
 let _pulses          = []; // pulses creados manualmente por admins
 let _pulseAreaAccess = {}; // (legacy, sistema viejo de áreas — mantenido para compat)
+let _profiles        = {}; // {userId: {name, photo}} — perfiles compartidos en Firebase
 
 const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulses:'fcn_pulses', pulseAreaAccess:'fcn_pulse_area_access' };
 
@@ -1660,6 +1661,31 @@ async function goLive(){
     _pulses=docs; localStorage.setItem(LS.pulses,JSON.stringify(docs));
     renderNav();
     if(currentView==='gestion') renderPulseList();
+  });
+
+  // ── Perfiles: nombre + foto compartidos ──
+  let prSynced=false;
+  listenProfiles(async data=>{
+    if(!prSynced){ prSynced=true;
+      // Primera vez: sube perfiles locales (foto/nombre) que no estén en Firebase
+      const localPhotos=JSON.parse(localStorage.getItem(LS_PHOTOS)||'{}');
+      const localOver  =JSON.parse(localStorage.getItem(LS_UOVER)||'{}');
+      for(const uid_ of Object.keys(USERS)){
+        const hasFb=!!data[uid_];
+        const photo=localPhotos[uid_];
+        const name =localOver[uid_]?.name;
+        if(!hasFb && (photo||name)){
+          await fbSaveProfile(uid_, {name:name||null, photo:photo||null});
+        }
+      }
+    }
+    _profiles=data||{};
+    // Aplica nombres compartidos a USERS
+    Object.keys(_profiles).forEach(uid_=>{
+      if(USERS[uid_] && _profiles[uid_].name) USERS[uid_].name=_profiles[uid_].name;
+    });
+    renderNav();
+    if(currentView==='tasks') renderDashboard();
   });
 }
 
@@ -3233,6 +3259,8 @@ function loadUserOverrides(){
 }
 
 function getUserPhoto(userId){
+  // Prioriza la foto compartida en Firebase; cae a localStorage si no hay
+  if(_profiles[userId]&&_profiles[userId].photo) return _profiles[userId].photo;
   try{ return JSON.parse(localStorage.getItem(LS_PHOTOS)||'{}')[userId]||null; }
   catch(e){ return null; }
 }
@@ -3297,6 +3325,11 @@ function uploadSettingsPhoto(input){
       const photos=JSON.parse(localStorage.getItem(LS_PHOTOS)||'{}');
       photos[currentUser.id]=dataUrl;
       localStorage.setItem(LS_PHOTOS,JSON.stringify(photos));
+      // refleja localmente al instante
+      if(!_profiles[currentUser.id]) _profiles[currentUser.id]={};
+      _profiles[currentUser.id].photo=dataUrl;
+      // sube a Firebase para que todos la vean
+      if(isConnected()) fbSaveProfile(currentUser.id, {photo:dataUrl}).catch(()=>{});
       renderSettingsModal();
       renderNav();
       if(currentView==='tasks') renderDashboard();
@@ -3311,6 +3344,8 @@ function removeSettingsPhoto(){
   const photos=JSON.parse(localStorage.getItem(LS_PHOTOS)||'{}');
   delete photos[currentUser.id];
   localStorage.setItem(LS_PHOTOS,JSON.stringify(photos));
+  if(_profiles[currentUser.id]) _profiles[currentUser.id].photo=null;
+  if(isConnected()) fbSaveProfile(currentUser.id, {photo:null}).catch(()=>{});
   renderSettingsModal();
   renderNav();
   if(currentView==='tasks') renderDashboard();
