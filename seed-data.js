@@ -8,9 +8,10 @@
   if (localStorage.getItem(SEED_KEY)) return; // ya corrió
 
   const t0 = Date.now();
-  const u  = (i) => 's' + (t0 + i).toString(36);
   let   idx = 0;
-  const id  = () => u(idx++);
+  // IDs deterministas: la misma tarea tiene el mismo ID en TODOS los equipos
+  // → evita duplicados al sincronizar con Firebase
+  const id  = () => 'seedt-' + (idx++);
 
   /* ── PROYECTOS ── */
   const PROJ = [
@@ -25,7 +26,7 @@
     { id:'p-veo',          name:'VEO Cams',                icon:'📹', area:'marketing',    team:[] },
   ].map((p, i) => ({
     ...p, desc:'', meth:'lista', type:'once', cycle:null,
-    status:'active', createdAt: t0 + i * 10
+    status:'active', createdAt: 1717000000000 + i * 10 // determinista
   }));
 
   /* ── HELPER ── */
@@ -42,7 +43,7 @@
       assignedUsers:assign,
       kStatus:'investigacion', calStatus:'idea', taskStatus:st,
       status: done ? 'done' : 'pending',
-      createdAt: t0 + idx * 7
+      createdAt: 1717000000000 + idx * 1000 // determinista (no Date.now)
     };
   }
 

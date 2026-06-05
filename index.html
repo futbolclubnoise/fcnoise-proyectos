@@ -986,6 +986,8 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
     </div>
     <!-- Instrucciones del admin -->
     <div id="mpd-desc" style="display:none;background:var(--bg3);border-radius:10px;padding:11px 13px;font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:14px;white-space:pre-wrap;border-left:3px solid var(--orange);"></div>
+    <!-- Metas del Q -->
+    <div id="mpd-goals" style="margin-bottom:14px;"></div>
     <!-- Progreso de proyectos incluidos -->
     <div id="mpd-projects" style="margin-bottom:14px;"></div>
     <!-- Tareas de los proyectos -->
@@ -1045,6 +1047,22 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
     <input type="hidden" id="mp-id">
     <div class="fi"><label>Nombre</label><input type="text" id="mp-name" placeholder="Ej. Marketing Semanal"></div>
     <div class="fi"><label>Descripción</label><textarea id="mp-desc" placeholder="Objetivo, entregables…"></textarea></div>
+    <div class="form-row">
+      <div class="fi"><label>Trimestre (Q)</label>
+        <select id="mp-quarter">
+          <option value="">— Sin Q —</option>
+          <option value="Q1">Q1 (Ene–Mar)</option>
+          <option value="Q2">Q2 (Abr–Jun)</option>
+          <option value="Q3">Q3 (Jul–Sep)</option>
+          <option value="Q4">Q4 (Oct–Dic)</option>
+        </select>
+      </div>
+      <div class="fi"><label>Año del Q</label><input type="number" id="mp-qyear" placeholder="2026" min="2024" max="2030" style="width:90px;"></div>
+    </div>
+    <div class="fi"><label>Metas del Q</label>
+      <textarea id="mp-goals" placeholder="Una meta por línea. Ej:&#10;Llegar a 500 inscritos&#10;Cerrar 3 patrocinios" style="min-height:64px;font-size:12px;"></textarea>
+      <div style="font-size:9px;color:var(--tx3);margin-top:4px;">Una meta por línea — aparecerán en el Pulse</div>
+    </div>
     <div class="form-row">
       <div class="fi"><label>Área</label>
         <select id="mp-area">
@@ -1586,6 +1604,25 @@ async function mergeLocalToFb(localArr, fbDocs, saveFn){
   }
 }
 
+/* Elimina tareas duplicadas en Firebase (mismo proyecto + nombre).
+   Corre una sola vez por sesión. Conserva la más antigua. */
+let _dedupeRan=false;
+async function dedupeTasks(docs){
+  if(_dedupeRan) return;
+  _dedupeRan=true;
+  const seen=new Map(); // key: projectId|name → doc conservado
+  const toDelete=[];
+  for(const t of [...docs].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0))){
+    const key=(t.projectId||'')+'|'+(t.name||'').trim().toLowerCase();
+    if(seen.has(key)) toDelete.push(t.id);
+    else seen.set(key, t);
+  }
+  if(toDelete.length){
+    console.log(`[FCN] Eliminando ${toDelete.length} tareas duplicadas…`);
+    for(const id of toDelete) await fbDeleteTask(id);
+  }
+}
+
 async function goLive(){
   if(_fbOn) return;
   // Reintenta inicializar el SDK por si el primer intento falló (CDN/red)
@@ -1612,11 +1649,12 @@ async function goLive(){
     onDataChange(); setSyncDot(true);
   });
 
-  // ── Tasks: merge ──
+  // ── Tasks: merge + dedup ──
   let tSynced=false;
   listenTasks(async docs=>{
     if(!tSynced){ tSynced=true;
       await mergeLocalToFb(_tasks, docs, fbSaveTask);
+      if(isAdmin()) await dedupeTasks(docs); // solo admins limpian duplicados
     }
     _tasks=docs; localStorage.setItem(LS.task,JSON.stringify(docs));
     onDataChange(); setSyncDot(true);
@@ -2857,6 +2895,9 @@ function openEditProj(id){
   document.getElementById('mp-prio').value  =p.priority||'media';
   document.getElementById('mp-start').value =p.startDate||'';
   document.getElementById('mp-end').value   =p.endDate||'';
+  document.getElementById('mp-quarter').value=p.quarter||'';
+  document.getElementById('mp-qyear').value =p.quarterYear||'';
+  document.getElementById('mp-goals').value =(p.goals||[]).join('\n');
   document.getElementById('mp-cycle-w').style.display=p.type==='cyclic'?'block':'none';
   const team=p.team||[];
   document.querySelectorAll('#mp-assign .a-chip').forEach(c=>{
@@ -2885,6 +2926,9 @@ async function saveProject(){
     priority:  document.getElementById('mp-prio').value||'media',
     startDate: document.getElementById('mp-start').value||null,
     endDate:   document.getElementById('mp-end').value||null,
+    quarter:     document.getElementById('mp-quarter').value||null,
+    quarterYear: document.getElementById('mp-qyear').value||null,
+    goals:       document.getElementById('mp-goals').value.split('\n').map(s=>s.trim()).filter(Boolean),
     team,
     status:    _projects.find(p=>p.id===id)?.status||'active',
     createdAt: _projects.find(p=>p.id===id)?.createdAt||Date.now(),
@@ -2895,11 +2939,12 @@ async function saveProject(){
   if(!_fbOn) renderProjGrid();
 }
 function clearProjForm(){
-  ['mp-id','mp-name','mp-desc','mp-icon','mp-start','mp-end'].forEach(i=>document.getElementById(i).value='');
+  ['mp-id','mp-name','mp-desc','mp-icon','mp-start','mp-end','mp-qyear','mp-goals'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('mp-area').value='marketing';
   document.getElementById('mp-meth').value='lista';
   document.getElementById('mp-type').value='once';
   document.getElementById('mp-prio').value='media';
+  document.getElementById('mp-quarter').value='';
   document.getElementById('mp-cycle-w').style.display='none';
   document.querySelectorAll('#mp-assign .a-chip').forEach(c=>c.classList.remove('sel'));
 }
@@ -3814,6 +3859,23 @@ function openPulseDetail(id){
   const descEl=document.getElementById('mpd-desc');
   if(pulse.desc){ descEl.textContent=pulse.desc; descEl.style.display='block'; }
   else { descEl.style.display='none'; }
+  // Metas del Q (de los proyectos incluidos)
+  const goalsEl=document.getElementById('mpd-goals');
+  const projsWithGoals=(pulse.projectIds||[])
+    .map(pid=>_projects.find(x=>x.id===pid))
+    .filter(p=>p&&p.goals&&p.goals.length);
+  if(projsWithGoals.length){
+    goalsEl.style.display='block';
+    goalsEl.innerHTML=projsWithGoals.map(p=>{
+      const qLabel=p.quarter?`${p.quarter}${p.quarterYear?' '+p.quarterYear:''}`:'Metas';
+      return `<div style="background:var(--ac2);border:1px solid var(--ac3);border-radius:10px;padding:11px 13px;margin-bottom:6px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;">🎯 ${esc(p.name)} · ${qLabel}</div>
+        ${p.goals.map(g=>`<div style="display:flex;align-items:flex-start;gap:7px;padding:3px 0;font-size:12px;color:var(--tx2);"><span style="color:var(--orange);">›</span><span>${esc(g)}</span></div>`).join('')}
+      </div>`;
+    }).join('');
+  } else {
+    goalsEl.style.display='none';
+  }
   // Projects
   const projsEl=document.getElementById('mpd-projects');
   projsEl.innerHTML=(pulse.projectIds||[]).map(pid=>{
