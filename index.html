@@ -385,6 +385,23 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
 .cal-cell:hover .cal-add-hint{opacity:1;}
 .cal-no-date{margin-top:14px;padding:14px;background:var(--bg3);border-radius:var(--r);}
 
+/* ── CALENDAR CONTENT CARDS (vista tarjeta del contenido) ── */
+.cal-cards-wrap{margin-top:20px;}
+.cal-cards-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd2);}
+.cal-cards-ttl{font-family:var(--font-display);font-size:13px;letter-spacing:.08em;color:var(--tx2);flex:1;}
+.cal-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.cal-card{background:linear-gradient(160deg,rgba(28,32,40,0.75) 0%,rgba(20,24,31,0.6) 100%);border:1px solid var(--glass-bd);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s;box-shadow:var(--card-shadow);border-top:3px solid var(--orange);}
+.cal-card:hover{transform:translateY(-2px);box-shadow:var(--card-hover-shadow);}
+.cal-card.done{opacity:.55;}
+.cal-card-body{padding:12px 13px;}
+.cal-card-status{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:600;letter-spacing:.03em;margin-bottom:7px;}
+.cal-card-title{font-size:13px;font-weight:600;line-height:1.35;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.cal-card-foot{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--tx3);}
+.cal-card-date{font-variant-numeric:tabular-nums;}
+.cal-card-avs{display:flex;gap:2px;margin-left:auto;}
+body.light .cal-card{background:#fff!important;border:1px solid rgba(0,0,0,.09)!important;border-top:3px solid var(--orange)!important;box-shadow:var(--card-shadow)!important;}
+@media(max-width:600px){.cal-cards-grid{grid-template-columns:1fr 1fr;}}
+
 /* ── PANEL ── */
 .panel{background:linear-gradient(170deg,rgba(28,32,40,0.6) 0%,rgba(20,24,31,0.5) 100%);border:1px solid var(--glass-bd);border-top-color:rgba(255,255,255,.08);border-radius:16px;padding:18px;margin-bottom:14px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--card-shadow);}
 .panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
@@ -2585,6 +2602,45 @@ function renderCalHTML(projId){
     </div>`;
   }
   h+=`</div>`; // end cal-grid
+
+  // ── Vista TARJETA del contenido del mes (título visible) ──
+  const monthPrefix=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  const monthContent=_tasks.filter(t=>{
+    if(t.projectId!==projId) return false;
+    const d=tEnd(t)||tStart(t);
+    return d && d.startsWith(monthPrefix);
+  }).sort((a,b)=>((tEnd(a)||tStart(a))||'').localeCompare((tEnd(b)||tStart(b))||''));
+
+  if(monthContent.length){
+    const cards=monthContent.map(t=>{
+      const calCol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
+      const done=t.status==='done';
+      const d=tEnd(t)||tStart(t);
+      const dd=d?d.slice(8,10)+'/'+d.slice(5,7):'';
+      const avs=(t.assignedUsers||[]).slice(0,3).map(uid_=>{
+        const u=USERS[uid_]; if(!u) return '';
+        const rm=ROLES[u.role];
+        return `<div class="udot" style="width:15px;height:15px;font-size:6px;background:${rm.bg};color:${rm.color};" title="${u.name}">${initials(u.name).charAt(0)}</div>`;
+      }).join('');
+      return `<div class="cal-card ${done?'done':''}" style="border-top-color:${calCol.color};" onclick="openTaskDetail('${t.id}')">
+        <div class="cal-card-body">
+          <div class="cal-card-status" style="color:${calCol.color};"><span class="dot dot-${t.calStatus||'idea'}"></span>${calCol.label}</div>
+          <div class="cal-card-title">${esc(t.name)}</div>
+          <div class="cal-card-foot">
+            ${dd?`<span class="cal-card-date">${dd}</span>`:''}
+            <div class="cal-card-avs">${avs}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    h+=`<div class="cal-cards-wrap">
+      <div class="cal-cards-hdr">
+        <span class="cal-cards-ttl">CONTENIDO DE ${MONTHS[calMonth].toUpperCase()}</span>
+        <span class="bscnt">${monthContent.length}</span>
+      </div>
+      <div class="cal-cards-grid">${cards}</div>
+    </div>`;
+  }
 
   // tasks without dates
   const noDate=_tasks.filter(t=>t.projectId===projId&&!tStart(t)&&!tEnd(t)&&t.status!=='done');
