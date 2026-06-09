@@ -389,18 +389,28 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
 .cal-cards-wrap{margin-top:20px;}
 .cal-cards-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd2);}
 .cal-cards-ttl{font-family:var(--font-display);font-size:13px;letter-spacing:.08em;color:var(--tx2);flex:1;}
-.cal-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
-.cal-card{background:linear-gradient(160deg,rgba(28,32,40,0.75) 0%,rgba(20,24,31,0.6) 100%);border:1px solid var(--glass-bd);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s;box-shadow:var(--card-shadow);border-top:3px solid var(--orange);}
-.cal-card:hover{transform:translateY(-2px);box-shadow:var(--card-hover-shadow);}
-.cal-card.done{opacity:.55;}
-.cal-card-body{padding:12px 13px;}
-.cal-card-status{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:600;letter-spacing:.03em;margin-bottom:7px;}
-.cal-card-title{font-size:13px;font-weight:600;line-height:1.35;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-.cal-card-foot{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--tx3);}
-.cal-card-date{font-variant-numeric:tabular-nums;}
-.cal-card-avs{display:flex;gap:2px;margin-left:auto;}
-body.light .cal-card{background:#fff!important;border:1px solid rgba(0,0,0,.09)!important;border-top:3px solid var(--orange)!important;box-shadow:var(--card-shadow)!important;}
+.cal-cards-hint{font-size:9px;color:var(--tx3);font-weight:500;}
+.cal-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;}
+.cal-card{position:relative;background:linear-gradient(165deg,rgba(30,34,42,0.8),rgba(20,24,31,0.62));border:1px solid var(--glass-bd);border-radius:13px;overflow:hidden;cursor:grab;transition:transform .18s,box-shadow .18s,border-color .18s;box-shadow:var(--card-shadow);}
+.cal-card:hover{transform:translateY(-2px);box-shadow:var(--card-hover-shadow);border-color:rgba(255,255,255,.14);}
+.cal-card:active{cursor:grabbing;}
+.cal-card.dragging{opacity:.4;transform:scale(.96);}
+.cal-card.done{opacity:.5;}
+.cal-card-body{padding:11px 12px 11px 14px;}
+.cal-card-status{display:inline-flex;align-items:center;gap:5px;font-size:8.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px;}
+.cal-card-title{font-size:12.5px;font-weight:600;line-height:1.3;margin-bottom:9px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:-.01em;}
+.cal-card-foot{display:flex;align-items:center;gap:6px;font-size:9.5px;color:var(--tx3);}
+.cal-card-date{font-variant-numeric:tabular-nums;font-weight:500;}
+.cal-card-avs{display:flex;gap:-3px;margin-left:auto;}
+.cal-card-avs .udot{width:17px;height:17px;font-size:7px;border:1.5px solid var(--bg2);margin-left:-4px;}
+.cal-card-avs .udot:first-child{margin-left:0;}
+body.light .cal-card{background:#fff!important;border:1px solid rgba(0,0,0,.08)!important;box-shadow:var(--card-shadow)!important;}
+body.light .cal-card-avs .udot{border-color:#fff;}
 @media(max-width:600px){.cal-cards-grid{grid-template-columns:1fr 1fr;}}
+/* drag-over en celdas del calendario */
+.cal-cell.cal-drop{border-color:var(--orange)!important;background:var(--ac2)!important;box-shadow:inset 0 0 0 2px var(--orange);}
+.cal-chip[draggable]{cursor:grab;}
+.cal-chip.dragging{opacity:.4;}
 
 /* ── PANEL ── */
 .panel{background:linear-gradient(170deg,rgba(28,32,40,0.6) 0%,rgba(20,24,31,0.5) 100%);border:1px solid var(--glass-bd);border-top-color:rgba(255,255,255,.08);border-radius:16px;padding:18px;margin-bottom:14px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--card-shadow);}
@@ -2589,6 +2599,38 @@ async function moveKbTask(taskId,colId){
   if(!_fbOn) renderProjDetail(currentProjId);
 }
 
+/* ── Drag & drop en CALENDARIO — arrastra contenido a un día ── */
+function calDragStart(e,id){
+  dragId=id;
+  e.dataTransfer.effectAllowed='move';
+  const card=document.getElementById('ccard-'+id); if(card) setTimeout(()=>card.classList.add('dragging'),0);
+}
+function calDragEnd(){
+  if(dragId){ const c=document.getElementById('ccard-'+dragId); if(c) c.classList.remove('dragging'); }
+  document.querySelectorAll('.cal-cell.cal-drop').forEach(el=>el.classList.remove('cal-drop'));
+}
+function calDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('cal-drop'); }
+function calDragLeave(e){ e.currentTarget.classList.remove('cal-drop'); }
+async function calDrop(e, dStr, projId){
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.remove('cal-drop');
+  const t=_tasks.find(x=>x.id===dragId);
+  if(!t || t.projectId!==projId){ dragId=null; return; }
+  const s=tStart(t), en=tEnd(t);
+  if(s&&en&&s!==en){
+    // preserva la duración: desplaza el rango al nuevo día de inicio
+    const span=Math.round((new Date(en)-new Date(s))/86400000);
+    t.startDate=dStr;
+    const nd=new Date(dStr+'T00:00:00'); nd.setDate(nd.getDate()+span);
+    t.endDate=nd.toISOString().split('T')[0]; t.dueDate=t.endDate;
+  } else {
+    t.startDate=dStr; t.endDate=dStr; t.dueDate=dStr;
+  }
+  dragId=null;
+  await persistTask(t);
+  if(!_fbOn) renderMethContent(projId,'calendario');
+}
+
 /* ── Calendar ── */
 function renderCalHTML(projId){
   const today=todayStr();
@@ -2624,16 +2666,19 @@ function renderCalHTML(projId){
       const calCol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
       const color=calCol.color;
       const title=esc(t.name);
-      return `<div class="cal-chip ${t.status==='done'?'done-c':''} ${isStart?'':'span-day'}"
+      const dragAttrs=isCeo?`draggable="true" ondragstart="calDragStart(event,'${t.id}')" ondragend="calDragEnd(event)"`:'';
+      return `<div class="cal-chip ${t.status==='done'?'done-c':''} ${isStart?'':'span-day'}" id="cchip-${t.id}-${dStr}"
+        ${dragAttrs}
         style="background:${color}22;color:${color};border:1px solid ${color}44;"
         onclick="event.stopPropagation();openTaskDetail('${t.id}')"
-        title="${calCol.icon} ${calCol.label} — ${title}">
-        ${isStart?`<span style="font-size:8px;">${calCol.icon}</span> ${title}`:'▸'}
+        title="${calCol.label} — ${title}">
+        ${isStart?title:'▸'}
       </div>`;
     }).join('');
     const addHint=isCeo?`<div class="cal-add-hint">+ agregar</div>`:'';
     const clickHandler=isCeo?`calDayClick('${dStr}','${projId}')`:'';
-    h+=`<div class="cal-cell ${isToday?'today':''}" ${clickHandler?`onclick="${clickHandler}"`:''}">
+    const dropAttrs=isCeo?`ondragover="calDragOver(event)" ondragleave="calDragLeave(event)" ondrop="calDrop(event,'${dStr}','${projId}')"`:'';
+    h+=`<div class="cal-cell ${isToday?'today':''}" ${clickHandler?`onclick="${clickHandler}"`:''} ${dropAttrs}>
       <div class="cal-date ${isToday?'is-today':''}">${d}</div>
       ${chips}
       ${addHint}
@@ -2658,11 +2703,13 @@ function renderCalHTML(projId){
       const avs=(t.assignedUsers||[]).slice(0,3).map(uid_=>{
         const u=USERS[uid_]; if(!u) return '';
         const rm=ROLES[u.role];
-        return `<div class="udot" style="width:15px;height:15px;font-size:6px;background:${rm.bg};color:${rm.color};" title="${u.name}">${initials(u.name).charAt(0)}</div>`;
+        return `<div class="udot" style="background:${rm.bg};color:${rm.color};" title="${u.name}">${initials(u.name).charAt(0)}</div>`;
       }).join('');
-      return `<div class="cal-card ${done?'done':''}" style="border-top-color:${calCol.color};" onclick="openTaskDetail('${t.id}')">
+      const dragAttrs=isCeo?`draggable="true" ondragstart="calDragStart(event,'${t.id}')" ondragend="calDragEnd(event)"`:'';
+      return `<div class="cal-card ${done?'done':''}" id="ccard-${t.id}" ${dragAttrs} style="--c:${calCol.color};" onclick="openTaskDetail('${t.id}')">
+        <span style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${calCol.color};"></span>
         <div class="cal-card-body">
-          <div class="cal-card-status" style="color:${calCol.color};"><span class="dot dot-${t.calStatus||'idea'}"></span>${calCol.label}</div>
+          <div class="cal-card-status" style="color:${calCol.color};">${calCol.label}</div>
           <div class="cal-card-title">${esc(t.name)}</div>
           <div class="cal-card-foot">
             ${dd?`<span class="cal-card-date">${dd}</span>`:''}
@@ -2674,6 +2721,7 @@ function renderCalHTML(projId){
     h+=`<div class="cal-cards-wrap">
       <div class="cal-cards-hdr">
         <span class="cal-cards-ttl">CONTENIDO DE ${MONTHS[calMonth].toUpperCase()}</span>
+        ${isCeo?'<span class="cal-cards-hint">Arrastra al día →</span>':''}
         <span class="bscnt">${monthContent.length}</span>
       </div>
       <div class="cal-cards-grid">${cards}</div>
@@ -4103,6 +4151,7 @@ Object.assign(window,{
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
+  calDragStart, calDragEnd, calDragOver, calDragLeave, calDrop,
   toggleChip,
   updateTaskFormStates, updateGestionStates,
   switchTaskType,
