@@ -407,11 +407,8 @@ body.light .cal-card{background:#fff!important;border:1px solid rgba(0,0,0,.09)!
 .panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .panel-ttl{font-family:var(--font-display);font-size:14px;letter-spacing:.06em;color:var(--tx2);}
 
-/* ── ASSIGN CHIPS ── */
-.assign-grid{display:flex;flex-wrap:wrap;gap:7px;}
-.a-chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid var(--bd2);background:var(--bg4);cursor:pointer;font-size:11px;font-weight:600;color:var(--tx2);user-select:none;transition:all .18s;}
+/* ── ASSIGN CHIPS (estilos en sección People Picker más abajo) ── */
 .a-chip input{display:none;}
-.a-chip.sel{border-color:var(--orange);background:var(--ac2);color:var(--orange);}
 
 /* ── STATS ── */
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
@@ -486,12 +483,17 @@ body.light .theme-toggle::after{transform:translateX(18px);background:#fff;}
 .tt-btn.on{background:var(--orange);color:#fff;}
 .tt-btn:not(.on):hover{background:var(--bg5);color:var(--tx);}
 
-/* ── ASSIGN CHIPS (div-based, no checkbox) ── */
-.a-chip{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;border:1px solid var(--bd2);background:var(--bg4);cursor:pointer;font-size:11px;font-weight:600;color:var(--tx3);user-select:none;transition:all .18s;}
-.a-chip.sel{border-color:var(--orange);background:var(--ac2);color:var(--orange);}
-.a-chip:not(.sel):hover{border-color:var(--bd3);color:var(--tx2);}
-.a-chip-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:.5;}
-.a-chip.sel .a-chip-dot{opacity:1;}
+/* ── PEOPLE PICKER (avatares compactos) ── */
+.assign-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.a-chip{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;user-select:none;width:52px;transition:all .15s;}
+.a-chip .a-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--bg4);color:var(--tx3);border:2px solid transparent;transition:all .18s;position:relative;}
+.a-chip .a-name{font-size:9.5px;font-weight:500;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52px;transition:color .15s;}
+.a-chip:not(.sel):hover .a-av{border-color:var(--bd3);background:var(--bg5);}
+.a-chip.sel .a-av{border-color:var(--orange);background:var(--ac2);color:var(--orange);}
+.a-chip.sel .a-av::after{content:'✓';position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;background:var(--orange);color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg2);}
+.a-chip.sel .a-name{color:var(--orange);font-weight:600;}
+/* legacy dot — oculto en el nuevo diseño */
+.a-chip-dot{display:none;}
 
 /* ── SETTINGS MODAL AVATAR ── */
 .settings-av{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;border:3px solid var(--ac3);background:var(--ac2);color:var(--accent);cursor:pointer;overflow:hidden;flex-shrink:0;transition:opacity .18s;}
@@ -640,6 +642,25 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
 .home-greeting-av img{width:100%;height:100%;object-fit:cover;border-radius:12px;}
 .greeting-name{font-family:var(--font-display);font-size:22px;letter-spacing:.04em;line-height:1;}
 .greeting-sub{font-size:11px;color:var(--tx3);margin-top:2px;}
+
+/* Quick actions */
+.quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.qa-btn{flex:1;min-width:130px;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--glass-bd);background:linear-gradient(160deg,rgba(28,32,40,0.7),rgba(20,24,31,0.55));cursor:pointer;transition:all .18s;box-shadow:var(--card-shadow);}
+.qa-btn:hover{transform:translateY(-2px);border-color:rgba(255,122,0,.35);box-shadow:var(--card-hover-shadow);}
+.qa-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--ac2);color:var(--orange);}
+.qa-ico svg{width:17px;height:17px;}
+.qa-txt{display:flex;flex-direction:column;line-height:1.2;}
+.qa-ttl{font-size:12px;font-weight:700;color:var(--tx);}
+.qa-sub{font-size:9.5px;color:var(--tx3);margin-top:1px;}
+body.light .qa-btn{background:#fff!important;border:1px solid rgba(0,0,0,.09)!important;}
+/* Urgent banner — destacado cuando hay vencidas */
+.urgent-banner{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;background:linear-gradient(160deg,rgba(232,64,64,.12),rgba(232,64,64,.05));border:1px solid var(--red3);margin-bottom:16px;}
+.urgent-banner-ico{font-size:20px;flex-shrink:0;}
+.urgent-banner-txt{flex:1;}
+.urgent-banner-ttl{font-size:13px;font-weight:700;color:var(--red);}
+.urgent-banner-sub{font-size:11px;color:var(--tx2);margin-top:2px;}
+.section-title{font-family:var(--font-display);font-size:15px;letter-spacing:.06em;color:var(--tx2);margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+.section-title .bscnt{font-family:var(--font-body);}
 
 .home-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
 @media(max-width:520px){.home-stats{grid-template-columns:repeat(2,1fr);}}
@@ -1133,10 +1154,10 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
     </div>
     <div class="fi"><label>Equipo</label>
       <div class="assign-grid" id="mp-assign">
-        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>Leonardo</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>Verónica</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>Laura</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>Editor</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-av">Le</span><span class="a-name">Leonardo</span></div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-av">Ve</span><span class="a-name">Verónica</span></div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-av">La</span><span class="a-name">Laura</span></div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-av">Ed</span><span class="a-name">Editor</span></div>
       </div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
@@ -1221,10 +1242,10 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
 
     <div class="fi"><label>Asignar a</label>
       <div class="assign-grid" id="tf-assign">
-        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>Leonardo</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>Verónica</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>Laura</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>Editor</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-av">Le</span><span class="a-name">Leonardo</span></div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-av">Ve</span><span class="a-name">Verónica</span></div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-av">La</span><span class="a-name">Laura</span></div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-av">Ed</span><span class="a-name">Editor</span></div>
       </div>
     </div>
 
@@ -1326,10 +1347,10 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
     </div>
     <div class="fi"><label>Participantes</label>
       <div class="assign-grid" id="mev-assign">
-        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-chip-dot"></span>Leonardo</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-chip-dot"></span>Verónica</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-chip-dot"></span>Laura</div>
-        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-chip-dot"></span>Editor</div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="leonardo"><span class="a-av">Le</span><span class="a-name">Leonardo</span></div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="veronica"><span class="a-av">Ve</span><span class="a-name">Verónica</span></div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="laura"><span class="a-av">La</span><span class="a-name">Laura</span></div>
+        <div class="a-chip" onclick="toggleChip(this)" data-value="editor"><span class="a-av">Ed</span><span class="a-name">Editor</span></div>
       </div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
@@ -1955,21 +1976,30 @@ function renderDashboard(){
 
   const all=myTasks();
   const today=todayStr();
-  const todayTasks=all.filter(t=>t.status!=='done'&&(tEnd(t)===today||tStart(t)===today)&&(t.priority||'media')==='alta');
-  const overdue   =all.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today&&(t.priority||'media')==='alta');
+  const weekEnd=new Date(); weekEnd.setDate(weekEnd.getDate()+7);
+  const weekStr=weekEnd.toISOString().split('T')[0];
+
+  // Clasificación clara — TODAS las prioridades (no solo alta)
+  const pend     =all.filter(t=>t.status!=='done');
+  const overdue  =pend.filter(t=>tEnd(t)&&tEnd(t)<today).sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
+  const todayT   =pend.filter(t=>tEnd(t)===today||tStart(t)===today);
+  const weekT    =pend.filter(t=>{const e=tEnd(t);return e&&e>today&&e<=weekStr;}).sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
   const done      =all.filter(t=>t.status==='done');
   const myProjs   =visibleProjects();
 
-  // Greeting
+  // Ordenar por prioridad
+  const po={alta:0,media:1,baja:2};
+  const byPrio=arr=>[...arr].sort((a,b)=>(po[a.priority??'media']??1)-(po[b.priority??'media']??1));
+
   const hr=new Date().getHours();
   const greeting=hr<12?'Buenos días':hr<18?'Buenas tardes':'Buenas noches';
   const photo=getUserPhoto(currentUser.id);
-  const avIn=photo?`<img src="${photo}" alt="">`:`<span>${currentUser.name.charAt(0).toUpperCase()}</span>`;
-
-  // Upcoming events (next 7 days)
-  const weekEnd=new Date(); weekEnd.setDate(weekEnd.getDate()+7);
-  const weekStr=weekEnd.toISOString().split('T')[0];
+  const avIn=photo?`<img src="${photo}" alt="">`:`<span>${initials(currentUser.name)}</span>`;
   const upcomingEvts=_events.filter(e=>e.date>=today&&e.date<=weekStr).slice(0,3);
+
+  // Iconos SVG (sin emoji)
+  const icoTask='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  const icoProj='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
 
   let h=`
   <div class="home-greeting">
@@ -1980,80 +2010,88 @@ function renderDashboard(){
     </div>
   </div>
 
+  <!-- Acciones rápidas -->
+  <div class="quick-actions">
+    <div class="qa-btn" onclick="openNewTask()">
+      <div class="qa-ico">${icoTask}</div>
+      <div class="qa-txt"><span class="qa-ttl">Nueva tarea</span><span class="qa-sub">Crear y asignar</span></div>
+    </div>
+    <div class="qa-btn" onclick="openNewProj()">
+      <div class="qa-ico">${icoProj}</div>
+      <div class="qa-txt"><span class="qa-ttl">Nuevo proyecto</span><span class="qa-sub">Iniciar un proyecto</span></div>
+    </div>
+    <div class="qa-btn" onclick="navigate('projs')">
+      <div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+      <div class="qa-txt"><span class="qa-ttl">Revisar</span><span class="qa-sub">Ver proyectos</span></div>
+    </div>
+  </div>
+
+  <!-- Banner urgente -->
+  ${overdue.length?`<div class="urgent-banner">
+    <div class="urgent-banner-ico">⚠️</div>
+    <div class="urgent-banner-txt">
+      <div class="urgent-banner-ttl">${overdue.length} ${overdue.length===1?'tarea vencida':'tareas vencidas'}</div>
+      <div class="urgent-banner-sub">Requieren tu atención lo antes posible</div>
+    </div>
+  </div>`:''}
+
+  <!-- Stats -->
   <div class="home-stats">
-    <div class="hstat">
-      <div class="hstat-num" style="color:${rm.color};">${todayTasks.length}</div>
-      <div class="hstat-lbl">Para hoy</div>
-    </div>
-    <div class="hstat">
-      <div class="hstat-num" style="color:var(--red);">${overdue.length}</div>
-      <div class="hstat-lbl">Urgentes</div>
-    </div>
-    <div class="hstat">
-      <div class="hstat-num" style="color:var(--grn);">${done.length}</div>
-      <div class="hstat-lbl">Completadas</div>
-    </div>
-    <div class="hstat">
-      <div class="hstat-num" style="color:var(--blu);">${myProjs.length}</div>
-      <div class="hstat-lbl">Proyectos</div>
-    </div>
-  </div>
+    <div class="hstat"><div class="hstat-num" style="color:var(--red);">${overdue.length}</div><div class="hstat-lbl">Vencidas</div></div>
+    <div class="hstat"><div class="hstat-num" style="color:${rm.color};">${todayT.length}</div><div class="hstat-lbl">Para hoy</div></div>
+    <div class="hstat"><div class="hstat-num" style="color:var(--blu);">${weekT.length}</div><div class="hstat-lbl">Esta semana</div></div>
+    <div class="hstat"><div class="hstat-num" style="color:var(--grn);">${done.length}</div><div class="hstat-lbl">Completadas</div></div>
+  </div>`;
 
+  // Sección "Qué hacer" — vencidas + hoy + semana
+  const hasWork=overdue.length||todayT.length||weekT.length;
+  h+=`<div class="section-title">QUÉ HACER ${hasWork?'':' '}<span class="bscnt">${overdue.length+todayT.length+weekT.length}</span></div>`;
+  if(!hasWork){
+    h+=`<div class="hcard"><div class="hcard-body"><div class="hcard-empty">🎉 Estás al día. Sin pendientes urgentes.</div></div></div>`;
+  } else {
+    h+=`<div class="home-grid">`;
+    // Vencidas
+    if(overdue.length){
+      h+=`<div class="hcard urgent">
+        <div class="hcard-hdr"><span class="hcard-ttl" style="color:var(--red);">VENCIDAS</span><span class="bscnt">${overdue.length}</span></div>
+        <div class="hcard-body">${byPrio(overdue).slice(0,6).map(t=>taskTicketHTML(t)).join('')}</div>
+      </div>`;
+    }
+    // Para hoy
+    h+=`<div class="hcard">
+      <div class="hcard-hdr"><span class="hcard-ttl">PARA HOY</span><span class="bscnt">${todayT.length}</span></div>
+      <div class="hcard-body">${todayT.length?byPrio(todayT).map(t=>taskTicketHTML(t)).join(''):'<div class="hcard-empty">Sin tareas para hoy</div>'}</div>
+    </div>`;
+    // Esta semana
+    if(weekT.length){
+      h+=`<div class="hcard">
+        <div class="hcard-hdr"><span class="hcard-ttl">ESTA SEMANA</span><span class="bscnt">${weekT.length}</span></div>
+        <div class="hcard-body">${byPrio(weekT).slice(0,6).map(t=>taskTicketHTML(t)).join('')}</div>
+      </div>`;
+    }
+    h+=`</div>`;
+  }
+
+  // Proyectos + Equipo
+  h+=`<div class="section-title">PROYECTOS Y EQUIPO</div>
   <div class="home-grid">
     <div class="hcard">
-      <div class="hcard-hdr">
-        <span class="hcard-ttl">PARA HOY</span>
-        <span class="bscnt">${todayTasks.length}</span>
-      </div>
-      <div class="hcard-body">
-        ${todayTasks.length?todayTasks.map(t=>taskTicketHTML(t)).join('')
-          :'<div class="hcard-empty">Sin tareas para hoy</div>'}
-      </div>
+      <div class="hcard-hdr"><span class="hcard-ttl">MIS PROYECTOS</span><span class="bscnt">${myProjs.length}</span></div>
+      <div class="hcard-body">${myProjs.length?myProjs.map(p=>projProgressHTML(p)).join(''):'<div class="hcard-empty">Sin proyectos asignados</div>'}</div>
     </div>
     <div class="hcard">
-      <div class="hcard-hdr">
-        <span class="hcard-ttl">MIS PROYECTOS</span>
-        <span class="bscnt">${myProjs.length}</span>
-      </div>
-      <div class="hcard-body">
-        ${myProjs.length?myProjs.map(p=>projProgressHTML(p)).join('')
-          :'<div class="hcard-empty">Sin proyectos asignados</div>'}
-      </div>
+      <div class="hcard-hdr"><span class="hcard-ttl">EQUIPO</span>${_fbOn?'<span class="bdg bg" style="font-size:9px;">● En vivo</span>':''}</div>
+      <div class="hcard-body" id="dash-team-body">${renderTeamHTML()}</div>
     </div>
-  </div>
+  </div>`;
 
-  <div class="home-grid">
-    <div class="hcard ${overdue.length?'urgent':''}">
-      <div class="hcard-hdr">
-        <span class="hcard-ttl">URGENTES</span>
-        <span class="bscnt">${overdue.length}</span>
-      </div>
-      <div class="hcard-body">
-        ${overdue.length?overdue.slice(0,6).map(t=>taskTicketHTML(t)).join('')
-          :'<div class="hcard-empty">Sin tareas vencidas</div>'}
-      </div>
-    </div>
-    <div class="hcard">
-      <div class="hcard-hdr">
-        <span class="hcard-ttl">EQUIPO</span>
-        ${_fbOn?'<span class="bdg bg" style="font-size:9px;">● En vivo</span>':''}
-      </div>
-      <div class="hcard-body" id="dash-team-body">
-        ${renderTeamHTML()}
-      </div>
-    </div>
-  </div>
-
-  ${upcomingEvts.length?`
-  <div class="hcard" style="margin-bottom:14px;">
-    <div class="hcard-hdr">
-      <span class="hcard-ttl">PRÓXIMOS EVENTOS</span>
-      <button class="btn btn-g btn-xs" onclick="navigate('eventos')">Ver todos →</button>
-    </div>
-    <div class="hcard-body">
-      ${upcomingEvts.map(e=>eventRowHTML(e,false)).join('')}
-    </div>
-  </div>`:''}`;
+  // Eventos
+  if(upcomingEvts.length){
+    h+=`<div class="hcard" style="margin-bottom:14px;">
+      <div class="hcard-hdr"><span class="hcard-ttl">PRÓXIMOS EVENTOS</span><button class="btn btn-g btn-xs" onclick="navigate('eventos')">Ver todos →</button></div>
+      <div class="hcard-body">${upcomingEvts.map(e=>eventRowHTML(e,false)).join('')}</div>
+    </div>`;
+  }
 
   document.getElementById('home-content').innerHTML=h;
   renderTimeline();
