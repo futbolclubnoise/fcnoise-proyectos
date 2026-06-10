@@ -1989,13 +1989,27 @@ function renderDashboard(){
   const weekEnd=new Date(); weekEnd.setDate(weekEnd.getDate()+7);
   const weekStr=weekEnd.toISOString().split('T')[0];
 
-  // Clasificación clara — TODAS las prioridades (no solo alta)
-  const pend     =all.filter(t=>t.status!=='done');
-  const overdue  =pend.filter(t=>tEnd(t)&&tEnd(t)<today).sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
-  const todayT   =pend.filter(t=>tEnd(t)===today||tStart(t)===today);
-  const weekT    =pend.filter(t=>{const e=tEnd(t);return e&&e>today&&e<=weekStr;}).sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
-  const done      =all.filter(t=>t.status==='done');
-  const myProjs   =visibleProjects();
+  // Pendientes SIN duplicados (mismo proyecto+nombre → una sola copia)
+  const seenKeys=new Set();
+  const pend=all.filter(t=>{
+    if(t.status==='done') return false;
+    const k=(t.projectId||'')+'|'+(t.name||'').trim().toLowerCase();
+    if(seenKeys.has(k)) return false;
+    seenKeys.add(k); return true;
+  });
+
+  // Clasificación mutuamente excluyente — una tarea solo cae en UN bloque
+  const overdue=[], todayT=[], weekT=[];
+  pend.forEach(t=>{
+    const e=tEnd(t), s=tStart(t);
+    if(e&&e<today)               overdue.push(t);   // vencida
+    else if(e===today||s===today) todayT.push(t);   // hoy
+    else if(e&&e>today&&e<=weekStr) weekT.push(t);   // esta semana
+  });
+  overdue.sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
+  weekT.sort((a,b)=>tEnd(a).localeCompare(tEnd(b)));
+  const done    =all.filter(t=>t.status==='done');
+  const myProjs =visibleProjects();
 
   // Ordenar por prioridad
   const po={alta:0,media:1,baja:2};
@@ -3288,23 +3302,30 @@ function openNewTask(){ _taskFromProjId=null; openTaskForm(null); }
 
 async function toggleTask(id){
   const t=_tasks.find(x=>x.id===id); if(!t) return;
-  const proj=_projects.find(p=>p.id===t.projectId);
-  const meth=proj?.meth||'lista';
-  const ttype=t.taskType||(meth==='calendario'?'contenido':'tarea');
-  t.status=t.status==='done'?'pending':'done';
-  if(ttype==='contenido'){
-    if(t.status==='done') t.calStatus='publicado';
-    if(t.status==='pending'&&t.calStatus==='publicado') t.calStatus='aprobado';
-  } else {
-    if(t.status==='done') t.taskStatus='completada';
-    if(t.status==='pending'&&t.taskStatus==='completada') t.taskStatus='en-proceso';
-    if(meth==='kanban'){
-      if(t.status==='done') t.kStatus='cierre';
-      if(t.status==='pending'&&t.kStatus==='cierre') t.kStatus='ejecucion';
+  const newStatus=t.status==='done'?'pending':'done';
+  // Aplica a TODAS las copias duplicadas (mismo proyecto + nombre) para que
+  // no quede una copia pendiente "fantasma" en urgentes / por hacer
+  const key=(t.projectId||'')+'|'+(t.name||'').trim().toLowerCase();
+  const copies=_tasks.filter(x=>((x.projectId||'')+'|'+(x.name||'').trim().toLowerCase())===key);
+  for(const c of copies){
+    const proj=_projects.find(p=>p.id===c.projectId);
+    const meth=proj?.meth||'lista';
+    const ttype=c.taskType||(meth==='calendario'?'contenido':'tarea');
+    c.status=newStatus;
+    if(ttype==='contenido'){
+      if(newStatus==='done') c.calStatus='publicado';
+      else if(c.calStatus==='publicado') c.calStatus='aprobado';
+    } else {
+      if(newStatus==='done') c.taskStatus='completada';
+      else if(c.taskStatus==='completada') c.taskStatus='en-proceso';
+      if(meth==='kanban'){
+        if(newStatus==='done') c.kStatus='cierre';
+        else if(c.kStatus==='cierre') c.kStatus='ejecucion';
+      }
     }
+    await persistTask(c);
   }
-  await persistTask(t);
-  if(!_fbOn) onDataChange();
+  onDataChange(); // actualiza la vista al instante (el listener de Firebase reconcilia)
 }
 
 /* ═══════════════════════════════════════
