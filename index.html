@@ -1487,17 +1487,16 @@ const DAYS_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','
 /* ── ROLE HELPERS ── */
 function isSuperAdmin(){ return currentUser?.role==='superadmin'; }
 function isAdmin(){ return ['admin','superadmin'].includes(currentUser?.role); }
+// SOLO el super admin (Leo) ve todo. Los demás (incl. Verónica) ven lo asignado.
 function visibleProjects(){
-  if(isAdmin()) return _projects;
-  // colaboradores: proyectos donde están en el team o los crearon
+  if(isSuperAdmin()) return _projects;
   return _projects.filter(p=>(p.team||[]).includes(currentUser.id)||p.createdBy===currentUser.id);
 }
 function canEditProject(p){
-  // superadmin, admin, creador, o miembro del equipo pueden editar
   if(!p) return false;
-  if(isAdmin()) return true;
-  if(p.createdBy===currentUser.id) return true;
-  return (p.team||[]).includes(currentUser.id);
+  if(isSuperAdmin()) return true;            // Leo edita cualquier proyecto
+  if(p.createdBy===currentUser.id) return true; // el creador
+  return (p.team||[]).includes(currentUser.id); // o miembro del equipo
 }
 
 /* ── PULSE AREA ACCESS ── */
@@ -1540,14 +1539,14 @@ let _profiles        = {}; // {userId: {name, photo}} — perfiles compartidos e
 const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulses:'fcn_pulses', pulseAreaAccess:'fcn_pulse_area_access' };
 
 function canSeePulse(){
-  if(isAdmin()) return true;
-  // Colaboradores: ven Pulse si tienen al menos un pulse asignado
-  return _pulses.some(p=>p.assignedTo===currentUser.id);
+  if(isSuperAdmin()) return true; // Leo siempre
+  // Verónica y colaboradores: ven Pulse si tienen uno asignado o creado
+  return _pulses.some(p=>p.assignedTo===currentUser.id||p.createdBy===currentUser.id);
 }
 function getMyPulses(){
-  if(isSuperAdmin()) return _pulses;
-  if(isAdmin()) return _pulses; // todos los admins ven todos los pulses
-  return _pulses.filter(p=>p.assignedTo===currentUser.id);
+  if(isSuperAdmin()) return _pulses; // Leo ve todos
+  // Verónica y colaboradores: solo los pulses asignados a ellos o creados por ellos
+  return _pulses.filter(p=>p.assignedTo===currentUser.id||p.createdBy===currentUser.id);
 }
 
 /* ═══════════════════════════════════════
@@ -1891,12 +1890,12 @@ function renderNav(){
     av.style.color=rm.color;
   }
   av.style.borderColor=rm.brd;
-  const admin=isAdmin();
+  const sa=isSuperAdmin();
   document.getElementById('nav-links').innerHTML=`
     <button class="nav-link" onclick="navigate('tasks')">Inicio</button>
     <button class="nav-link" onclick="navigate('projs')">Proyectos</button>
     ${canSeePulse()?`<button class="nav-link" onclick="navigate('gestion')">Pulse Week</button>`:''}
-    ${admin?`<button class="nav-link" onclick="navigate('revision')">Revisión</button>`:''}`;
+    ${sa?`<button class="nav-link" onclick="navigate('revision')">Revisión</button>`:''}`;
 }
 function savePulseAreaAccess(){
   localStorage.setItem(LS.pulseAreaAccess, JSON.stringify(_pulseAreaAccess));
@@ -1958,8 +1957,8 @@ function navigate(view, projId){
   // nav link index: dynamic — Pulse Week only shows if canSeePulse()
   let linkIdx=2;
   const map={'tasks':0,'projs':1};
-  if(canSeePulse()) { map['gestion']=linkIdx++; }
-  if(isAdmin())     { map['revision']=linkIdx; }
+  if(canSeePulse())   { map['gestion']=linkIdx++; }
+  if(isSuperAdmin())  { map['revision']=linkIdx; }
   const links=document.querySelectorAll('.nav-link');
   const idx=map[view]; if(idx!==undefined && links[idx]) links[idx].classList.add('on');
 
@@ -1976,7 +1975,8 @@ function goBack(){ navigate('projs'); }
    DASHBOARD — home view
 ═══════════════════════════════════════ */
 function myTasks(){
-  if(isAdmin()) return _tasks;
+  if(isSuperAdmin()) return _tasks; // Leo ve todas
+  // Verónica y colaboradores: solo tareas asignadas a ellos
   return _tasks.filter(t=>Array.isArray(t.assignedUsers)&&t.assignedUsers.includes(currentUser.id));
 }
 
@@ -3933,34 +3933,31 @@ async function deleteMilestone(id){
    PULSE WEEK — RENDER PRINCIPAL
 ═══════════════════════════════════════ */
 function renderPulseWeek(){
-  // Botón crear (solo admins)
+  // Botón crear: super admin y administradores (Vero también puede crear/asignar)
   const createBtn=document.getElementById('pw-create-btn');
   if(createBtn) createBtn.innerHTML=isAdmin()
     ?`<button class="btn btn-p btn-sm" onclick="openNewPulse()">+ Crear Pulse</button>`:'';
 
-  // Stats rápidos (solo admins)
+  // Stats según el alcance de cada quien: Leo ve global, los demás solo lo suyo
   const statsEl=document.getElementById('ops-stats');
   if(statsEl){
-    if(isAdmin()){
-      statsEl.style.display='';
-      const today=todayStr();
-      const atrasadas=_tasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today).length;
-      const enProc=_tasks.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='en-proceso').length;
-      const revision=_tasks.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='revision').length;
-      const doneTot=_tasks.filter(t=>t.status==='done').length;
-      statsEl.innerHTML=`
-        <div class="hstat"><div class="hstat-num" style="color:var(--red);">${atrasadas}</div><div class="hstat-lbl">Atrasadas</div></div>
-        <div class="hstat"><div class="hstat-num" style="color:var(--blu);">${enProc}</div><div class="hstat-lbl">En proceso</div></div>
-        <div class="hstat"><div class="hstat-num" style="color:var(--yel);">${revision}</div><div class="hstat-lbl">En revisión</div></div>
-        <div class="hstat"><div class="hstat-num" style="color:var(--grn);">${doneTot}</div><div class="hstat-lbl">Completadas</div></div>`;
-    } else {
-      statsEl.style.display='none';
-    }
+    statsEl.style.display='';
+    const scope=myTasks(); // Leo: todas · Vero/colaboradores: asignadas
+    const today=todayStr();
+    const atrasadas=scope.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today).length;
+    const enProc=scope.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='en-proceso').length;
+    const revision=scope.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='revision').length;
+    const doneTot=scope.filter(t=>t.status==='done').length;
+    statsEl.innerHTML=`
+      <div class="hstat"><div class="hstat-num" style="color:var(--red);">${atrasadas}</div><div class="hstat-lbl">Atrasadas</div></div>
+      <div class="hstat"><div class="hstat-num" style="color:var(--blu);">${enProc}</div><div class="hstat-lbl">En proceso</div></div>
+      <div class="hstat"><div class="hstat-num" style="color:var(--yel);">${revision}</div><div class="hstat-lbl">En revisión</div></div>
+      <div class="hstat"><div class="hstat-num" style="color:var(--grn);">${doneTot}</div><div class="hstat-lbl">Completadas</div></div>`;
   }
 
   // Label dinámico
   const lbl=document.getElementById('pw-pulses-label');
-  if(lbl) lbl.textContent=isAdmin()?'PULSES ACTIVOS':'MIS PULSES';
+  if(lbl) lbl.textContent=isSuperAdmin()?'PULSES ACTIVOS':'MIS PULSES';
 
   renderGoodNews();
   renderPulseList();
