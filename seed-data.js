@@ -4,6 +4,11 @@
    Después de cargar los datos se puede eliminar este archivo.
    ───────────────────────────────────────────────────────── */
 (function () {
+  // ⛔ SEED DESACTIVADO — los datos ya viven en Firebase y son la fuente de
+  // verdad. Re-sembrar en un equipo nuevo re-introducía tareas viejas/borradas.
+  // Si algún día necesitas re-sembrar datos iniciales, quita este return.
+  return;
+
   const SEED_KEY = 'fcn_seeded_sheet1';
   if (localStorage.getItem(SEED_KEY)) return; // ya corrió
 

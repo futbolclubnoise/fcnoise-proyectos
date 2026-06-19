@@ -1653,24 +1653,8 @@ async function mergeLocalToFb(localArr, fbDocs, saveFn){
   }
 }
 
-/* Elimina tareas duplicadas en Firebase (mismo proyecto + nombre).
-   Corre una sola vez por sesión. Conserva la más antigua. */
-let _dedupeRan=false;
-async function dedupeTasks(docs){
-  if(_dedupeRan) return;
-  _dedupeRan=true;
-  const seen=new Map(); // key: projectId|name → doc conservado
-  const toDelete=[];
-  for(const t of [...docs].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0))){
-    const key=(t.projectId||'')+'|'+(t.name||'').trim().toLowerCase();
-    if(seen.has(key)) toDelete.push(t.id);
-    else seen.set(key, t);
-  }
-  if(toDelete.length){
-    console.log(`[FCN] Eliminando ${toDelete.length} tareas duplicadas…`);
-    for(const id of toDelete) await fbDeleteTask(id);
-  }
-}
+/* (Eliminada la limpieza automática de duplicados: borraba tareas reales.
+   La prevención de duplicados ahora es solo por IDs deterministas en el seed.) */
 
 async function goLive(){
   if(_fbOn) return;
@@ -1698,12 +1682,11 @@ async function goLive(){
     onDataChange(); setSyncDot(true);
   });
 
-  // ── Tasks: merge + dedup ──
+  // ── Tasks: merge ──
   let tSynced=false;
   listenTasks(async docs=>{
     if(!tSynced){ tSynced=true;
       await mergeLocalToFb(_tasks, docs, fbSaveTask);
-      if(isAdmin()) await dedupeTasks(docs); // solo admins limpian duplicados
     }
     _tasks=docs; localStorage.setItem(LS.task,JSON.stringify(docs));
     onDataChange(); setSyncDot(true);
