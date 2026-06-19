@@ -752,7 +752,71 @@ body.light .qa-btn{background:#fff!important;border:1px solid rgba(0,0,0,.09)!im
 .tl-m-event{font-size:8.5px;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:3px;line-height:1.3;}
 .tl-m-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
 
-/* ── PULSE WEEK ── */
+/* ── PULSE WEEK — DASHBOARD POR ÁREA ── */
+.pw-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;margin-bottom:16px;scrollbar-width:none;}
+.pw-tabs::-webkit-scrollbar{display:none;}
+.pw-tab{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:11px;border:1px solid var(--glass-bd);background:rgba(20,24,31,0.5);cursor:pointer;transition:all .18s;font-size:12px;font-weight:600;color:var(--tx3);}
+.pw-tab:hover{border-color:var(--bd3);color:var(--tx2);}
+.pw-tab.on{color:#fff;}
+.pw-tab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+body.light .pw-tab{background:#fff!important;border-color:rgba(0,0,0,.09)!important;}
+/* Anclado arriba: metas */
+.pw-goals-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+@media(max-width:680px){.pw-goals-row{grid-template-columns:1fr;}}
+.pw-goal-card{background:linear-gradient(160deg,rgba(28,32,40,0.72),rgba(20,24,31,0.6));border:1px solid var(--glass-bd);border-radius:14px;padding:14px;box-shadow:var(--card-shadow);}
+.pw-goal-card.q{border-left:3px solid var(--orange);}
+.pw-goal-card.year{border-left:3px solid var(--blu);}
+body.light .pw-goal-card{background:#fff!important;border:1px solid rgba(0,0,0,.09)!important;}
+.pw-goal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.pw-goal-ttl{font-family:var(--font-display);font-size:12px;letter-spacing:.08em;color:var(--tx2);}
+.pw-goal-list{display:flex;flex-direction:column;gap:5px;}
+.pw-goal-item{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--tx2);line-height:1.4;}
+.pw-goal-item .gi-mark{flex-shrink:0;font-weight:700;}
+.pw-goal-empty{font-size:11px;color:var(--tx3);font-style:italic;}
+/* Layout 2 columnas: good news (izq) + proyectos (der) */
+.pw-cols{display:grid;grid-template-columns:1fr 1.3fr;gap:14px;margin-bottom:16px;}
+@media(max-width:780px){.pw-cols{grid-template-columns:1fr;}}
+.pw-col-card{background:linear-gradient(170deg,rgba(28,32,40,0.6),rgba(20,24,31,0.5));border:1px solid var(--glass-bd);border-radius:16px;padding:14px;box-shadow:var(--card-shadow);}
+body.light .pw-col-card{background:#fff!important;border:1px solid rgba(0,0,0,.09)!important;}
+.pw-col-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.pw-col-ttl{font-family:var(--font-display);font-size:12px;letter-spacing:.1em;color:var(--tx2);}
+/* Proyectos por prioridad (3 mini columnas) */
+.pw-prio-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+@media(max-width:560px){.pw-prio-cols{grid-template-columns:1fr;}}
+.pw-prio-col{background:rgba(255,255,255,.02);border:1px dashed var(--bd2);border-radius:11px;padding:8px;min-height:80px;transition:all .15s;}
+.pw-prio-col.drop{border-color:var(--orange);background:var(--ac2);}
+body.light .pw-prio-col{background:rgba(0,0,0,.02);}
+.pw-prio-hdr{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;padding:0 2px;}
+.pw-proj-card{background:var(--bg2);border:1px solid var(--bd2);border-radius:9px;padding:9px 10px;margin-bottom:6px;cursor:grab;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.18);}
+body.light .pw-proj-card{background:#fff!important;border-color:rgba(0,0,0,.1)!important;}
+.pw-proj-card:hover{border-color:rgba(255,122,0,.3);transform:translateY(-1px);}
+.pw-proj-card:active{cursor:grabbing;}
+.pw-proj-card.dragging{opacity:.4;}
+.pw-proj-name{font-size:11.5px;font-weight:600;line-height:1.25;margin-bottom:5px;}
+.pw-proj-foot{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--tx3);}
+.pw-proj-bar{height:3px;background:var(--bg5);border-radius:3px;overflow:hidden;margin-top:6px;}
+.pw-proj-fill{height:100%;border-radius:3px;}
+/* IDS — temas / comentarios */
+.pw-ids-item{background:rgba(20,24,31,0.5);border:1px solid var(--glass-bd);border-radius:12px;margin-bottom:8px;overflow:hidden;}
+body.light .pw-ids-item{background:#fff!important;border:1px solid rgba(0,0,0,.09)!important;}
+.pw-ids-hdr{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;user-select:none;}
+.pw-ids-hdr:hover{background:rgba(255,255,255,.03);}
+body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
+.pw-ids-chk{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--bd3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pw-ids-chk.done{background:var(--grn);border-color:var(--grn);}
+.pw-ids-chk svg{width:10px;height:10px;stroke:#fff;}
+.pw-ids-title{flex:1;font-size:13px;font-weight:600;}
+.pw-ids-title.done{text-decoration:line-through;color:var(--tx3);}
+.pw-ids-cnt{font-size:10px;color:var(--tx3);background:var(--bg4);padding:1px 7px;border-radius:10px;}
+.pw-ids-body{padding:0 13px 12px 41px;}
+.pw-cmt{display:flex;gap:8px;padding:6px 0;border-top:1px solid var(--bd);}
+.pw-cmt-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;}
+.pw-cmt-body{flex:1;}
+.pw-cmt-meta{font-size:9px;color:var(--tx3);margin-bottom:1px;}
+.pw-cmt-text{font-size:12px;color:var(--tx2);line-height:1.4;}
+.pw-cmt-input{display:flex;gap:6px;margin-top:8px;}
+.pw-cmt-input input{flex:1;padding:7px 11px;background:var(--inp);border:1px solid var(--bd2);border-radius:9px;color:var(--tx);font-size:12px;font-family:var(--font-body);outline:none;}
+.pw-cmt-input input:focus{border-color:var(--orange);}
 .pw-section{margin-bottom:20px;}
 .pw-sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd2);}
 .pw-sec-ttl{font-family:var(--font-display);font-size:11px;letter-spacing:.14em;color:var(--tx3);}
@@ -881,30 +945,11 @@ body.light .qa-btn{background:#fff!important;border:1px solid rgba(0,0,0,.09)!im
       <div class="page-hdr">
         <div class="back-btn" onclick="navigate('tasks')">← Inicio</div>
         <div class="page-title" style="font-size:18px;">PULSE WEEK</div>
-        <div class="ml-auto flex gap-6">
-          <div id="pw-create-btn"></div>
-        </div>
       </div>
-
-      <!-- Good News -->
-      <div class="pw-section">
-        <div class="pw-sec-hdr">
-          <span class="pw-sec-ttl">GOOD NEWS</span>
-          <div id="pw-gn-btn"></div>
-        </div>
-        <div id="pw-gn-list"></div>
-      </div>
-
-      <div class="pw-divider"></div>
-
-      <!-- Stats (admins only) -->
-      <div class="home-stats" id="ops-stats" style="margin-bottom:16px;display:none;"></div>
-
-      <!-- Pulses list -->
-      <div class="pw-sec-hdr" style="margin-bottom:12px;">
-        <span class="pw-sec-ttl" id="pw-pulses-label">PULSES</span>
-      </div>
-      <div id="pw-pulses-list"></div>
+      <!-- Tabs de áreas -->
+      <div id="pw-area-tabs" class="pw-tabs"></div>
+      <!-- Dashboard del área seleccionada -->
+      <div id="pw-area-dash"></div>
     </div>
 
     <!-- ── REVISIÓN CEO ── -->
@@ -1540,13 +1585,8 @@ const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'f
 
 function canSeePulse(){
   if(isSuperAdmin()) return true; // Leo siempre
-  // Verónica y colaboradores: ven Pulse si tienen uno asignado o creado
-  return _pulses.some(p=>p.assignedTo===currentUser.id||p.createdBy===currentUser.id);
-}
-function getMyPulses(){
-  if(isSuperAdmin()) return _pulses; // Leo ve todos
-  // Verónica y colaboradores: solo los pulses asignados a ellos o creados por ellos
-  return _pulses.filter(p=>p.assignedTo===currentUser.id||p.createdBy===currentUser.id);
+  // Los demás ven Pulse si tienen al menos un área con proyectos asignados
+  return (isSuperAdmin()?_projects:visibleProjects()).length>0;
 }
 
 /* ═══════════════════════════════════════
@@ -1730,7 +1770,7 @@ async function goLive(){
     }
     _pulses=docs; localStorage.setItem(LS.pulses,JSON.stringify(docs));
     renderNav();
-    if(currentView==='gestion') renderPulseList();
+    if(currentView==='gestion') renderPulseWeek();
   });
 
   // ── Perfiles: nombre + foto compartidos ──
@@ -3910,243 +3950,239 @@ async function deleteMilestone(id){
 }
 
 /* ═══════════════════════════════════════
-   FEATURE 3 — PULSE WEEK
+   PULSE WEEK — DASHBOARD POR ÁREA
 ═══════════════════════════════════════ */
-/* ═══════════════════════════════════════
-   PULSE WEEK — RENDER PRINCIPAL
-═══════════════════════════════════════ */
-function renderPulseWeek(){
-  // Botón crear: super admin y administradores (Vero también puede crear/asignar)
-  const createBtn=document.getElementById('pw-create-btn');
-  if(createBtn) createBtn.innerHTML=isAdmin()
-    ?`<button class="btn btn-p btn-sm" onclick="openNewPulse()">+ Crear Pulse</button>`:'';
+let _pulseArea=null;
 
-  // Stats según el alcance de cada quien: Leo ve global, los demás solo lo suyo
-  const statsEl=document.getElementById('ops-stats');
-  if(statsEl){
-    statsEl.style.display='';
-    const scope=myTasks(); // Leo: todas · Vero/colaboradores: asignadas
-    const today=todayStr();
-    const atrasadas=scope.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today).length;
-    const enProc=scope.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='en-proceso').length;
-    const revision=scope.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='revision').length;
-    const doneTot=scope.filter(t=>t.status==='done').length;
-    statsEl.innerHTML=`
-      <div class="hstat"><div class="hstat-num" style="color:var(--red);">${atrasadas}</div><div class="hstat-lbl">Atrasadas</div></div>
-      <div class="hstat"><div class="hstat-num" style="color:var(--blu);">${enProc}</div><div class="hstat-lbl">En proceso</div></div>
-      <div class="hstat"><div class="hstat-num" style="color:var(--yel);">${revision}</div><div class="hstat-lbl">En revisión</div></div>
-      <div class="hstat"><div class="hstat-num" style="color:var(--grn);">${doneTot}</div><div class="hstat-lbl">Completadas</div></div>`;
-  }
-
-  // Label dinámico
-  const lbl=document.getElementById('pw-pulses-label');
-  if(lbl) lbl.textContent=isSuperAdmin()?'PULSES ACTIVOS':'MIS PULSES';
-
-  renderGoodNews();
-  renderPulseList();
+// Áreas visibles: Leo todas (con proyectos); los demás las de sus proyectos
+function myPulseAreas(){
+  const withProj=new Set((isSuperAdmin()?_projects:visibleProjects()).map(p=>p.area||'general'));
+  return Object.keys(AREAS).filter(a=>withProj.has(a));
 }
+// Obtiene (o crea plantilla) el pulse de un área
+function getAreaPulse(area){
+  let p=_pulses.find(x=>x.area===area && x.type==='area');
+  if(!p){
+    p={ id:'apulse-'+area, type:'area', area,
+        quarterGoals:[], yearGoals:[], goodnews:[], ids:[],
+        createdAt:Date.now(), createdBy:currentUser?.id };
+  }
+  return p;
+}
+async function saveAreaPulse(p){ p.type='area'; await persistPulse(p); }
 
-function renderPulseList(){
-  const el=document.getElementById('pw-pulses-list'); if(!el) return;
-  const pulses=getMyPulses();
-  if(!pulses.length){
-    el.innerHTML=`<div class="pw-empty" style="padding:32px 0;">
-      ${isAdmin()?'Todavía no has creado ningún pulse.<br><br><button class="btn btn-p btn-sm" onclick="openNewPulse()">Crear el primer Pulse</button>':'Sin pulses asignados aún.'}
-    </div>`;
+function renderPulseWeek(){
+  const areas=myPulseAreas();
+  if(!areas.length){
+    document.getElementById('pw-area-tabs').innerHTML='';
+    document.getElementById('pw-area-dash').innerHTML='<div class="pw-empty" style="padding:40px 0;">Sin áreas con proyectos todavía.</div>';
     return;
   }
-  // Sort newest first
-  const sorted=[...pulses].sort((a,b)=>b.createdAt-a.createdAt);
-  el.innerHTML=sorted.map(pulse=>{
-    const assignee=USERS[pulse.assignedTo];
-    const creator=USERS[pulse.createdBy];
-    const rm=assignee?ROLES[assignee.role]:null;
-    const projList=(pulse.projectIds||[]).map(pid=>{
-      const p=_projects.find(x=>x.id===pid);
-      return p?`<span class="pulse-card-proj">${p.icon||'📁'} ${esc(p.name)}</span>`:'';
-    }).filter(Boolean).join('');
-    const totalTasks=(pulse.projectIds||[]).reduce((n,pid)=>n+_tasks.filter(t=>t.projectId===pid&&t.status!=='done').length,0);
-    return `<div class="pulse-card" onclick="openPulseDetail('${pulse.id}')">
-      <div class="pulse-card-hdr">
-        <div class="pulse-card-dot" style="background:var(--orange);box-shadow:0 0 0 3px var(--ac2);"></div>
-        <div class="pulse-card-name">${esc(pulse.name)}</div>
-        ${isAdmin()?`<div class="pulse-admin-actions">
-          <button class="btn-icon" onclick="event.stopPropagation();openEditPulse('${pulse.id}')" title="Editar"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-          <button class="btn-icon btn-del" onclick="event.stopPropagation();deletePulse('${pulse.id}')">✕</button>
-        </div>`:''}
-      </div>
-      ${assignee?`<div class="pulse-card-assignee">
-        <div class="udot" style="width:16px;height:16px;font-size:6px;background:${rm.bg};color:${rm.color};">${initials(assignee.name).charAt(0)}</div>
-        Para <strong>${assignee.name}</strong>
-        ${creator&&creator.id!==assignee.id?`· de ${creator.name}`:''}
-      </div>`:''}
-      ${pulse.desc?`<div class="pulse-card-desc">${esc(pulse.desc)}</div>`:''}
-      <div class="pulse-card-projs">${projList||'<span class="pulse-card-proj">Sin proyectos</span>'}</div>
-      <div class="pulse-card-foot">
-        <span style="font-size:10px;color:var(--tx3);">${(pulse.projectIds||[]).length} proyecto${(pulse.projectIds||[]).length!==1?'s':''} · ${totalTasks} tareas pendientes</span>
-        <span style="font-size:10px;color:var(--orange);font-weight:600;">Ver pulse →</span>
-      </div>
+  if(!_pulseArea || !areas.includes(_pulseArea)) _pulseArea=areas[0];
+  // Tabs
+  document.getElementById('pw-area-tabs').innerHTML=areas.map(a=>{
+    const am=AREAS[a]||AREAS.general;
+    return `<div class="pw-tab ${a===_pulseArea?'on':''}" style="${a===_pulseArea?`background:${am.color};border-color:transparent;`:''}" onclick="selectPulseArea('${a}')">
+      <span class="pw-tab-dot" style="background:${a===_pulseArea?'#fff':am.color};"></span>${am.label}
     </div>`;
   }).join('');
+  renderAreaDash(_pulseArea);
 }
 
-/* ── Open pulse detail ── */
-function openPulseDetail(id){
-  const pulse=_pulses.find(p=>p.id===id); if(!pulse) return;
-  const assignee=USERS[pulse.assignedTo];
-  const creator=USERS[pulse.createdBy];
-  document.getElementById('mpd-name').textContent=pulse.name;
-  const rm=assignee?ROLES[assignee.role]:null;
-  document.getElementById('mpd-meta').innerHTML=`
-    ${assignee?`<div class="udot" style="width:16px;height:16px;font-size:6px;background:${rm.bg};color:${rm.color};">${initials(assignee.name).charAt(0)}</div><span>Para <strong>${assignee.name}</strong></span>`:''}
-    ${creator?`<span style="color:var(--tx3);">· Creado por ${creator.name}</span>`:''}
-    <span style="color:var(--tx3);">· ${new Date(pulse.createdAt).toLocaleDateString('es')}</span>`;
-  const descEl=document.getElementById('mpd-desc');
-  if(pulse.desc){ descEl.textContent=pulse.desc; descEl.style.display='block'; }
-  else { descEl.style.display='none'; }
-  // Metas del Q (de los proyectos incluidos)
-  const goalsEl=document.getElementById('mpd-goals');
-  const projsWithGoals=(pulse.projectIds||[])
-    .map(pid=>_projects.find(x=>x.id===pid))
-    .filter(p=>p&&p.goals&&p.goals.length);
-  if(projsWithGoals.length){
-    goalsEl.style.display='block';
-    goalsEl.innerHTML=projsWithGoals.map(p=>{
-      const qLabel=p.quarter?`${p.quarter}${p.quarterYear?' '+p.quarterYear:''}`:'Metas';
-      return `<div style="background:var(--ac2);border:1px solid var(--ac3);border-radius:10px;padding:11px 13px;margin-bottom:6px;">
-        <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;">🎯 ${esc(p.name)} · ${qLabel}</div>
-        ${p.goals.map(g=>`<div style="display:flex;align-items:flex-start;gap:7px;padding:3px 0;font-size:12px;color:var(--tx2);"><span style="color:var(--orange);">›</span><span>${esc(g)}</span></div>`).join('')}
-      </div>`;
-    }).join('');
-  } else {
-    goalsEl.style.display='none';
-  }
-  // Projects
-  const projsEl=document.getElementById('mpd-projects');
-  projsEl.innerHTML=(pulse.projectIds||[]).map(pid=>{
-    const p=_projects.find(x=>x.id===pid); if(!p) return '';
-    const pt=_tasks.filter(t=>t.projectId===pid);
+function selectPulseArea(area){ _pulseArea=area; renderPulseWeek(); }
+
+function renderAreaDash(area){
+  const am=AREAS[area]||AREAS.general;
+  const pulse=getAreaPulse(area);
+  const admin=isAdmin();
+  const el=document.getElementById('pw-area-dash'); if(!el) return;
+
+  // Proyectos del área por prioridad
+  const areaProjs=(isSuperAdmin()?_projects:visibleProjects()).filter(p=>(p.area||'general')===area);
+  const prioCols=[
+    {k:'alta', lbl:'Alta',  color:'var(--red)'},
+    {k:'media',lbl:'Media', color:'var(--yel)'},
+    {k:'baja', lbl:'Baja',  color:'var(--grn)'},
+  ];
+  const projCardHTML=(p)=>{
+    const pt=_tasks.filter(t=>t.projectId===p.id);
     const dn=pt.filter(t=>t.status==='done').length;
     const pct=pt.length?Math.round(dn/pt.length*100):0;
-    const am=AREAS[p.area]||AREAS.general;
-    const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
-    const fill=fillMap[am.cls]||'var(--tx3)';
-    return `<div class="ppr-row" onclick="closeMod('m-pulse-detail');navigate('proj-detail','${p.id}')">
-      <div class="ppr-icon">${p.icon||'📁'}</div>
-      <div class="ppr-info"><div class="ppr-name">${esc(p.name)}</div>
-        <div class="ppr-bar"><div class="ppr-fill" style="width:${pct}%;background:${fill};"></div></div>
-      </div>
-      <div class="ppr-pct" style="color:${fill};">${pct}%</div>
+    const drag=admin?`draggable="true" ondragstart="pwProjDragStart(event,'${p.id}')" ondragend="pwProjDragEnd(event)"`:'';
+    return `<div class="pw-proj-card" id="pwproj-${p.id}" ${drag} onclick="navigate('proj-detail','${p.id}')">
+      <div class="pw-proj-name">${p.icon||'📁'} ${esc(p.name)}</div>
+      <div class="pw-proj-foot"><span>${pt.length} tareas</span><span style="margin-left:auto;">${pct}%</span></div>
+      <div class="pw-proj-bar"><div class="pw-proj-fill" style="width:${pct}%;background:${am.color};"></div></div>
     </div>`;
-  }).join('')||'<div style="font-size:11px;color:var(--tx3);padding:6px 0;">Sin proyectos asignados.</div>';
-  // Tasks de los proyectos del pulse
-  const tasksEl=document.getElementById('mpd-tasks');
-  const allPulseTasks=_tasks.filter(t=>(pulse.projectIds||[]).includes(t.projectId)&&t.status!=='done')
-    .sort((a,b)=>{const po={alta:0,media:1,baja:2};return (po[a.priority??'media']??1)-(po[b.priority??'media']??1);});
-  tasksEl.innerHTML=allPulseTasks.length
-    ?`<div style="font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--tx3);margin-bottom:8px;text-transform:uppercase;">Tareas pendientes (${allPulseTasks.length})</div>`
-    +allPulseTasks.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;">${taskRowHTML(t)}</div>`).join('')
-    :`<div class="pw-empty">Sin tareas pendientes en estos proyectos</div>`;
-  // Admin actions
-  document.getElementById('mpd-admin-btns').innerHTML=isAdmin()
-    ?`<button class="btn btn-g btn-sm" onclick="closeMod('m-pulse-detail');openEditPulse('${id}')">Editar Pulse</button>`:'';
-  openMod('m-pulse-detail');
-}
-
-/* ── Crear / Editar Pulse ── */
-function openNewPulse(){
-  document.getElementById('mpulse-id').value='';
-  document.getElementById('mpulse-name').value='';
-  document.getElementById('mpulse-assignto').value='';
-  document.getElementById('mpulse-desc').value='';
-  document.getElementById('mpulse-ttl').textContent='Crear Pulse';
-  _populatePulseProjects([]);
-  openMod('m-pulse');
-}
-function openEditPulse(id){
-  const pulse=_pulses.find(p=>p.id===id); if(!pulse) return;
-  document.getElementById('mpulse-id').value=pulse.id;
-  document.getElementById('mpulse-name').value=pulse.name;
-  document.getElementById('mpulse-assignto').value=pulse.assignedTo||'';
-  document.getElementById('mpulse-desc').value=pulse.desc||'';
-  document.getElementById('mpulse-ttl').textContent='Editar Pulse';
-  _populatePulseProjects(pulse.projectIds||[]);
-  openMod('m-pulse');
-}
-function _populatePulseProjects(selected){
-  const cont=document.getElementById('mpulse-projects'); if(!cont) return;
-  cont.innerHTML=_projects.map(p=>`
-    <div class="a-chip ${selected.includes(p.id)?'sel':''}" onclick="toggleChip(this)" data-value="${p.id}">
-      <span class="a-chip-dot"></span>${p.icon||'📁'} ${esc(p.name)}
-    </div>`).join('');
-}
-async function savePulse(){
-  const name=document.getElementById('mpulse-name').value.trim();
-  if(!name) return alert('Nombre requerido.');
-  const id=document.getElementById('mpulse-id').value||uid();
-  const assignedTo=document.getElementById('mpulse-assignto').value;
-  const desc=document.getElementById('mpulse-desc').value.trim();
-  const projectIds=[...document.querySelectorAll('#mpulse-projects .a-chip.sel')].map(c=>c.dataset.value);
-  const existing=_pulses.find(p=>p.id===id);
-  const pulse={
-    id, name, assignedTo, desc, projectIds,
-    createdBy: existing?.createdBy||currentUser.id,
-    createdAt: existing?.createdAt||Date.now(),
   };
-  await persistPulse(pulse);
-  closeMod('m-pulse');
-  renderPulseWeek();
-  renderNav();
-}
-async function deletePulse(id){
-  if(!confirm('¿Eliminar este pulse?')) return;
-  await removePulse(id);
-  renderPulseWeek();
-  renderNav();
+  const prioColsHTML=prioCols.map(c=>{
+    const items=areaProjs.filter(p=>(p.priority||'media')===c.k);
+    const drop=admin?`ondragover="pwProjDragOver(event)" ondragleave="pwProjDragLeave(event)" ondrop="pwProjDrop(event,'${area}','${c.k}')"`:'';
+    return `<div class="pw-prio-col" ${drop}>
+      <div class="pw-prio-hdr"><span class="dot dot-${c.k}"></span>${c.lbl} · ${items.length}</div>
+      ${items.map(projCardHTML).join('')||'<div style="font-size:9px;color:var(--tx3);text-align:center;padding:8px 0;">—</div>'}
+    </div>`;
+  }).join('');
+
+  // Metas
+  const goalsHTML=(arr,kind)=>arr.length
+    ? arr.map(g=>`<div class="pw-goal-item"><span class="gi-mark" style="color:${kind==='q'?'var(--orange)':'var(--blu)'};">›</span><span>${esc(g)}</span></div>`).join('')
+    : `<div class="pw-goal-empty">Sin metas definidas${admin?' — toca editar':''}</div>`;
+
+  // Good news
+  const gnHTML=(pulse.goodnews||[]).length
+    ? [...pulse.goodnews].reverse().map(g=>`<div class="gn-item">
+        <div class="gn-bullet"></div>
+        <div class="gn-text">${esc(g.text)}</div>
+        <div class="gn-date">${g.date||''}</div>
+        ${admin?`<button class="btn-icon btn-del" style="flex-shrink:0;" onclick="delAreaGoodNews('${area}','${g.id}')">✕</button>`:''}
+      </div>`).join('')
+    : '<div style="font-size:11px;color:var(--tx3);padding:8px 0;">Sin buenas noticias aún.</div>';
+
+  // IDS
+  const idsHTML=(pulse.ids||[]).length
+    ? pulse.ids.map(it=>{
+        const cmts=(it.comments||[]).map(c=>{
+          const u=USERS[c.by]; const rm=u?ROLES[u.role]:null;
+          return `<div class="pw-cmt">
+            <div class="pw-cmt-av" style="background:${rm?rm.bg:'var(--bg4)'};color:${rm?rm.color:'var(--tx3)'};">${u?initials(u.name).charAt(0):'?'}</div>
+            <div class="pw-cmt-body"><div class="pw-cmt-meta">${u?u.name:'—'} · ${c.date||''}</div><div class="pw-cmt-text">${esc(c.text)}</div></div>
+          </div>`;
+        }).join('');
+        return `<div class="pw-ids-item">
+          <div class="pw-ids-hdr" onclick="toggleIdsOpen(this)">
+            <div class="pw-ids-chk ${it.done?'done':''}" onclick="event.stopPropagation();toggleIdsItem('${area}','${it.id}')">
+              ${it.done?'<svg viewBox=\"0 0 12 10\" fill=\"none\" stroke-width=\"2.5\"><polyline points=\"1,5 4.5,8.5 11,1\"/></svg>':''}
+            </div>
+            <span class="pw-ids-title ${it.done?'done':''}">${esc(it.title)}</span>
+            <span class="pw-ids-cnt">${(it.comments||[]).length} 💬</span>
+            ${admin?`<button class="btn-icon btn-del" style="flex-shrink:0;" onclick="event.stopPropagation();delIdsItem('${area}','${it.id}')">✕</button>`:''}
+          </div>
+          <div class="pw-ids-body" style="display:none;">
+            ${cmts||'<div style="font-size:11px;color:var(--tx3);padding:6px 0;">Sin comentarios.</div>'}
+            <div class="pw-cmt-input">
+              <input type="text" placeholder="Escribe un comentario…" onkeydown="if(event.key==='Enter'){addIdsComment('${area}','${it.id}',this.value);this.value='';}">
+            </div>
+          </div>
+        </div>`;
+      }).join('')
+    : '<div class="pw-empty" style="padding:20px 0;">Sin temas. Agrega el primero para discutir.</div>';
+
+  el.innerHTML=`
+    <!-- Metas ancladas arriba -->
+    <div class="pw-goals-row">
+      <div class="pw-goal-card q">
+        <div class="pw-goal-hdr"><span class="pw-goal-ttl">🎯 METAS DEL Q</span>${admin?`<button class="btn-icon" onclick="editAreaGoals('${area}','q')" title="Editar"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}</div>
+        <div class="pw-goal-list">${goalsHTML(pulse.quarterGoals||[],'q')}</div>
+      </div>
+      <div class="pw-goal-card year">
+        <div class="pw-goal-hdr"><span class="pw-goal-ttl">📅 METAS DEL AÑO</span>${admin?`<button class="btn-icon" onclick="editAreaGoals('${area}','year')" title="Editar"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}</div>
+        <div class="pw-goal-list">${goalsHTML(pulse.yearGoals||[],'year')}</div>
+      </div>
+    </div>
+
+    <!-- 2 columnas: Good News (izq) + Proyectos (der) -->
+    <div class="pw-cols">
+      <div class="pw-col-card">
+        <div class="pw-col-hdr"><span class="pw-col-ttl">GOOD NEWS</span><button class="btn btn-p btn-xs" onclick="addAreaGoodNews('${area}')">+ Agregar</button></div>
+        <div>${gnHTML}</div>
+      </div>
+      <div class="pw-col-card">
+        <div class="pw-col-hdr"><span class="pw-col-ttl">PROYECTOS · por prioridad</span>${admin?'<span style="font-size:9px;color:var(--tx3);">Arrastra entre columnas →</span>':''}</div>
+        <div class="pw-prio-cols">${prioColsHTML}</div>
+      </div>
+    </div>
+
+    <!-- IDS abajo -->
+    <div class="pw-col-card">
+      <div class="pw-col-hdr"><span class="pw-col-ttl">IDS · Temas a resolver</span><button class="btn btn-p btn-xs" onclick="addIdsItem('${area}')">+ Tema</button></div>
+      <div>${idsHTML}</div>
+    </div>`;
 }
 
-function renderGoodNews(){
-  const btnWrap=document.getElementById('pw-gn-btn');
-  if(btnWrap) btnWrap.innerHTML=isAdmin()
-    ?`<button class="btn btn-p btn-sm" onclick="openMod('m-goodnews')">+ Agregar</button>`:'';
-  const el=document.getElementById('pw-gn-list'); if(!el) return;
-  if(!_goodnews.length){
-    el.innerHTML='<div style="font-size:11px;color:var(--tx3);padding:8px 0;">Sin noticias esta semana.</div>';
-    return;
-  }
-  const sorted=[..._goodnews].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  el.innerHTML=sorted.slice(0,10).map(gn=>`
-    <div class="gn-item">
-      <div class="gn-bullet"></div>
-      <div class="gn-text">${esc(gn.text)}</div>
-      <div class="gn-date">${gn.date||''}</div>
-      ${isAdmin()?`<button class="btn-icon btn-del" style="flex-shrink:0;" onclick="deleteGoodNews('${gn.id}')">✕</button>`:''}
-    </div>`).join('');
+/* ── Metas ── */
+async function editAreaGoals(area, kind){
+  const pulse=getAreaPulse(area);
+  const cur=(kind==='q'?pulse.quarterGoals:pulse.yearGoals)||[];
+  const label=kind==='q'?'Metas del Q':'Metas del Año';
+  const txt=prompt(`${label} (una por línea):`, cur.join('\n'));
+  if(txt===null) return;
+  const arr=txt.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(kind==='q') pulse.quarterGoals=arr; else pulse.yearGoals=arr;
+  await saveAreaPulse(pulse);
+  renderAreaDash(area);
+}
+
+/* ── Good News ── */
+async function addAreaGoodNews(area){
+  const txt=prompt('Buena noticia:'); if(!txt||!txt.trim()) return;
+  const pulse=getAreaPulse(area);
+  pulse.goodnews=[...(pulse.goodnews||[]),{id:uid(),text:txt.trim(),date:todayStr()}];
+  await saveAreaPulse(pulse);
+  renderAreaDash(area);
+}
+async function delAreaGoodNews(area,id){
+  const pulse=getAreaPulse(area);
+  pulse.goodnews=(pulse.goodnews||[]).filter(g=>g.id!==id);
+  await saveAreaPulse(pulse);
+  renderAreaDash(area);
+}
+
+/* ── Proyectos: arrastrar por prioridad ── */
+function pwProjDragStart(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; const c=document.getElementById('pwproj-'+id); if(c) setTimeout(()=>c.classList.add('dragging'),0); }
+function pwProjDragEnd(){ if(dragId){const c=document.getElementById('pwproj-'+dragId);if(c)c.classList.remove('dragging');} document.querySelectorAll('.pw-prio-col.drop').forEach(el=>el.classList.remove('drop')); }
+function pwProjDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('drop'); }
+function pwProjDragLeave(e){ e.currentTarget.classList.remove('drop'); }
+async function pwProjDrop(e,area,prio){
+  e.preventDefault(); e.currentTarget.classList.remove('drop');
+  const p=_projects.find(x=>x.id===dragId); dragId=null;
+  if(!p||(p.priority||'media')===prio) { renderAreaDash(area); return; }
+  p.priority=prio;
+  await persistProject(p);
+  renderAreaDash(area);
+}
+
+/* ── IDS — temas y comentarios ── */
+function toggleIdsOpen(hdr){ const b=hdr.nextElementSibling; if(b) b.style.display=b.style.display==='none'?'block':'none'; }
+async function addIdsItem(area){
+  const txt=prompt('Tema a discutir / resolver:'); if(!txt||!txt.trim()) return;
+  const pulse=getAreaPulse(area);
+  pulse.ids=[...(pulse.ids||[]),{id:uid(),title:txt.trim(),done:false,comments:[]}];
+  await saveAreaPulse(pulse);
+  renderAreaDash(area);
+}
+async function toggleIdsItem(area,id){
+  const pulse=getAreaPulse(area);
+  const it=(pulse.ids||[]).find(x=>x.id===id); if(!it) return;
+  it.done=!it.done;
+  await saveAreaPulse(pulse);
+  renderAreaDash(area);
+}
+async function delIdsItem(area,id){
+  if(!confirm('¿Eliminar este tema?')) return;
+  const pulse=getAreaPulse(area);
+  pulse.ids=(pulse.ids||[]).filter(x=>x.id!==id);
+  await saveAreaPulse(pulse);
+  renderAreaDash(area);
+}
+async function addIdsComment(area,id,text){
+  if(!text||!text.trim()) return;
+  const pulse=getAreaPulse(area);
+  const it=(pulse.ids||[]).find(x=>x.id===id); if(!it) return;
+  it.comments=[...(it.comments||[]),{id:uid(),text:text.trim(),by:currentUser.id,date:todayStr()}];
+  await saveAreaPulse(pulse);
+  renderAreaDash(area);
 }
 function renderWeekAnalysis(){ /* no-op */ }
-
-async function saveGoodNews(){
-  const text=document.getElementById('gn-text').value.trim();
-  if(!text) return alert('Escribe una noticia.');
-  const gn={id:uid(), text, date:todayStr()};
-  await persistGoodnews(gn);
-  document.getElementById('gn-text').value='';
-  closeMod('m-goodnews');
-  renderGoodNews();
-}
-
-async function deleteGoodNews(id){
-  if(!confirm('¿Eliminar esta noticia?')) return;
-  await removeGoodnews(id);
-  renderGoodNews();
-}
 
 /* ═══════════════════════════════════════
    WINDOW EXPORTS
 ═══════════════════════════════════════ */
 Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
-  openNewPulse, openEditPulse, savePulse, deletePulse, openPulseDetail,
+  selectPulseArea, editAreaGoals, addAreaGoodNews, delAreaGoodNews,
+  pwProjDragStart, pwProjDragEnd, pwProjDragOver, pwProjDragLeave, pwProjDrop,
+  toggleIdsOpen, addIdsItem, toggleIdsItem, delIdsItem, addIdsComment,
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
@@ -4167,7 +4203,7 @@ Object.assign(window,{
   // Feature 2
   renderTimeline, openMonthModal, toggleMilestoneForm, saveMilestone, deleteMilestone,
   // Feature 3
-  renderPulseWeek, renderPulseList, renderGoodNews, renderWeekAnalysis, saveGoodNews, deleteGoodNews,
+  renderPulseWeek, renderWeekAnalysis,
 });
 
 /* ═══════════════════════════════════════
