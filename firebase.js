@@ -28,6 +28,8 @@ const COL_MILESTONES = "fcn_milestones";
 const COL_GOODNEWS   = "fcn_goodnews";
 const COL_PULSES     = "fcn_pulses";
 const COL_PROFILES   = "fcn_profiles";
+const COL_USERS      = "fcn_users";
+const COL_AREAS      = "fcn_areas";
 
 let db = null;
 let _projUnsub       = null;
@@ -38,6 +40,8 @@ let _milestonesUnsub = null;
 let _goodnewsUnsub   = null;
 let _pulsesUnsub     = null;
 let _profilesUnsub   = null;
+let _usersUnsub      = null;
+let _areasUnsub      = null;
 
 /* ── INIT ── */
 export function firebaseInit() {
@@ -60,9 +64,11 @@ export function firebaseInit() {
 /* ── STOP ALL LISTENERS ── */
 export function fbStopListening() {
   [_projUnsub, _taskUnsub, _eventsUnsub, _presenceUnsub,
-   _milestonesUnsub, _goodnewsUnsub, _pulsesUnsub, _profilesUnsub].forEach(fn => fn && fn());
+   _milestonesUnsub, _goodnewsUnsub, _pulsesUnsub, _profilesUnsub,
+   _usersUnsub, _areasUnsub].forEach(fn => fn && fn());
   _projUnsub = _taskUnsub = _eventsUnsub = _presenceUnsub =
-  _milestonesUnsub = _goodnewsUnsub = _pulsesUnsub = _profilesUnsub = null;
+  _milestonesUnsub = _goodnewsUnsub = _pulsesUnsub = _profilesUnsub =
+  _usersUnsub = _areasUnsub = null;
   console.log("[FCN] Firebase listeners detenidos");
 }
 
@@ -148,6 +154,43 @@ export async function fbSaveProfile(userId, profile) {
   if (!db) return;
   try { await setDoc(doc(db, COL_PROFILES, userId), { userId, ...profile }, { merge: true }); }
   catch (e) { console.error("[FCN] saveProfile:", e); }
+}
+
+/* ── Usuarios (extras y overrides de contraseña/nombre/rol) ── */
+export function listenUsers(callback) {
+  if (!db) return;
+  if (_usersUnsub) _usersUnsub();
+  _usersUnsub = onSnapshot(collection(db, COL_USERS), snap => {
+    const data = {};
+    snap.docs.forEach(d => { data[d.id] = d.data(); });
+    callback(data);
+  });
+}
+export async function fbSaveUser(u) {
+  if (!db) return;
+  try { await setDoc(doc(db, COL_USERS, u.id), u, { merge: true }); }
+  catch (e) { console.error("[FCN] saveUser:", e); }
+}
+
+/* ── Áreas personalizadas ── */
+export function listenAreas(callback) {
+  if (!db) return;
+  if (_areasUnsub) _areasUnsub();
+  _areasUnsub = onSnapshot(collection(db, COL_AREAS), snap => {
+    const data = {};
+    snap.docs.forEach(d => { data[d.id] = d.data(); });
+    callback(data);
+  });
+}
+export async function fbSaveArea(a) {
+  if (!db) return;
+  try { await setDoc(doc(db, COL_AREAS, a.id), a, { merge: true }); }
+  catch (e) { console.error("[FCN] saveArea:", e); }
+}
+export async function fbDeleteArea(id) {
+  if (!db) return;
+  try { await deleteDoc(doc(db, COL_AREAS, id)); }
+  catch (e) { console.error("[FCN] deleteArea:", e); }
 }
 
 /* ─────────────────────────────────────────────

@@ -208,7 +208,10 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
   border-color:var(--orange);
   box-shadow:0 0 0 4px rgba(255,122,0,.12);
 }
-.fi select option{background:var(--bg3);}
+/* Opciones de TODOS los selects: fondo + texto explícitos (evita texto invisible) */
+select option{background:var(--bg3);color:var(--tx);}
+body.light select option{background:#ffffff;color:#1a1a1a;}
+body.light select{color:#1a1a1a;}
 .fi textarea{resize:vertical;min-height:64px;}
 .login-err{font-size:11px;color:var(--red);background:var(--red2);border:1px solid var(--red3);padding:8px 12px;border-radius:8px;margin-bottom:12px;display:none;}
 .login-err.show{display:block;}
@@ -1426,8 +1429,73 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="fi"><label>Confirmar contraseña</label><input type="password" id="smod-pass2" placeholder="Repetir"></div>
     <div id="smod-err" class="login-err"></div>
     <button class="btn btn-p w-full" onclick="saveSettingsModal()">Guardar cambios</button>
+
+    <!-- Administración (solo admins) -->
+    <div id="smod-admin" style="display:none;">
+      <div style="height:1px;background:var(--bd);margin:16px 0 12px;"></div>
+      <div class="tdp-slbl">Administración</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-g w-full" onclick="openMod('m-admin-pass')">🔑 Editar contraseñas</button>
+        <button class="btn btn-g w-full" onclick="openMod('m-admin-user')">👤 Agregar persona</button>
+        <button class="btn btn-g w-full" onclick="openMod('m-admin-area')">📂 Crear / gestionar áreas</button>
+      </div>
+    </div>
+
     <div style="height:1px;background:var(--bd);margin:16px 0 14px;"></div>
     <button class="btn btn-g w-full" onclick="closeMod('m-settings');logout()" style="color:var(--red);border-color:var(--red3);">Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL ADMIN — CONTRASEÑAS ═══ -->
+<div class="mov" id="m-admin-pass">
+  <div class="modal" style="max-width:400px;">
+    <div class="mhdr"><span class="mttl">Editar contraseñas</span><button class="mclose" onclick="closeMod('m-admin-pass')">✕</button></div>
+    <div id="adm-pass-list"></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL ADMIN — AGREGAR PERSONA ═══ -->
+<div class="mov" id="m-admin-user">
+  <div class="modal" style="max-width:400px;">
+    <div class="mhdr"><span class="mttl">Agregar persona</span><button class="mclose" onclick="closeMod('m-admin-user')">✕</button></div>
+    <div class="fi"><label>Nombre</label><input type="text" id="adm-u-name" placeholder="Ej. Camilo"></div>
+    <div class="fi"><label>Rol</label>
+      <select id="adm-u-role">
+        <option value="colaborador">Colaborador</option>
+        <option value="admin">Administrador</option>
+      </select>
+    </div>
+    <div class="fi"><label>Contraseña</label><input type="text" id="adm-u-pass" placeholder="123456"></div>
+    <div id="adm-u-err" class="login-err"></div>
+    <button class="btn btn-p w-full" onclick="adminAddUser()">Crear persona</button>
+    <div style="height:1px;background:var(--bd);margin:14px 0 10px;"></div>
+    <div class="tdp-slbl">Personas</div>
+    <div id="adm-user-list"></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL ADMIN — ÁREAS ═══ -->
+<div class="mov" id="m-admin-area">
+  <div class="modal" style="max-width:400px;">
+    <div class="mhdr"><span class="mttl">Áreas</span><button class="mclose" onclick="closeMod('m-admin-area')">✕</button></div>
+    <div class="form-row">
+      <div class="fi"><label>Nombre del área</label><input type="text" id="adm-a-name" placeholder="Ej. Comunidad"></div>
+      <div class="fi"><label>Emoji</label><input type="text" id="adm-a-icon" placeholder="📂" maxlength="2" style="width:70px;"></div>
+    </div>
+    <div class="fi"><label>Color</label>
+      <select id="adm-a-color">
+        <option value="var(--org)">Naranja</option>
+        <option value="var(--blu)">Azul</option>
+        <option value="var(--grn)">Verde</option>
+        <option value="var(--pur)">Morado</option>
+        <option value="var(--yel)">Amarillo</option>
+        <option value="var(--red)">Rojo</option>
+      </select>
+    </div>
+    <button class="btn btn-p w-full" onclick="adminAddArea()">Crear área</button>
+    <div style="height:1px;background:var(--bd);margin:14px 0 10px;"></div>
+    <div class="tdp-slbl">Áreas existentes</div>
+    <div id="adm-area-list"></div>
   </div>
 </div>
 
@@ -1513,11 +1581,13 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
 import { firebaseInit, isConnected,
          listenProjects, listenTasks, listenEvents, listenPresence,
          listenMilestones, listenGoodnews, listenPulses, listenProfiles,
+         listenUsers, listenAreas,
          fbSaveProject, fbDeleteProject, fbSaveTask, fbDeleteTask,
          fbSaveEvent, fbDeleteEvent, fbSetPresence,
          fbSaveMilestone, fbDeleteMilestone,
          fbSaveGoodnews, fbDeleteGoodnews,
          fbSavePulse, fbDeletePulse, fbSaveProfile,
+         fbSaveUser, fbSaveArea, fbDeleteArea,
          fbStopListening } from './firebase.js';
 
 /* ═══════════════════════════════════════
@@ -1633,8 +1703,10 @@ let _openMilestoneMonth = null; // currently open month key in milestone modal
 let _pulses          = []; // pulses creados manualmente por admins
 let _pulseAreaAccess = {}; // (legacy, sistema viejo de áreas — mantenido para compat)
 let _profiles        = {}; // {userId: {name, photo}} — perfiles compartidos en Firebase
+let _customUsers     = {}; // usuarios extra / overrides sincronizados
+let _customAreas     = {}; // áreas personalizadas sincronizadas
 
-const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulses:'fcn_pulses', pulseAreaAccess:'fcn_pulse_area_access' };
+const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulses:'fcn_pulses', pulseAreaAccess:'fcn_pulse_area_access', cusers:'fcn_custom_users', careas:'fcn_custom_areas' };
 
 function canSeePulse(){
   if(isSuperAdmin()) return true; // Leo siempre
@@ -1732,6 +1804,9 @@ async function initData(){
   _milestones  =JSON.parse(localStorage.getItem(LS.milestones)||'[]');
   _goodnews    =JSON.parse(localStorage.getItem(LS.goodnews)||'[]');
   _pulses =JSON.parse(localStorage.getItem(LS.pulses)||'[]');
+  // Usuarios y áreas personalizadas (desde localStorage; Firebase los reconcilia)
+  try{ applyCustomUsers(JSON.parse(localStorage.getItem(LS.cusers)||'{}')); }catch(e){}
+  try{ applyCustomAreas(JSON.parse(localStorage.getItem(LS.careas)||'{}')); }catch(e){}
 }
 
 /* Sube al vuelo los items locales que no están en Firebase (merge por ID).
@@ -1850,6 +1925,72 @@ async function goLive(){
     renderNav();
     if(currentView==='tasks') renderDashboard();
   });
+
+  // ── Usuarios (extras + overrides de contraseña/nombre/rol) ──
+  listenUsers(async data=>{
+    applyCustomUsers(data||{});
+    renderNav();
+    refreshAssignGrids();
+    if(currentView==='tasks') renderDashboard();
+  });
+
+  // ── Áreas personalizadas ──
+  listenAreas(async data=>{
+    applyCustomAreas(data||{});
+    refreshAreaSelects();
+    if(currentView==='gestion') renderPulseWeek();
+  });
+}
+
+/* Aplica usuarios dinámicos: overrides a los existentes + nuevos */
+function applyCustomUsers(data){
+  _customUsers=data||{};
+  localStorage.setItem(LS.cusers, JSON.stringify(_customUsers));
+  Object.values(_customUsers).forEach(u=>{
+    if(!u||!u.id) return;
+    if(USERS[u.id]){ // override de existente
+      if(u.name) USERS[u.id].name=u.name;
+      if(u.pass) USERS[u.id].pass=u.pass;
+      if(u.role) USERS[u.id].role=u.role;
+    } else { // usuario nuevo
+      USERS[u.id]={ id:u.id, name:u.name||u.id, pass:u.pass||'123456', role:u.role||'colaborador' };
+      if(!ROLES[USERS[u.id].role]) USERS[u.id].role='colaborador';
+    }
+  });
+  populateLoginUsers();
+}
+/* Aplica áreas personalizadas */
+function applyCustomAreas(data){
+  _customAreas=data||{};
+  localStorage.setItem(LS.careas, JSON.stringify(_customAreas));
+  Object.values(_customAreas).forEach(a=>{
+    if(!a||!a.id) return;
+    AREAS[a.id]={ label:a.label||a.id, icon:a.icon||'📂', cls:a.cls||'bw', color:a.color||'var(--tx3)' };
+  });
+}
+
+/* Pobla el dropdown de login con todos los usuarios */
+function populateLoginUsers(){
+  const sel=document.getElementById('l-user'); if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Selecciona…</option>'+
+    Object.values(USERS).map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('');
+  if(cur) sel.value=cur;
+}
+/* Reconstruye los chips de asignación (personas) en los formularios */
+function refreshAssignGrids(){
+  const people=Object.values(USERS);
+  const chipHTML=people.map(u=>`<div class="a-chip" onclick="toggleChip(this)" data-value="${u.id}"><span class="a-av">${initials(u.name)}</span><span class="a-name">${esc(u.name)}</span></div>`).join('');
+  ['tf-assign','mp-assign','mev-assign'].forEach(gid=>{
+    const g=document.getElementById(gid); if(g) g.innerHTML=chipHTML;
+  });
+}
+/* Reconstruye los selects de área en los formularios */
+function refreshAreaSelects(){
+  const opts=Object.entries(AREAS).map(([k,a])=>`<option value="${k}">${a.icon} ${esc(a.label)}</option>`).join('');
+  ['tf-area','mp-area'].forEach(sid=>{
+    const s=document.getElementById(sid); if(s){ const v=s.value; s.innerHTML=opts; if(v&&AREAS[v]) s.value=v; }
+  });
 }
 
 async function toggleLive(){
@@ -1939,6 +2080,8 @@ function showApp(){
   document.getElementById('screen-login').style.display='none';
   document.getElementById('screen-app').classList.remove('hidden');
   applyTheme();
+  refreshAssignGrids();
+  refreshAreaSelects();
   renderNav();
   navigate('tasks');
   setTimeout(showAlerts,700);
@@ -3677,7 +3820,101 @@ function renderSettingsModal(){
   }
   document.getElementById('smod-name-lbl').textContent=currentUser.name;
   document.getElementById('smod-role-lbl').textContent=rm.label;
+  // Sección de administración solo para admins (Leo + Vero)
+  const admEl=document.getElementById('smod-admin');
+  if(admEl) admEl.style.display=isAdmin()?'block':'none';
   _updateThemeBtns();
+}
+
+/* ═══════════════════════════════════════
+   ADMINISTRACIÓN — contraseñas, personas, áreas
+═══════════════════════════════════════ */
+const AREA_CLS_BY_COLOR={'var(--org)':'bo','var(--blu)':'bb','var(--grn)':'bg','var(--pur)':'bp','var(--yel)':'by','var(--red)':'br'};
+
+function renderAdminPassList(){
+  const el=document.getElementById('adm-pass-list'); if(!el) return;
+  el.innerHTML=Object.values(USERS).map(u=>{
+    const rm=ROLES[u.role];
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);">
+      <div class="udot" style="width:28px;height:28px;font-size:10px;background:${rm.bg};color:${rm.color};">${initials(u.name).charAt(0)}</div>
+      <div style="flex:1;"><div style="font-size:12px;font-weight:600;">${esc(u.name)}</div><div style="font-size:9px;color:var(--tx3);">${rm.label}</div></div>
+      <input type="text" id="admpass-${u.id}" placeholder="Nueva clave" style="width:110px;padding:6px 9px;background:var(--inp);border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-size:11px;">
+      <button class="btn btn-p btn-xs" onclick="adminSetPass('${u.id}')">OK</button>
+    </div>`;
+  }).join('');
+}
+async function adminSetPass(uid_){
+  const inp=document.getElementById('admpass-'+uid_); if(!inp) return;
+  const pass=inp.value.trim();
+  if(!pass){ return; }
+  const u=USERS[uid_]; if(!u) return;
+  u.pass=pass;
+  const rec={..._customUsers[uid_], id:uid_, name:u.name, role:u.role, pass};
+  _customUsers[uid_]=rec; applyCustomUsers(_customUsers);
+  if(isConnected()) await fbSaveUser(rec);
+  inp.value=''; inp.placeholder='✓ Guardada';
+}
+
+function renderAdminUserList(){
+  const el=document.getElementById('adm-user-list'); if(!el) return;
+  el.innerHTML=Object.values(USERS).map(u=>{
+    const rm=ROLES[u.role];
+    const isCustom=!!_customUsers[u.id] && !['leonardo','veronica','laura','editor'].includes(u.id);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);">
+      <div class="udot" style="width:24px;height:24px;font-size:9px;background:${rm.bg};color:${rm.color};">${initials(u.name).charAt(0)}</div>
+      <div style="flex:1;"><div style="font-size:12px;font-weight:600;">${esc(u.name)}</div><div style="font-size:9px;color:var(--tx3);">${rm.label}</div></div>
+    </div>`;
+  }).join('');
+}
+async function adminAddUser(){
+  const name=document.getElementById('adm-u-name').value.trim();
+  const role=document.getElementById('adm-u-role').value;
+  const pass=document.getElementById('adm-u-pass').value.trim()||'123456';
+  const err=document.getElementById('adm-u-err');
+  err.classList.remove('show');
+  if(!name){ err.textContent='Nombre requerido.'; err.classList.add('show'); return; }
+  const id=name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'')||('u'+Date.now().toString(36));
+  if(USERS[id]){ err.textContent='Ya existe una persona con ese nombre.'; err.classList.add('show'); return; }
+  const rec={id, name, role, pass};
+  _customUsers[id]=rec; applyCustomUsers(_customUsers);
+  if(isConnected()) await fbSaveUser(rec);
+  document.getElementById('adm-u-name').value='';
+  document.getElementById('adm-u-pass').value='';
+  refreshAssignGrids(); populateLoginUsers(); renderAdminUserList();
+  alert('Persona "'+name+'" creada. Puede entrar con su nombre y la contraseña.');
+}
+
+function renderAdminAreaList(){
+  const el=document.getElementById('adm-area-list'); if(!el) return;
+  el.innerHTML=Object.entries(AREAS).map(([k,a])=>{
+    const custom=!!_customAreas[k];
+    return `<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd);">
+      <span style="width:9px;height:9px;border-radius:50%;background:${a.color};flex-shrink:0;"></span>
+      <span style="flex:1;font-size:12px;">${a.icon} ${esc(a.label)}</span>
+      ${custom?`<button class="btn-icon btn-del" onclick="adminDelArea('${k}')">✕</button>`:'<span style="font-size:9px;color:var(--tx3);">base</span>'}
+    </div>`;
+  }).join('');
+}
+async function adminAddArea(){
+  const name=document.getElementById('adm-a-name').value.trim();
+  const icon=document.getElementById('adm-a-icon').value.trim()||'📂';
+  const color=document.getElementById('adm-a-color').value;
+  if(!name){ alert('Nombre del área requerido.'); return; }
+  const id=name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'')||('a'+Date.now().toString(36));
+  if(AREAS[id]){ alert('Ya existe un área con ese nombre.'); return; }
+  const rec={id, label:name, icon, color, cls:AREA_CLS_BY_COLOR[color]||'bw'};
+  _customAreas[id]=rec; applyCustomAreas(_customAreas);
+  if(isConnected()) await fbSaveArea(rec);
+  document.getElementById('adm-a-name').value='';
+  document.getElementById('adm-a-icon').value='';
+  refreshAreaSelects(); renderAdminAreaList();
+}
+async function adminDelArea(id){
+  if(!confirm('¿Eliminar esta área?')) return;
+  delete _customAreas[id]; delete AREAS[id];
+  localStorage.setItem(LS.careas, JSON.stringify(_customAreas));
+  if(isConnected()) await fbDeleteArea(id);
+  refreshAreaSelects(); renderAdminAreaList();
 }
 
 function uploadSettingsPhoto(input){
@@ -3769,6 +4006,9 @@ function populateProjSels(targetId, selectedId){
 function openMod(id){
   document.getElementById(id)?.classList.add('open');
   if(id==='m-pulse-access') renderPulseAccessModal();
+  if(id==='m-admin-pass')  renderAdminPassList();
+  if(id==='m-admin-user')  renderAdminUserList();
+  if(id==='m-admin-area')  renderAdminAreaList();
 }
 function closeMod(id){
   document.getElementById(id)?.classList.remove('open');
@@ -4371,6 +4611,8 @@ Object.assign(window,{
   switchTaskType,
   openProfile, saveProfile, openSettingsModal, renderSettingsModal,
   saveSettingsModal, uploadSettingsPhoto, removeSettingsPhoto,
+  adminSetPass, adminAddUser, adminAddArea, adminDelArea,
+  renderAdminPassList, renderAdminUserList, renderAdminAreaList,
   openNewEvent, openEditEvent, saveEvent, deleteEvent,
   selectCalPill, toggleLive,
   // Feature 1
@@ -4388,6 +4630,7 @@ Object.assign(window,{
   loadUserOverrides(); // apply any saved name/password changes
   applyTheme();
   await initData();
+  populateLoginUsers();
   const saved=localStorage.getItem(LS.user);
   if(saved&&USERS[saved]){ currentUser=USERS[saved]; showApp(); }
 })();
