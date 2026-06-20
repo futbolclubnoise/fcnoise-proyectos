@@ -701,6 +701,10 @@ body.light .qa-btn{background:#fff!important;border:1px solid rgba(0,0,0,.09)!im
 .hstat-lbl{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
 
 .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;align-items:start;}
+/* Masonry para "Qué hacer": las tarjetas se reparten y equilibran, sin huecos */
+.qh-masonry{column-count:2;column-gap:12px;margin-bottom:12px;}
+.qh-masonry>.hcard{break-inside:avoid;margin-bottom:12px;width:100%;}
+@media(max-width:660px){.qh-masonry{column-count:1;}}
 @media(max-width:660px){.home-grid{grid-template-columns:1fr;}}
 .hcard{background:linear-gradient(170deg,rgba(28,32,40,0.7) 0%,rgba(20,24,31,0.55) 100%);border:1px solid var(--glass-bd);border-top-color:rgba(255,255,255,.09);border-radius:16px;overflow:hidden;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--card-shadow);}
 .hcard.urgent{border-color:var(--red3);}
@@ -788,9 +792,10 @@ body.light .pw-person{background:#fff!important;border-color:rgba(0,0,0,.09)!imp
 .pw-tabs-row::-webkit-scrollbar{display:none;}
 .pw-tab{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:11px;border:1px solid var(--glass-bd);background:rgba(20,24,31,0.5);cursor:pointer;transition:all .18s;font-size:12px;font-weight:600;color:var(--tx3);}
 .pw-tab:hover{border-color:var(--bd3);color:var(--tx2);}
-.pw-tab.on{color:#fff;}
+.pw-tab.on{color:var(--tx);border-color:var(--orange);background:var(--ac2);font-weight:700;}
 .pw-tab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-body.light .pw-tab{background:#fff!important;border-color:rgba(0,0,0,.09)!important;}
+body.light .pw-tab{background:#fff;border-color:rgba(0,0,0,.09);}
+body.light .pw-tab.on{background:var(--ac2);border-color:var(--orange);}
 /* Anclado arriba: metas */
 .pw-goals-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
 @media(max-width:680px){.pw-goals-row{grid-template-columns:1fr;}}
@@ -2294,7 +2299,7 @@ function renderDashboard(){
   if(!hasWork){
     h+=`<div class="hcard"><div class="hcard-body"><div class="hcard-empty">🎉 Estás al día. Sin pendientes urgentes.</div></div></div>`;
   } else {
-    h+=`<div class="home-grid">`;
+    h+=`<div class="qh-masonry">`;
     // Vencidas
     if(overdue.length){
       h+=`<div class="hcard urgent">
@@ -4394,8 +4399,8 @@ function renderPulseWeek(){
   // Tabs de área (debajo del selector de persona)
   tabsEl.innerHTML=personBar+`<div class="pw-tabs-row">${areas.map(a=>{
     const am=AREAS[a]||AREAS.general;
-    return `<div class="pw-tab ${a===_pulseArea?'on':''}" style="${a===_pulseArea?`background:${am.color};border-color:transparent;`:''}" onclick="selectPulseArea('${a}')">
-      <span class="pw-tab-dot" style="background:${a===_pulseArea?'#fff':am.color};"></span>${am.label}
+    return `<div class="pw-tab ${a===_pulseArea?'on':''}" onclick="selectPulseArea('${a}')">
+      <span class="pw-tab-dot" style="background:${am.color};"></span>${esc(am.label)}
     </div>`;
   }).join('')}</div>`;
   renderAreaDash(_pulseArea);
