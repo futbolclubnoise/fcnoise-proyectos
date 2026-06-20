@@ -771,9 +771,18 @@ body.light .qa-btn{background:#fff!important;border:1px solid rgba(0,0,0,.09)!im
 .tl-m-event{font-size:8.5px;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:3px;line-height:1.3;}
 .tl-m-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
 
-/* ── PULSE WEEK — DASHBOARD POR ÁREA ── */
-.pw-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;margin-bottom:16px;scrollbar-width:none;}
-.pw-tabs::-webkit-scrollbar{display:none;}
+/* ── PULSE WEEK — DASHBOARD POR PERSONA / ÁREA ── */
+.pw-tabs{margin-bottom:16px;}
+/* Selector de persona (super admin) */
+.pw-people{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;margin-bottom:12px;scrollbar-width:none;border-bottom:1px solid var(--bd2);}
+.pw-people::-webkit-scrollbar{display:none;}
+.pw-person{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:7px 13px 7px 7px;border-radius:24px;border:1px solid var(--glass-bd);background:rgba(20,24,31,0.5);cursor:pointer;transition:all .18s;font-size:12px;font-weight:600;color:var(--tx3);}
+.pw-person:hover{border-color:var(--bd3);color:var(--tx2);}
+.pw-person.on{color:var(--tx);border-color:var(--orange);background:var(--ac2);}
+.pw-person-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+body.light .pw-person{background:#fff!important;border-color:rgba(0,0,0,.09)!important;}
+.pw-tabs-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;}
+.pw-tabs-row::-webkit-scrollbar{display:none;}
 .pw-tab{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:11px;border:1px solid var(--glass-bd);background:rgba(20,24,31,0.5);cursor:pointer;transition:all .18s;font-size:12px;font-weight:600;color:var(--tx3);}
 .pw-tab:hover{border-color:var(--bd3);color:var(--tx2);}
 .pw-tab.on{color:#fff;}
@@ -4079,14 +4088,28 @@ async function deleteMilestone(id){
 }
 
 /* ═══════════════════════════════════════
-   PULSE WEEK — DASHBOARD POR ÁREA
+   PULSE WEEK — DASHBOARD POR PERSONA / ÁREA
 ═══════════════════════════════════════ */
 let _pulseArea=null;
+let _pulsePerson=null; // (solo Leo) persona cuyo pulse está viendo
 
-// Áreas visibles: Leo todas (con proyectos); los demás las de sus proyectos
+// Persona "en vista": Leo elige; los demás son ellos mismos
+function pulseViewUser(){
+  if(isSuperAdmin()) return _pulsePerson || 'veronica';
+  return currentUser.id;
+}
+// Proyectos de una persona (en equipo o creados por ella)
+function projectsForUser(uid){
+  return _projects.filter(p=>(p.team||[]).includes(uid)||p.createdBy===uid);
+}
+// Áreas con proyectos de esa persona
+function areasForUser(uid){
+  const set=new Set(projectsForUser(uid).map(p=>p.area||'general'));
+  return Object.keys(AREAS).filter(a=>set.has(a));
+}
+// Áreas del pulse según la persona en vista
 function myPulseAreas(){
-  const withProj=new Set((isSuperAdmin()?_projects:visibleProjects()).map(p=>p.area||'general'));
-  return Object.keys(AREAS).filter(a=>withProj.has(a));
+  return areasForUser(pulseViewUser());
 }
 // Obtiene (o crea plantilla) el pulse de un área
 function getAreaPulse(area){
@@ -4101,24 +4124,45 @@ function getAreaPulse(area){
 async function saveAreaPulse(p){ p.type='area'; await persistPulse(p); }
 
 function renderPulseWeek(){
+  const tabsEl=document.getElementById('pw-area-tabs');
+  const dashEl=document.getElementById('pw-area-dash');
+  // ── Selector de PERSONA (solo super admin) ──
+  let personBar='';
+  if(isSuperAdmin()){
+    const people=Object.values(USERS); // todas las personas
+    const cur=pulseViewUser();
+    personBar=`<div class="pw-people">
+      ${people.map(u=>{
+        const rm=ROLES[u.role];
+        const on=u.id===cur;
+        return `<div class="pw-person ${on?'on':''}" onclick="selectPulsePerson('${u.id}')">
+          <div class="pw-person-av" style="background:${on?rm.color:rm.bg};color:${on?'#fff':rm.color};">${initials(u.name).charAt(0)}</div>
+          <span>${u.name}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
   const areas=myPulseAreas();
   if(!areas.length){
-    document.getElementById('pw-area-tabs').innerHTML='';
-    document.getElementById('pw-area-dash').innerHTML='<div class="pw-empty" style="padding:40px 0;">Sin áreas con proyectos todavía.</div>';
+    tabsEl.innerHTML=personBar;
+    const who=isSuperAdmin()?(USERS[pulseViewUser()]?.name||''):'';
+    dashEl.innerHTML=`<div class="pw-empty" style="padding:40px 0;">${who?who+' no tiene':'Sin'} áreas/proyectos asignados todavía.</div>`;
     return;
   }
   if(!_pulseArea || !areas.includes(_pulseArea)) _pulseArea=areas[0];
-  // Tabs
-  document.getElementById('pw-area-tabs').innerHTML=areas.map(a=>{
+  // Tabs de área (debajo del selector de persona)
+  tabsEl.innerHTML=personBar+`<div class="pw-tabs-row">${areas.map(a=>{
     const am=AREAS[a]||AREAS.general;
     return `<div class="pw-tab ${a===_pulseArea?'on':''}" style="${a===_pulseArea?`background:${am.color};border-color:transparent;`:''}" onclick="selectPulseArea('${a}')">
       <span class="pw-tab-dot" style="background:${a===_pulseArea?'#fff':am.color};"></span>${am.label}
     </div>`;
-  }).join('');
+  }).join('')}</div>`;
   renderAreaDash(_pulseArea);
 }
 
 function selectPulseArea(area){ _pulseArea=area; renderPulseWeek(); }
+function selectPulsePerson(uid){ _pulsePerson=uid; _pulseArea=null; renderPulseWeek(); }
 
 function renderAreaDash(area){
   const am=AREAS[area]||AREAS.general;
@@ -4126,8 +4170,8 @@ function renderAreaDash(area){
   const admin=isAdmin();
   const el=document.getElementById('pw-area-dash'); if(!el) return;
 
-  // Proyectos del área por prioridad
-  const areaProjs=(isSuperAdmin()?_projects:visibleProjects()).filter(p=>(p.area||'general')===area);
+  // Proyectos del área por prioridad — de la persona en vista
+  const areaProjs=projectsForUser(pulseViewUser()).filter(p=>(p.area||'general')===area);
   const prioCols=[
     {k:'alta', lbl:'Alta',  color:'var(--red)'},
     {k:'media',lbl:'Media', color:'var(--yel)'},
@@ -4309,7 +4353,7 @@ function renderWeekAnalysis(){ /* no-op */ }
 ═══════════════════════════════════════ */
 Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
-  selectPulseArea, editAreaGoals, addAreaGoodNews, delAreaGoodNews,
+  selectPulseArea, selectPulsePerson, editAreaGoals, addAreaGoodNews, delAreaGoodNews,
   pwProjDragStart, pwProjDragEnd, pwProjDragOver, pwProjDragLeave, pwProjDrop,
   toggleIdsOpen, addIdsItem, toggleIdsItem, delIdsItem, addIdsComment,
   openMod, closeMod,
