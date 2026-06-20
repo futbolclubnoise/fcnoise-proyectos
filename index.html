@@ -319,6 +319,25 @@ body.light .fi input:focus,body.light .fi select:focus,body.light .fi textarea:f
 .tdp-state{padding:6px 13px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--bd2);background:var(--bg4);color:var(--tx3);cursor:pointer;transition:all .18s;font-family:var(--font-body);}
 .tdp-state.on{border-color:var(--orange);background:var(--ac2);color:var(--orange);}
 .tdp-divider{height:1px;background:var(--bd);margin:14px 0;}
+/* Subtareas */
+.sub-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.sub-pct{font-family:var(--font-display);font-size:16px;letter-spacing:.02em;color:var(--grn);}
+.sub-bar{height:5px;background:var(--bg5);border-radius:4px;overflow:hidden;margin-bottom:4px;}
+.sub-fill{height:100%;border-radius:4px;background:var(--grn);transition:width .4s;}
+.sub-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd);}
+.sub-item:last-child{border-bottom:none;}
+.sub-chk{width:17px;height:17px;border-radius:5px;border:1.5px solid var(--bd3);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .15s;}
+.sub-chk.on{background:var(--grn);border-color:var(--grn);}
+.sub-chk svg{width:10px;height:10px;stroke:#fff;}
+.sub-txt{flex:1;font-size:12.5px;color:var(--tx2);}
+.sub-txt.done{text-decoration:line-through;color:var(--tx3);}
+.sub-add{display:flex;gap:6px;}
+.sub-add input{flex:1;padding:8px 11px;background:var(--inp);border:1px solid var(--bd2);border-radius:9px;color:var(--tx);font-size:12px;font-family:var(--font-body);outline:none;}
+.sub-add input:focus{border-color:var(--orange);}
+/* progreso de subtareas en tarjetas */
+.tr-subbar{display:inline-flex;align-items:center;gap:5px;font-size:9px;color:var(--tx3);}
+.tr-subbar .b{width:34px;height:3px;border-radius:3px;background:var(--bg5);overflow:hidden;}
+.tr-subbar .f{height:100%;background:var(--grn);border-radius:3px;}
 .tdp-acts{display:flex;gap:8px;}
 
 /* ══════════════════════════════════════
@@ -1335,6 +1354,21 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="tdp-slbl" id="tdp-states-lbl">Estado</div>
     <div class="tdp-chips" id="tdp-states"></div>
 
+    <!-- Subtareas (solo tareas, no contenido) -->
+    <div id="tdp-subs-wrap" style="display:none;">
+      <div class="tdp-divider"></div>
+      <div class="sub-hdr">
+        <span class="tdp-slbl" style="margin:0;">Subtareas</span>
+        <span class="sub-pct" id="tdp-sub-pct"></span>
+      </div>
+      <div class="sub-bar"><div class="sub-fill" id="tdp-sub-fill"></div></div>
+      <div id="tdp-subs-list" style="margin:8px 0;"></div>
+      <div class="sub-add">
+        <input type="text" id="tdp-sub-input" placeholder="Agregar subtarea…" onkeydown="if(event.key==='Enter'){tdpAddSubtask(this.value);this.value='';}">
+        <button class="btn btn-g btn-sm" onclick="const i=document.getElementById('tdp-sub-input');tdpAddSubtask(i.value);i.value='';">Agregar</button>
+      </div>
+    </div>
+
     <div class="tdp-divider"></div>
     <div class="tdp-acts">
       <button class="btn btn-g btn-sm" id="tdp-done-btn" onclick="tdpToggleDone()"></button>
@@ -2215,12 +2249,11 @@ function taskRowHTML(t){
   const am=AREAS[t.area]||AREAS.general;
   const prio=t.priority||'media';
   const e=tEnd(t);
-  const dots=(t.assignedUsers||[]).map(uid_=>{
+  const dots=(t.assignedUsers||[]).slice(0,3).map(uid_=>{
     const u=USERS[uid_]; if(!u) return '';
     const rm=ROLES[u.role];
-    return `<div class="udot" style="width:16px;height:16px;font-size:7px;background:${rm.bg};color:${rm.color};" title="${u.name}">${u.name.charAt(0).toUpperCase()}</div>`;
+    return `<div class="udot" style="width:16px;height:16px;font-size:7px;background:${rm.bg};color:${rm.color};margin-left:-4px;border:1.5px solid var(--bg2);" title="${u.name}">${initials(u.name).charAt(0)}</div>`;
   }).join('');
-  // status dot: use priority color as primary indicator
   const projMeth=proj?.meth||'lista';
   const taskType_=t.taskType||(projMeth==='calendario'?'contenido':'tarea');
   let statusLabel='';
@@ -2231,6 +2264,11 @@ function taskRowHTML(t){
     const ts=TASK_STATES.find(s=>s.id===(t.taskStatus||'pendiente'))||TASK_STATES[0];
     statusLabel=`<span class="itag"><span class="dot dot-${t.taskStatus||'pendiente'}"></span>${ts.label}</span>`;
   }
+  // indicadores: subtareas, notas, recursos
+  const subs=t.subtasks||[];
+  const subBar=subs.length?`<span class="tr-subbar" title="${subs.filter(x=>x.done).length}/${subs.length} subtareas"><span class="b"><span class="f" style="width:${subtaskPct(t)}%;"></span></span>${subtaskPct(t)}%</span>`:'';
+  const hasNote=(t.desc&&t.desc.trim())||(t.contentDesc&&t.contentDesc.trim());
+  const noteIco=hasNote?`<span class="itag" title="Tiene notas"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>`:'';
 
   return `<div class="task-row ${done?'done-r':''}" onclick="openTaskDetail('${t.id}')">
     <div class="dot dot-${prio}" style="flex-shrink:0;" title="Prioridad ${prio}"></div>
@@ -2241,8 +2279,10 @@ function taskRowHTML(t){
     <div class="tr-meta">
       <span class="itag" style="color:${am.color};">${am.label}</span>
       ${statusLabel}
+      ${subBar}
+      ${noteIco}
       ${e?`<span class="itag">${e}</span>`:''}
-      <div class="flex" style="gap:2px;">${dots}</div>
+      <div class="flex" style="padding-left:4px;">${dots}</div>
       <span class="tr-arr">›</span>
     </div>
   </div>`;
@@ -2330,6 +2370,27 @@ function refreshDetailPopup(){
     }).join('');
   }
 
+  // subtareas (solo tareas, no contenido)
+  const subsWrap=document.getElementById('tdp-subs-wrap');
+  if(tdpType==='contenido'){
+    subsWrap.style.display='none';
+  } else {
+    subsWrap.style.display='';
+    const subs=t.subtasks||[];
+    const pct=subtaskPct(t);
+    document.getElementById('tdp-sub-pct').textContent=subs.length?pct+'%':'';
+    document.getElementById('tdp-sub-fill').style.width=pct+'%';
+    document.getElementById('tdp-subs-list').innerHTML=subs.length
+      ? subs.map(st=>`<div class="sub-item">
+          <div class="sub-chk ${st.done?'on':''}" onclick="tdpToggleSubtask('${st.id}')">
+            ${st.done?'<svg viewBox=\"0 0 12 10\" fill=\"none\" stroke-width=\"2.5\"><polyline points=\"1,5 4.5,8.5 11,1\"/></svg>':''}
+          </div>
+          <span class="sub-txt ${st.done?'done':''}">${esc(st.text)}</span>
+          <button class="btn-icon btn-del" style="width:22px;height:22px;" onclick="tdpDelSubtask('${st.id}')">✕</button>
+        </div>`).join('')
+      : '<div style="font-size:11px;color:var(--tx3);padding:4px 0;">Sin subtareas. Agrega la primera abajo.</div>';
+  }
+
   // done button
   document.getElementById('tdp-done-btn').textContent=done?'↩ Reabrir':'✓ Completar';
   document.getElementById('tdp-done-btn').style.background=done?'var(--bg5)':'var(--grn2)';
@@ -2350,6 +2411,32 @@ async function tdpToggleUser(userId){
   t.assignedUsers=au.includes(userId)?au.filter(x=>x!==userId):[...au,userId];
   await persistTask(t);
   if(!_fbOn) refreshDetailPopup();
+}
+
+/* ── Subtareas ── */
+function subtaskPct(t){
+  const s=t.subtasks||[]; if(!s.length) return 0;
+  return Math.round(s.filter(x=>x.done).length/s.length*100);
+}
+async function tdpAddSubtask(text){
+  if(!text||!text.trim()) return;
+  const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
+  t.subtasks=[...(t.subtasks||[]),{id:uid(),text:text.trim(),done:false}];
+  await persistTask(t);
+  refreshDetailPopup(); onDataChange();
+}
+async function tdpToggleSubtask(sid){
+  const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
+  const st=(t.subtasks||[]).find(x=>x.id===sid); if(!st) return;
+  st.done=!st.done;
+  await persistTask(t);
+  refreshDetailPopup(); onDataChange();
+}
+async function tdpDelSubtask(sid){
+  const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
+  t.subtasks=(t.subtasks||[]).filter(x=>x.id!==sid);
+  await persistTask(t);
+  refreshDetailPopup(); onDataChange();
 }
 
 async function tdpSetState(colId, type){
@@ -3270,6 +3357,9 @@ function openTaskForm(taskId, projId, preDate, forceType){
     lockEl.style.display='none';
   }
   setTaskFormMode(!!_taskFromProjId);
+  // Tarea y Contenido son excluyentes: al EDITAR no se puede cambiar el tipo
+  const toggle=document.getElementById('tf-type-toggle');
+  if(toggle) toggle.style.display = taskId ? 'none' : '';
   openMod('m-task-form');
 }
 
@@ -4188,6 +4278,7 @@ Object.assign(window,{
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
   openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, openAreaModal, renderPulseTaskSections, pwTaskHTML, formatResources, togglePwSection,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
+  tdpAddSubtask, tdpToggleSubtask, tdpDelSubtask,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
   calDragStart, calDragEnd, calDragOver, calDragLeave, calDrop,
