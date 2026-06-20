@@ -697,7 +697,7 @@ body.light .qa-btn{background:#fff!important;border:1px solid rgba(0,0,0,.09)!im
 .hstat-num{font-family:var(--font-display);font-size:30px;letter-spacing:.02em;line-height:1;}
 .hstat-lbl{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
 
-.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;align-items:start;}
 @media(max-width:660px){.home-grid{grid-template-columns:1fr;}}
 .hcard{background:linear-gradient(170deg,rgba(28,32,40,0.7) 0%,rgba(20,24,31,0.55) 100%);border:1px solid var(--glass-bd);border-top-color:rgba(255,255,255,.09);border-radius:16px;overflow:hidden;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--card-shadow);}
 .hcard.urgent{border-color:var(--red3);}
@@ -793,7 +793,7 @@ body.light .pw-goal-card{background:#fff!important;border:1px solid rgba(0,0,0,.
 .pw-goal-item .gi-mark{flex-shrink:0;font-weight:700;}
 .pw-goal-empty{font-size:11px;color:var(--tx3);font-style:italic;}
 /* Layout 2 columnas: good news (izq) + proyectos (der) */
-.pw-cols{display:grid;grid-template-columns:1fr 1.3fr;gap:14px;margin-bottom:16px;}
+.pw-cols{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:16px;}
 @media(max-width:780px){.pw-cols{grid-template-columns:1fr;}}
 .pw-col-card{background:linear-gradient(170deg,rgba(28,32,40,0.6),rgba(20,24,31,0.5));border:1px solid var(--glass-bd);border-radius:16px;padding:14px;box-shadow:var(--card-shadow);}
 body.light .pw-col-card{background:#fff!important;border:1px solid rgba(0,0,0,.09)!important;}
@@ -1294,6 +1294,15 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
           <select id="tf-kstatus"></select>
         </div>
       </div>
+      <!-- Subtareas al crear -->
+      <div class="fi">
+        <label>Subtareas</label>
+        <div id="tf-subs-list" style="margin-bottom:6px;"></div>
+        <div class="sub-add">
+          <input type="text" id="tf-sub-input" placeholder="Agregar subtarea…" onkeydown="if(event.key==='Enter'){event.preventDefault();tfAddSubtask(this.value);this.value='';}">
+          <button type="button" class="btn btn-g btn-sm" onclick="const i=document.getElementById('tf-sub-input');tfAddSubtask(i.value);i.value='';">Agregar</button>
+        </div>
+      </div>
     </div>
 
     <!-- Contenido-only fields -->
@@ -1607,6 +1616,7 @@ let _presence= {}; // {userId: {online: bool, lastSeen: ...}}
 let dragId         = null;
 let _tdpId         = null; // task currently open in detail popup
 let _taskFromProjId= null; // when opening task form from inside a project, lock to that project
+let _tfSubs        = []; // subtareas en construcción dentro del formulario de tarea
 let _editEventId   = null; // event currently being edited
 let _milestones    = []; // brand timeline milestones
 let _goodnews      = []; // pulse week good news items
@@ -2128,7 +2138,7 @@ function renderDashboard(){
 
   // Sección "Qué hacer" — vencidas + hoy + semana
   const hasWork=overdue.length||todayT.length||weekT.length;
-  h+=`<div class="section-title">QUÉ HACER ${hasWork?'':' '}<span class="bscnt">${overdue.length+todayT.length+weekT.length}</span></div>`;
+  h+=`<div class="section-title">QUÉ HACER <span class="bscnt">${overdue.length+todayT.length+weekT.length}</span></div>`;
   if(!hasWork){
     h+=`<div class="hcard"><div class="hcard-body"><div class="hcard-empty">🎉 Estás al día. Sin pendientes urgentes.</div></div></div>`;
   } else {
@@ -2437,6 +2447,31 @@ async function tdpDelSubtask(sid){
   t.subtasks=(t.subtasks||[]).filter(x=>x.id!==sid);
   await persistTask(t);
   refreshDetailPopup(); onDataChange();
+}
+
+/* ── Subtareas dentro del formulario de creación ── */
+function renderTfSubs(){
+  const el=document.getElementById('tf-subs-list'); if(!el) return;
+  el.innerHTML=_tfSubs.length
+    ? _tfSubs.map(st=>`<div class="sub-item">
+        <div class="sub-chk ${st.done?'on':''}" onclick="tfToggleSubtask('${st.id}')">${st.done?'<svg viewBox=\"0 0 12 10\" fill=\"none\" stroke-width=\"2.5\"><polyline points=\"1,5 4.5,8.5 11,1\"/></svg>':''}</div>
+        <span class="sub-txt ${st.done?'done':''}">${esc(st.text)}</span>
+        <button type="button" class="btn-icon btn-del" style="width:22px;height:22px;" onclick="tfDelSubtask('${st.id}')">✕</button>
+      </div>`).join('')
+    : '<div style="font-size:11px;color:var(--tx3);padding:2px 0;">Sin subtareas todavía.</div>';
+}
+function tfAddSubtask(text){
+  if(!text||!text.trim()) return;
+  _tfSubs=[..._tfSubs,{id:uid(),text:text.trim(),done:false}];
+  renderTfSubs();
+}
+function tfToggleSubtask(id){
+  const st=_tfSubs.find(x=>x.id===id); if(st) st.done=!st.done;
+  renderTfSubs();
+}
+function tfDelSubtask(id){
+  _tfSubs=_tfSubs.filter(x=>x.id!==id);
+  renderTfSubs();
 }
 
 async function tdpSetState(colId, type){
@@ -3321,6 +3356,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>{
       c.classList.toggle('sel', (t.assignedUsers||[]).includes(c.dataset.value));
     });
+    _tfSubs=(t.subtasks||[]).map(s=>({...s}));
     document.getElementById('tf-ttl').textContent='Editar Tarea';
   } else {
     // new
@@ -3339,6 +3375,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>c.classList.remove('sel'));
     document.getElementById('tf-resources').value='';
     document.getElementById('tf-content-desc').value='';
+    _tfSubs=[];
     document.getElementById('tf-ttl').textContent=defaultType==='contenido'?'Nuevo Contenido':'Nueva Tarea';
     switchTaskType(defaultType);
     if(defaultType==='tarea') updateTaskFormStates(useProjId);
@@ -3360,6 +3397,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
   // Tarea y Contenido son excluyentes: al EDITAR no se puede cambiar el tipo
   const toggle=document.getElementById('tf-type-toggle');
   if(toggle) toggle.style.display = taskId ? 'none' : '';
+  renderTfSubs();
   openMod('m-task-form');
 }
 
@@ -3403,6 +3441,7 @@ async function saveTaskForm(){
     kStatus, calStatus, taskStatus, status,
     resources:    taskType==='contenido'?(document.getElementById('tf-resources').value.trim()||null):existing?.resources||null,
     contentDesc:  taskType==='contenido'?(document.getElementById('tf-content-desc').value.trim()||null):null,
+    subtasks:     taskType==='contenido'?(existing?.subtasks||[]):[..._tfSubs],
     createdAt:existing?.createdAt||Date.now(),
   };
   await persistTask(t);
@@ -4171,15 +4210,15 @@ function renderAreaDash(area){
       </div>
     </div>
 
-    <!-- 2 columnas: Good News (izq) + Proyectos (der) -->
+    <!-- 2 columnas: Proyectos (izq) + Good News (der) -->
     <div class="pw-cols">
+      <div class="pw-col-card">
+        <div class="pw-col-hdr"><span class="pw-col-ttl">PROYECTOS · por prioridad</span>${admin?'<span style="font-size:9px;color:var(--tx3);">Arrastra entre columnas</span>':''}</div>
+        <div class="pw-prio-cols">${prioColsHTML}</div>
+      </div>
       <div class="pw-col-card">
         <div class="pw-col-hdr"><span class="pw-col-ttl">GOOD NEWS</span><button class="btn btn-p btn-xs" onclick="addAreaGoodNews('${area}')">+ Agregar</button></div>
         <div>${gnHTML}</div>
-      </div>
-      <div class="pw-col-card">
-        <div class="pw-col-hdr"><span class="pw-col-ttl">PROYECTOS · por prioridad</span>${admin?'<span style="font-size:9px;color:var(--tx3);">Arrastra entre columnas →</span>':''}</div>
-        <div class="pw-prio-cols">${prioColsHTML}</div>
       </div>
     </div>
 
@@ -4279,6 +4318,7 @@ Object.assign(window,{
   openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, openAreaModal, renderPulseTaskSections, pwTaskHTML, formatResources, togglePwSection,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   tdpAddSubtask, tdpToggleSubtask, tdpDelSubtask,
+  tfAddSubtask, tfToggleSubtask, tfDelSubtask,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
   calDragStart, calDragEnd, calDragOver, calDragLeave, calDrop,
