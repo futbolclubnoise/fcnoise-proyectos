@@ -701,10 +701,11 @@ body.light .qa-btn{background:#fff!important;border:1px solid rgba(0,0,0,.09)!im
 .hstat-lbl{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
 
 .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;align-items:start;}
-/* Masonry para "Qué hacer": las tarjetas se reparten y equilibran, sin huecos */
-.qh-masonry{column-count:2;column-gap:12px;margin-bottom:12px;}
-.qh-masonry>.hcard{break-inside:avoid;margin-bottom:12px;width:100%;}
-@media(max-width:660px){.qh-masonry{column-count:1;}}
+/* Grilla uniforme del dashboard: tarjetas alineadas que se acomodan solas */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:12px;align-items:start;}
+@media(max-width:560px){.dash-grid{grid-template-columns:1fr;}}
+.hcard-more{display:block;text-align:center;font-size:10px;font-weight:600;color:var(--tx3);padding:8px 0 2px;cursor:pointer;letter-spacing:.04em;border-top:1px solid var(--bd);margin-top:4px;transition:color .15s;}
+.hcard-more:hover{color:var(--orange);}
 @media(max-width:660px){.home-grid{grid-template-columns:1fr;}}
 .hcard{background:linear-gradient(170deg,rgba(28,32,40,0.7) 0%,rgba(20,24,31,0.55) 100%);border:1px solid var(--glass-bd);border-top-color:rgba(255,255,255,.09);border-radius:16px;overflow:hidden;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--card-shadow);}
 .hcard.urgent{border-color:var(--red3);}
@@ -2296,52 +2297,42 @@ function renderDashboard(){
   // Sección "Qué hacer" — vencidas + hoy + semana
   const hasWork=overdue.length||todayT.length||weekT.length;
   h+=`<div class="section-title">QUÉ HACER <span class="bscnt">${overdue.length+todayT.length+weekT.length}</span></div>`;
+  // Cada tarjeta muestra hasta 5 items para que todas queden con altura pareja
+  const CAP=5;
+  const card=(ttl,color,arr,emptyMsg)=>{
+    const shown=byPrio(arr).slice(0,CAP);
+    const more=arr.length>CAP?`<div class="hcard-more">+${arr.length-CAP} más</div>`:'';
+    return `<div class="hcard ${color==='var(--red)'?'urgent':''}">
+      <div class="hcard-hdr"><span class="hcard-ttl" style="color:${color};">${ttl}</span><span class="bscnt">${arr.length}</span></div>
+      <div class="hcard-body">${shown.length?shown.map(t=>taskTicketHTML(t)).join(''):`<div class="hcard-empty">${emptyMsg}</div>`}${more}</div>
+    </div>`;
+  };
   if(!hasWork){
     h+=`<div class="hcard"><div class="hcard-body"><div class="hcard-empty">🎉 Estás al día. Sin pendientes urgentes.</div></div></div>`;
   } else {
-    h+=`<div class="qh-masonry">`;
-    // Vencidas
-    if(overdue.length){
-      h+=`<div class="hcard urgent">
-        <div class="hcard-hdr"><span class="hcard-ttl" style="color:var(--red);">VENCIDAS</span><span class="bscnt">${overdue.length}</span></div>
-        <div class="hcard-body">${byPrio(overdue).slice(0,6).map(t=>taskTicketHTML(t)).join('')}</div>
-      </div>`;
-    }
-    // Para hoy
-    h+=`<div class="hcard">
-      <div class="hcard-hdr"><span class="hcard-ttl">PARA HOY</span><span class="bscnt">${todayT.length}</span></div>
-      <div class="hcard-body">${todayT.length?byPrio(todayT).map(t=>taskTicketHTML(t)).join(''):'<div class="hcard-empty">Sin tareas para hoy</div>'}</div>
-    </div>`;
-    // Esta semana
-    if(weekT.length){
-      h+=`<div class="hcard">
-        <div class="hcard-hdr"><span class="hcard-ttl">ESTA SEMANA</span><span class="bscnt">${weekT.length}</span></div>
-        <div class="hcard-body">${byPrio(weekT).slice(0,6).map(t=>taskTicketHTML(t)).join('')}</div>
-      </div>`;
-    }
+    h+=`<div class="dash-grid">`;
+    if(overdue.length) h+=card('VENCIDAS','var(--red)',overdue,'');
+    h+=card('PARA HOY','var(--tx2)',todayT,'Sin tareas para hoy');
+    if(weekT.length) h+=card('ESTA SEMANA','var(--tx2)',weekT,'');
     h+=`</div>`;
   }
 
-  // Proyectos + Equipo
+  // Proyectos + Equipo — misma grilla uniforme
   h+=`<div class="section-title">PROYECTOS Y EQUIPO</div>
-  <div class="home-grid">
+  <div class="dash-grid">
     <div class="hcard">
       <div class="hcard-hdr"><span class="hcard-ttl">MIS PROYECTOS</span><span class="bscnt">${myProjs.length}</span></div>
-      <div class="hcard-body">${myProjs.length?myProjs.map(p=>projProgressHTML(p)).join(''):'<div class="hcard-empty">Sin proyectos asignados</div>'}</div>
+      <div class="hcard-body">${myProjs.length?myProjs.slice(0,CAP).map(p=>projProgressHTML(p)).join('')+(myProjs.length>CAP?`<div class="hcard-more" onclick="navigate('projs')">Ver todos (${myProjs.length})</div>`:''):'<div class="hcard-empty">Sin proyectos asignados</div>'}</div>
     </div>
     <div class="hcard">
       <div class="hcard-hdr"><span class="hcard-ttl">EQUIPO</span>${_fbOn?'<span class="bdg bg" style="font-size:9px;">● En vivo</span>':''}</div>
       <div class="hcard-body" id="dash-team-body">${renderTeamHTML()}</div>
     </div>
-  </div>`;
-
-  // Eventos
-  if(upcomingEvts.length){
-    h+=`<div class="hcard" style="margin-bottom:14px;">
+    ${upcomingEvts.length?`<div class="hcard">
       <div class="hcard-hdr"><span class="hcard-ttl">PRÓXIMOS EVENTOS</span><button class="btn btn-g btn-xs" onclick="navigate('eventos')">Ver todos →</button></div>
       <div class="hcard-body">${upcomingEvts.map(e=>eventRowHTML(e,false)).join('')}</div>
-    </div>`;
-  }
+    </div>`:''}
+  </div>`;
 
   document.getElementById('home-content').innerHTML=h;
   renderTimeline();
