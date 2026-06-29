@@ -153,7 +153,12 @@ body.light .hcard-hdr{background:rgba(0,0,0,.02)!important;border-bottom-color:r
 body.light .hcard.urgent .hcard-hdr{background:rgba(232,64,64,.06)!important;}
 body.light .board-shdr{background:rgba(0,0,0,.03)!important;}
 body.light .panel-hdr{border-bottom:1px solid rgba(0,0,0,.08);}
-body.light .login-box{background:#ffffff!important;border-color:rgba(0,0,0,.1)!important;}
+/* El login siempre se ve en oscuro (consistente en ambos temas) */
+body.light #screen-login{background:#0a0a0a!important;}
+body.light .login-box{background:var(--black-blue)!important;border-color:rgba(255,255,255,.09)!important;}
+body.light #screen-login .fi label{color:#888!important;}
+body.light #screen-login .fi input,body.light #screen-login .fi select{background:rgba(255,255,255,.04)!important;border-color:rgba(255,255,255,.08)!important;color:#f5f5f5!important;}
+body.light #screen-login select option{background:#1c2028!important;color:#f5f5f5!important;}
 body.light .proj-detail-hdr{background:#ffffff!important;border:1px solid rgba(0,0,0,.09)!important;}
 body.light .pdh-chips .bdg{border-color:rgba(0,0,0,.1)!important;}
 body.light .section-sep{background:rgba(0,0,0,.08)!important;}
@@ -183,7 +188,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* ── LOGIN ── */
 #screen-login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;background:var(--black);}
-.login-logo{font-family:var(--font-display);font-size:52px;letter-spacing:.05em;line-height:1;margin-bottom:6px;}
+.login-logo{font-family:var(--font-display);font-size:52px;letter-spacing:.05em;line-height:1;margin-bottom:6px;color:#f5f5f5;}
 .login-logo em{color:var(--orange);font-style:normal;}
 .login-tagline{font-size:10px;font-weight:600;color:var(--gray-500);letter-spacing:.18em;text-transform:uppercase;margin-bottom:36px;}
 .login-box{width:100%;max-width:320px;background:var(--black-blue);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:26px 22px;box-shadow:var(--shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
@@ -2092,6 +2097,8 @@ function showApp(){
   document.getElementById('screen-login').style.display='none';
   document.getElementById('screen-app').classList.remove('hidden');
   applyTheme();
+  // Leo (super admin) y admins ven "Todas" por defecto; colaboradores "Mías"
+  _homeFilter=isAdmin()?'todas':'mias';
   refreshAssignGrids();
   refreshAreaSelects();
   renderNav();
