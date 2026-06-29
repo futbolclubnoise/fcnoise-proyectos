@@ -376,7 +376,7 @@ body.light select{color:#1a1a1a;}
 .kb-hdr{padding:11px 13px 8px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);}
 .kb-count{background:var(--bg5);color:var(--tx3);padding:1px 7px;border-radius:20px;font-size:9px;}
 .kb-body{padding:7px;min-height:110px;transition:background .18s;}
-.kb-body.drag-over{background:var(--bg5);}
+.kanban-col.drag-over{background:var(--ac2);box-shadow:inset 0 0 0 2px var(--orange);}
 .kb-card{background:var(--card);border:1px solid var(--bd2);border-radius:9px;padding:10px;margin-bottom:7px;cursor:grab;transition:box-shadow .18s;user-select:none;}
 .kb-card:active{cursor:grabbing;box-shadow:0 6px 24px rgba(0,0,0,.5);}
 .kb-card.dragging{opacity:.3;}
@@ -676,7 +676,13 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
 .greeting-sub{font-size:11px;color:var(--tx3);margin-top:2px;}
 
 /* Quick actions */
-.quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+/* Filtro Mías / Compartidas / Todas */
+.home-filter{display:inline-flex;gap:3px;padding:3px;border-radius:11px;background:var(--bg3);border:1px solid var(--bd2);margin-bottom:16px;}
+.hf-btn{padding:6px 14px;border:none;border-radius:8px;background:transparent;color:var(--tx3);font-family:var(--font-body);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em;}
+.hf-btn:hover{color:var(--tx);}
+.hf-btn.on{background:var(--orange);color:#fff;}
+body.light .home-filter{background:#fff;border-color:rgba(0,0,0,.1);}
 .qa-btn{flex:1;min-width:130px;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--glass-bd);background:linear-gradient(160deg,rgba(28,32,40,0.7),rgba(20,24,31,0.55));cursor:pointer;transition:all .18s;box-shadow:var(--card-shadow);}
 .qa-btn:hover{transform:translateY(-2px);border-color:rgba(255,122,0,.35);box-shadow:var(--card-hover-shadow);}
 .qa-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--ac2);color:var(--orange);}
@@ -2205,13 +2211,23 @@ function myTasks(){
   return _tasks.filter(t=>Array.isArray(t.assignedUsers)&&t.assignedUsers.includes(currentUser.id));
 }
 
+// Filtro del home: mías / compartidas / todas
+let _homeFilter='mias';
+function homeTasks(){
+  if(_homeFilter==='todas') return _tasks;
+  const mine=_tasks.filter(t=>(t.assignedUsers||[]).includes(currentUser.id));
+  if(_homeFilter==='compartidas') return mine.filter(t=>(t.assignedUsers||[]).length>1);
+  return mine;
+}
+function selectHomeFilter(f){ _homeFilter=f; renderDashboard(); }
+
 function renderDashboard(){
   const rm=ROLES[currentUser.role];
   document.documentElement.style.setProperty('--accent',rm.color);
   document.documentElement.style.setProperty('--ac2',rm.bg);
   document.documentElement.style.setProperty('--ac3',rm.brd);
 
-  const all=myTasks();
+  const all=homeTasks();
   const today=todayStr();
   const weekEnd=new Date(); weekEnd.setDate(weekEnd.getDate()+7);
   const weekStr=weekEnd.toISOString().split('T')[0];
@@ -2275,6 +2291,13 @@ function renderDashboard(){
       <div class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
       <div class="qa-txt"><span class="qa-ttl">Revisar</span><span class="qa-sub">Ver proyectos</span></div>
     </div>
+  </div>
+
+  <!-- Filtro de tareas -->
+  <div class="home-filter">
+    <button class="hf-btn ${_homeFilter==='mias'?'on':''}" onclick="selectHomeFilter('mias')">Mías</button>
+    <button class="hf-btn ${_homeFilter==='compartidas'?'on':''}" onclick="selectHomeFilter('compartidas')">Compartidas</button>
+    <button class="hf-btn ${_homeFilter==='todas'?'on':''}" onclick="selectHomeFilter('todas')">Todas</button>
   </div>
 
   <!-- Banner urgente -->
@@ -2568,7 +2591,7 @@ async function tdpToggleUser(userId){
   const au=t.assignedUsers||[];
   t.assignedUsers=au.includes(userId)?au.filter(x=>x!==userId):[...au,userId];
   await persistTask(t);
-  if(!_fbOn) refreshDetailPopup();
+  refreshDetailPopup(); onDataChange();
 }
 
 /* ── Subtareas ── */
@@ -2637,7 +2660,7 @@ async function tdpSetState(colId, type){
     t.status=colId==='cierre'?'done':'pending';
   }
   await persistTask(t);
-  if(!_fbOn){ refreshDetailPopup(); onDataChange(); }
+  refreshDetailPopup(); onDataChange();
 }
 
 async function tdpToggleDone(){
@@ -2660,7 +2683,7 @@ async function tdpToggleDone(){
     }
   }
   await persistTask(t);
-  if(!_fbOn){ refreshDetailPopup(); onDataChange(); }
+  refreshDetailPopup(); onDataChange();
 }
 
 function tdpEdit(){
@@ -2674,7 +2697,7 @@ async function tdpDelete(){
   await removeTask(_tdpId);
   _tdpId=null;
   closeMod('m-task-detail');
-  if(!_fbOn) onDataChange();
+  onDataChange();
 }
 
 /* ═══════════════════════════════════════
@@ -2840,7 +2863,9 @@ function renderListaHTML(projId){
 function renderKanbanHTML(projId){
   const tasks=_tasks.filter(t=>t.projectId===projId);
   const cols=KB_COLS.map(col=>{
-    const colTasks=tasks.filter(t=>(t.kStatus||'investigacion')===col.id);
+    const colTasks=tasks.filter(t=>(t.kStatus||'investigacion')===col.id)
+      .sort((a,b)=>(b.kbMovedAt||0)-(a.kbMovedAt||0)); // recién movidos arriba
+
     const cards=colTasks.map(t=>{
       const am=AREAS[t.area]||AREAS.general;
       const pm=PRIOS[t.priority]||PRIOS.media;
@@ -2873,11 +2898,10 @@ function renderKanbanHTML(projId){
         </select>
       </div>`;
     }).join('');
-    return `<div class="kanban-col">
+    return `<div class="kanban-col" ondragover="kbDragOver(event)" ondragleave="kbDragLeave(event)" ondrop="kbDrop(event,'${col.id}')">
       <div class="kb-hdr"><span class="bdg ${col.cls}">${col.icon} ${col.label}</span><span class="kb-count">${colTasks.length}</span></div>
-      <div class="kb-body" id="kb-${col.id}"
-        ondragover="kbDragOver(event)" ondragleave="kbDragLeave(event)" ondrop="kbDrop(event,'${col.id}')">
-        ${cards||`<div style="padding:14px;text-align:center;font-size:11px;color:var(--tx3);">Arrastra aquí</div>`}
+      <div class="kb-body" id="kb-${col.id}">
+        ${cards||`<div style="padding:14px;text-align:center;font-size:11px;color:var(--tx3);">Suelta aquí</div>`}
       </div>
     </div>`;
   }).join('');
@@ -2896,16 +2920,18 @@ function kbDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('drag-
 function kbDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
 async function kbDrop(e,colId){
   e.preventDefault(); e.currentTarget.classList.remove('drag-over');
-  const t=_tasks.find(x=>x.id===dragId); if(!t) return;
+  const t=_tasks.find(x=>x.id===dragId); dragId=null; if(!t) return;
   t.kStatus=colId; t.status=colId==='cierre'?'done':'pending';
+  t.kbMovedAt=Date.now(); // para que quede arriba en su nueva columna
+  renderProjDetail(currentProjId); // optimista: se ve de una
   await persistTask(t);
-  if(!_fbOn) renderProjDetail(currentProjId);
 }
 async function moveKbTask(taskId,colId){
   const t=_tasks.find(x=>x.id===taskId); if(!t) return;
   t.kStatus=colId; t.status=colId==='cierre'?'done':'pending';
+  t.kbMovedAt=Date.now();
+  renderProjDetail(currentProjId);
   await persistTask(t);
-  if(!_fbOn) renderProjDetail(currentProjId);
 }
 
 /* ── Drag & drop en CALENDARIO — arrastra contenido a un día ── */
@@ -2937,7 +2963,7 @@ async function calDrop(e, dStr, projId){
   }
   dragId=null;
   await persistTask(t);
-  if(!_fbOn) renderMethContent(projId,'calendario');
+  renderMethContent(projId,'calendario');
 }
 
 /* ── Calendar ── */
@@ -3387,7 +3413,7 @@ async function saveProject(){
   };
   await persistProject(proj);
   closeMod('m-proj'); clearProjForm();
-  if(!_fbOn) renderProjGrid();
+  renderProjGrid();
 }
 function clearProjForm(){
   ['mp-id','mp-name','mp-desc','mp-icon','mp-start','mp-end','mp-qyear','mp-goals'].forEach(i=>document.getElementById(i).value='');
@@ -3402,7 +3428,7 @@ function clearProjForm(){
 async function deleteProject(id){
   if(!confirm('¿Eliminar proyecto y sus tareas?')) return;
   await removeProject(id);
-  if(!_fbOn) renderProjGrid();
+  renderProjGrid();
 }
 
 /* ═══════════════════════════════════════
@@ -3594,7 +3620,7 @@ async function saveTaskForm(){
   };
   await persistTask(t);
   closeMod('m-task-form');
-  if(!_fbOn) onDataChange();
+  onDataChange();
 }
 
 // createTask is no longer used (gestión inline form removed)
@@ -3741,13 +3767,13 @@ async function saveEvent(){
   };
   await persistEvent(ev);
   closeMod('m-event');
-  if(!_fbOn) renderEventos();
+  renderEventos();
 }
 
 async function deleteEvent(id){
   if(!confirm('¿Eliminar este evento?')) return;
   await removeEvent(id);
-  if(!_fbOn) renderEventos();
+  renderEventos();
 }
 
 /* ═══════════════════════════════════════
@@ -4594,7 +4620,7 @@ Object.assign(window,{
   toggleIdsOpen, addIdsItem, toggleIdsItem, delIdsItem, addIdsComment,
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
-  createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask,
+  createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask, selectHomeFilter,
   openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, openAreaModal, renderPulseTaskSections, pwTaskHTML, formatResources, togglePwSection,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   tdpAddSubtask, tdpToggleSubtask, tdpDelSubtask,
