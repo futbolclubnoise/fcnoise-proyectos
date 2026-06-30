@@ -1456,6 +1456,13 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
         <button class="btn btn-g w-full" onclick="openMod('m-admin-user')">👤 Agregar persona</button>
         <button class="btn btn-g w-full" onclick="openMod('m-admin-area')">📂 Crear / gestionar áreas</button>
       </div>
+      <div style="height:1px;background:var(--bd);margin:14px 0 10px;"></div>
+      <div class="tdp-slbl">Respaldo de datos</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-g w-full" onclick="exportData()">⬇️ Descargar respaldo</button>
+        <label class="btn btn-g w-full" style="cursor:pointer;">⬆️ Restaurar respaldo<input type="file" id="impfile" accept="application/json" style="display:none;" onchange="importData(this)"></label>
+        <div style="font-size:9px;color:var(--tx3);">Descarga un archivo con todos los datos. Si algo falla, lo restauras aquí.</div>
+      </div>
     </div>
 
     <div style="height:1px;background:var(--bd);margin:16px 0 14px;"></div>
@@ -3952,6 +3959,48 @@ async function adminDelArea(id){
   refreshAreaSelects(); renderAdminAreaList();
 }
 
+/* ── RESPALDO: exportar / importar todos los datos ── */
+function exportData(){
+  const dump={
+    _exportDate:new Date().toISOString(),
+    projects:_projects, tasks:_tasks, events:_events,
+    milestones:_milestones, goodnews:_goodnews, pulses:_pulses,
+    profiles:_profiles, customUsers:_customUsers, customAreas:_customAreas,
+  };
+  const blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='fcnoise-respaldo-'+todayStr()+'.json';
+  a.click();
+}
+async function importData(input){
+  const file=input.files[0]; if(!file) return;
+  if(!confirm('Esto va a restaurar los datos del archivo y sobrescribir lo que haya. ¿Continuar?')){ input.value=''; return; }
+  try{
+    const dump=JSON.parse(await file.text());
+    const sets=[
+      ['projects',_v=>{_projects=_v;localStorage.setItem(LS.proj,JSON.stringify(_v));}, fbSaveProject],
+      ['tasks',   _v=>{_tasks=_v;   localStorage.setItem(LS.task,JSON.stringify(_v));}, fbSaveTask],
+      ['events',  _v=>{_events=_v;  localStorage.setItem(LS.events,JSON.stringify(_v));}, fbSaveEvent],
+      ['milestones',_v=>{_milestones=_v;localStorage.setItem(LS.milestones,JSON.stringify(_v));}, fbSaveMilestone],
+      ['goodnews',_v=>{_goodnews=_v;localStorage.setItem(LS.goodnews,JSON.stringify(_v));}, fbSaveGoodnews],
+      ['pulses',  _v=>{_pulses=_v;  localStorage.setItem(LS.pulses,JSON.stringify(_v));}, fbSavePulse],
+    ];
+    let total=0;
+    for(const [key,setLocal,saveFn] of sets){
+      const arr=Array.isArray(dump[key])?dump[key]:[];
+      setLocal(arr);
+      if(isConnected()) for(const item of arr){ if(item&&item.id){ await saveFn(item); total++; } }
+    }
+    input.value='';
+    alert('✅ Restaurado: '+total+' elementos subidos. La app ya muestra los datos.');
+    onDataChange(); renderNav();
+  }catch(e){
+    alert('No se pudo leer el archivo: '+e.message);
+    input.value='';
+  }
+}
+
 function uploadSettingsPhoto(input){
   const file=input.files[0]; if(!file) return;
   const reader=new FileReader();
@@ -4646,7 +4695,7 @@ Object.assign(window,{
   switchTaskType,
   openProfile, saveProfile, openSettingsModal, renderSettingsModal,
   saveSettingsModal, uploadSettingsPhoto, removeSettingsPhoto,
-  adminSetPass, adminAddUser, adminAddArea, adminDelArea,
+  adminSetPass, adminAddUser, adminAddArea, adminDelArea, exportData, importData,
   renderAdminPassList, renderAdminUserList, renderAdminAreaList,
   openNewEvent, openEditEvent, saveEvent, deleteEvent,
   selectCalPill, toggleLive,
