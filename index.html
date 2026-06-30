@@ -1862,6 +1862,7 @@ async function goLive(){
   listenProjects(async docs=>{
     if(!pSynced){ pSynced=true;
       await mergeLocalToFb(_projects, docs, fbSaveProject);
+      if(docs.length===0 && _projects.length>0){ setSyncDot(true); return; } // NO borrar local con FB vacío
     }
     _projects=docs; localStorage.setItem(LS.proj,JSON.stringify(docs));
     onDataChange(); setSyncDot(true);
@@ -1872,6 +1873,7 @@ async function goLive(){
   listenTasks(async docs=>{
     if(!tSynced){ tSynced=true;
       await mergeLocalToFb(_tasks, docs, fbSaveTask);
+      if(docs.length===0 && _tasks.length>0){ setSyncDot(true); return; }
     }
     _tasks=docs; localStorage.setItem(LS.task,JSON.stringify(docs));
     onDataChange(); setSyncDot(true);
@@ -1882,6 +1884,7 @@ async function goLive(){
   listenEvents(async docs=>{
     if(!eSynced){ eSynced=true;
       await mergeLocalToFb(_events, docs, fbSaveEvent);
+      if(docs.length===0 && _events.length>0) return;
     }
     _events=docs; localStorage.setItem(LS.events,JSON.stringify(docs));
     onDataChange();
@@ -1892,6 +1895,7 @@ async function goLive(){
   listenMilestones(async docs=>{
     if(!mSynced){ mSynced=true;
       await mergeLocalToFb(_milestones, docs, fbSaveMilestone);
+      if(docs.length===0 && _milestones.length>0) return;
     }
     _milestones=docs; localStorage.setItem(LS.milestones,JSON.stringify(docs));
     if(currentView==='tasks') renderTimeline();
@@ -1902,6 +1906,7 @@ async function goLive(){
   listenGoodnews(async docs=>{
     if(!gnSynced){ gnSynced=true;
       await mergeLocalToFb(_goodnews, docs, fbSaveGoodnews);
+      if(docs.length===0 && _goodnews.length>0) return;
     }
     _goodnews=docs; localStorage.setItem(LS.goodnews,JSON.stringify(docs));
     if(currentView==='gestion') renderGoodNews();
@@ -1912,6 +1917,7 @@ async function goLive(){
   listenPulses(async docs=>{
     if(!puSynced){ puSynced=true;
       await mergeLocalToFb(_pulses, docs, fbSavePulse);
+      if(docs.length===0 && _pulses.length>0){ renderNav(); return; }
     }
     _pulses=docs; localStorage.setItem(LS.pulses,JSON.stringify(docs));
     renderNav();
