@@ -1751,6 +1751,20 @@ function canSeePulse(){
 ═══════════════════════════════════════ */
 function tStart(t){ return t.startDate || ''; }
 function tEnd(t)  { return t.endDate || t.dueDate || ''; }
+// Clave de identidad de una tarea (proyecto + nombre) para detectar copias duplicadas
+function taskKey(t){ return (t.projectId||'')+'|'+(t.name||'').trim().toLowerCase(); }
+// Conjunto de claves que YA están hechas (cualquier copia hecha marca todo el grupo)
+function doneKeySet(){
+  const s=new Set();
+  _tasks.forEach(t=>{ if(t.status==='done') s.add(taskKey(t)); });
+  return s;
+}
+// Una tarea cuenta como HECHA si su copia lo está, o si CUALQUIER copia gemela lo está.
+// Así, al terminar una tarea desaparece de urgentes/pendientes aunque exista duplicada.
+function taskDone(t, doneKeys){
+  if(t.status==='done') return true;
+  return (doneKeys||doneKeySet()).has(taskKey(t));
+}
 
 function saveProjects(d){ _projects=d; localStorage.setItem(LS.proj,JSON.stringify(d)); }
 function saveTasks(d)   { _tasks=d;    localStorage.setItem(LS.task,JSON.stringify(d)); }
@@ -2260,11 +2274,13 @@ function renderDashboard(){
   const weekEnd=new Date(); weekEnd.setDate(weekEnd.getDate()+7);
   const weekStr=weekEnd.toISOString().split('T')[0];
 
-  // Pendientes SIN duplicados (mismo proyecto+nombre → una sola copia)
+  // Pendientes SIN duplicados (mismo proyecto+nombre → una sola copia).
+  // Si CUALQUIER copia está hecha, el grupo se considera hecho y no aparece.
+  const doneKeys=doneKeySet();
   const seenKeys=new Set();
   const pend=all.filter(t=>{
-    if(t.status==='done') return false;
-    const k=(t.projectId||'')+'|'+(t.name||'').trim().toLowerCase();
+    if(taskDone(t,doneKeys)) return false;
+    const k=taskKey(t);
     if(seenKeys.has(k)) return false;
     seenKeys.add(k); return true;
   });
@@ -2673,44 +2689,56 @@ function tfDelSubtask(id){
   renderTfSubs();
 }
 
+// Sincroniza los campos de estado de UNA tarea según hecho/pendiente
+function applyDoneState(t, done){
+  const proj=_projects.find(p=>p.id===t.projectId);
+  const meth=proj?.meth||'lista';
+  const ttype=t.taskType||(meth==='calendario'?'contenido':'tarea');
+  t.status=done?'done':'pending';
+  if(ttype==='contenido'){
+    if(done) t.calStatus='publicado';
+    else if(t.calStatus==='publicado') t.calStatus='aprobado';
+  } else {
+    if(done) t.taskStatus='completada';
+    else if(t.taskStatus==='completada') t.taskStatus='en-proceso';
+    if(meth==='kanban'){
+      if(done) t.kStatus='cierre';
+      else if(t.kStatus==='cierre') t.kStatus='ejecucion';
+    }
+  }
+}
+// Marca hecha/pendiente una tarea Y todas sus copias duplicadas, y persiste cada una.
+// Así "ya terminé" limpia el pendiente en TODAS partes (sin borrar datos).
+async function persistDoneAllCopies(t, done){
+  const key=taskKey(t);
+  const copies=_tasks.filter(x=>taskKey(x)===key);
+  for(const c of copies){ applyDoneState(c, done); await persistTask(c); }
+}
+
 async function tdpSetState(colId, type){
   const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
+  let done=t.status==='done';
   if(type==='contenido'){
     t.calStatus=colId;
-    const col=CAL_COLS.find(c=>c.id===colId);
-    t.status=col?.done?'done':'pending';
+    const col=CAL_COLS.find(c=>c.id===colId); done=!!col?.done;
   } else if(type==='tarea'){
     t.taskStatus=colId;
-    const ts=TASK_STATES.find(s=>s.id===colId);
-    t.status=ts?.done?'done':'pending';
+    const ts=TASK_STATES.find(s=>s.id===colId); done=!!ts?.done;
   } else if(type==='kanban'){
-    t.kStatus=colId;
-    t.status=colId==='cierre'?'done':'pending';
+    t.kStatus=colId; done=colId==='cierre';
   }
+  t.status=done?'done':'pending';
   await persistTask(t);
+  // Propaga el hecho/pendiente a las copias duplicadas (mantiene consistencia)
+  const key=taskKey(t);
+  for(const c of _tasks.filter(x=>taskKey(x)===key&&x.id!==t.id)){ applyDoneState(c, done); await persistTask(c); }
   refreshDetailPopup(); onDataChange();
 }
 
 async function tdpToggleDone(){
   const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
-  const proj=_projects.find(p=>p.id===t.projectId);
-  const meth=proj?.meth||'lista';
-  const ttype=t.taskType||(meth==='calendario'?'contenido':'tarea');
-  t.status=t.status==='done'?'pending':'done';
-  if(ttype==='contenido'){
-    if(t.status==='done') t.calStatus='publicado';
-    if(t.status==='pending'&&t.calStatus==='publicado') t.calStatus='aprobado';
-  } else {
-    // tarea
-    if(t.status==='done') t.taskStatus='completada';
-    if(t.status==='pending'&&t.taskStatus==='completada') t.taskStatus='en-proceso';
-    // also sync kStatus for kanban board
-    if(meth==='kanban'){
-      if(t.status==='done') t.kStatus='cierre';
-      if(t.status==='pending'&&t.kStatus==='cierre') t.kStatus='ejecucion';
-    }
-  }
-  await persistTask(t);
+  const done=t.status!=='done'; // nuevo estado
+  await persistDoneAllCopies(t, done);
   refreshDetailPopup(); onDataChange();
 }
 
@@ -2969,20 +2997,24 @@ function kbDragEnd(){
 }
 function kbDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
 function kbDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
-async function kbDrop(e,colId){
-  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
-  const t=_tasks.find(x=>x.id===dragId); dragId=null; if(!t) return;
-  t.kStatus=colId; t.status=colId==='cierre'?'done':'pending';
+async function kbMove(t,colId){
+  const done=colId==='cierre';
+  t.kStatus=colId; t.status=done?'done':'pending';
   t.kbMovedAt=Date.now(); // para que quede arriba en su nueva columna
   renderProjDetail(currentProjId); // optimista: se ve de una
   await persistTask(t);
+  // Propaga hecho/pendiente a las copias duplicadas (sin borrar nada)
+  const key=taskKey(t);
+  for(const c of _tasks.filter(x=>taskKey(x)===key&&x.id!==t.id)){ applyDoneState(c, done); await persistTask(c); }
+}
+async function kbDrop(e,colId){
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  const t=_tasks.find(x=>x.id===dragId); dragId=null; if(!t) return;
+  await kbMove(t,colId);
 }
 async function moveKbTask(taskId,colId){
   const t=_tasks.find(x=>x.id===taskId); if(!t) return;
-  t.kStatus=colId; t.status=colId==='cierre'?'done':'pending';
-  t.kbMovedAt=Date.now();
-  renderProjDetail(currentProjId);
-  await persistTask(t);
+  await kbMove(t,colId);
 }
 
 /* ── Drag & drop en CALENDARIO — arrastra contenido a un día ── */
@@ -3151,7 +3183,11 @@ function calPickOpen(type){
 ═══════════════════════════════════════ */
 function showAlerts(){
   const today=todayStr();
-  const urgent=myTasks().filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<=today);
+  const dk=doneKeySet(), seen=new Set();
+  const urgent=myTasks().filter(t=>{
+    if(taskDone(t,dk)||!tEnd(t)||tEnd(t)>today) return false;
+    const k=taskKey(t); if(seen.has(k)) return false; seen.add(k); return true;
+  });
   if(!urgent.length) return;
   document.getElementById('m-alert-list').innerHTML=urgent.map(t=>{
     const over=tEnd(t)<today;
@@ -3183,9 +3219,10 @@ function renderOpsView(){
   const allT=isSuperAdmin()||isAdmin()
     ? _tasks
     : _tasks.filter(t=>myAreas.includes(t.area||'general')&&(t.assignedUsers||[]).includes(currentUser.id));
-  const urgent  =allT.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today);
-  const inProc  =allT.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='en-proceso');
-  const inRev   =allT.filter(t=>t.status!=='done'&&(t.taskStatus||'pendiente')==='revision');
+  const dkO=doneKeySet();
+  const urgent  =allT.filter(t=>!taskDone(t,dkO)&&tEnd(t)&&tEnd(t)<today);
+  const inProc  =allT.filter(t=>!taskDone(t,dkO)&&(t.taskStatus||'pendiente')==='en-proceso');
+  const inRev   =allT.filter(t=>!taskDone(t,dkO)&&(t.taskStatus||'pendiente')==='revision');
   const doneTd  =allT.filter(t=>t.status==='done');
   const statsEl =document.getElementById('ops-stats');
   if(statsEl) statsEl.innerHTML=`
@@ -3681,29 +3718,9 @@ function openNewTask(){ _taskFromProjId=null; openTaskForm(null); }
 
 async function toggleTask(id){
   const t=_tasks.find(x=>x.id===id); if(!t) return;
-  const newStatus=t.status==='done'?'pending':'done';
   // Aplica a TODAS las copias duplicadas (mismo proyecto + nombre) para que
   // no quede una copia pendiente "fantasma" en urgentes / por hacer
-  const key=(t.projectId||'')+'|'+(t.name||'').trim().toLowerCase();
-  const copies=_tasks.filter(x=>((x.projectId||'')+'|'+(x.name||'').trim().toLowerCase())===key);
-  for(const c of copies){
-    const proj=_projects.find(p=>p.id===c.projectId);
-    const meth=proj?.meth||'lista';
-    const ttype=c.taskType||(meth==='calendario'?'contenido':'tarea');
-    c.status=newStatus;
-    if(ttype==='contenido'){
-      if(newStatus==='done') c.calStatus='publicado';
-      else if(c.calStatus==='publicado') c.calStatus='aprobado';
-    } else {
-      if(newStatus==='done') c.taskStatus='completada';
-      else if(c.taskStatus==='completada') c.taskStatus='en-proceso';
-      if(meth==='kanban'){
-        if(newStatus==='done') c.kStatus='cierre';
-        else if(c.kStatus==='cierre') c.kStatus='ejecucion';
-      }
-    }
-    await persistTask(c);
-  }
+  await persistDoneAllCopies(t, t.status!=='done');
   onDataChange(); // actualiza la vista al instante (el listener de Firebase reconcilia)
 }
 
@@ -4343,10 +4360,11 @@ function renderPulseTaskSections(){
     return op!==0?op:(tEnd(a)||'').localeCompare(tEnd(b)||'');
   });
 
-  const overdue=sortPrio(srcTasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<today));
-  const thisWkT=sortPrio(srcTasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)>=thisWk.start&&tEnd(t)<=thisWk.end));
-  const nextWkT=sortPrio(srcTasks.filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)>=nextWk.start&&tEnd(t)<=nextWk.end));
-  const laterT =sortPrio(srcTasks.filter(t=>t.status!=='done'&&(!tEnd(t)||(tEnd(t)>nextWk.end&&tEnd(t)>=today))));
+  const dkW=doneKeySet();
+  const overdue=sortPrio(srcTasks.filter(t=>!taskDone(t,dkW)&&tEnd(t)&&tEnd(t)<today));
+  const thisWkT=sortPrio(srcTasks.filter(t=>!taskDone(t,dkW)&&tEnd(t)&&tEnd(t)>=thisWk.start&&tEnd(t)<=thisWk.end));
+  const nextWkT=sortPrio(srcTasks.filter(t=>!taskDone(t,dkW)&&tEnd(t)&&tEnd(t)>=nextWk.start&&tEnd(t)<=nextWk.end));
+  const laterT =sortPrio(srcTasks.filter(t=>!taskDone(t,dkW)&&(!tEnd(t)||(tEnd(t)>nextWk.end&&tEnd(t)>=today))));
 
   // Retrasadas (siempre visible, sin colapso)
   const delEl=document.getElementById('pw-delayed');
