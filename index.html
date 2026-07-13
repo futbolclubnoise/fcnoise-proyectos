@@ -267,6 +267,7 @@ body.light select{color:#1a1a1a;}
 .dot-completada,.dot-done{background:var(--grn);}
 /* Contenido */
 .dot-idea{background:var(--blu);}
+.dot-grabacion{background:var(--red);}
 .dot-edicion{background:var(--yel);}
 .dot-ajuste{background:var(--org);}
 .dot-aprobado{background:var(--grn);}
@@ -408,6 +409,14 @@ body.light select{color:#1a1a1a;}
 .cal-chip{font-size:9px;font-weight:600;padding:2px 6px;border-radius:5px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;transition:opacity .18s;}
 .cal-chip:hover{opacity:.75;}
 .cal-chip.span-day{opacity:.55;font-style:italic;}
+/* Contenido: entrega (borde punteado) vs publicación (sólido, destacado) */
+.cal-chip.c-entrega{border-style:dashed!important;font-weight:600;}
+.cal-chip.c-publica{font-weight:700;box-shadow:inset 0 0 0 1px currentColor;}
+.cal-chip .c-ico{font-style:normal;margin-right:2px;}
+.cal-chip.c-mid{opacity:.32;padding:1px 6px;font-size:8px;}
+/* Leyenda del calendario */
+.cal-legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:10px;color:var(--tx3);}
+.cal-legend span{display:inline-flex;align-items:center;gap:4px;}
 .cal-add-hint{font-size:9px;color:var(--tx3);opacity:0;transition:opacity .18s;text-align:center;margin-top:4px;}
 .cal-cell:hover .cal-add-hint{opacity:1;}
 .cal-no-date{margin-top:14px;padding:14px;background:var(--bg3);border-radius:var(--r);}
@@ -426,8 +435,8 @@ body.light select{color:#1a1a1a;}
 .cal-card-body{padding:11px 12px 11px 14px;}
 .cal-card-status{display:inline-flex;align-items:center;gap:5px;font-size:8.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px;}
 .cal-card-title{font-size:12.5px;font-weight:600;line-height:1.3;margin-bottom:9px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:-.01em;}
-.cal-card-foot{display:flex;align-items:center;gap:6px;font-size:9.5px;color:var(--tx3);}
-.cal-card-date{font-variant-numeric:tabular-nums;font-weight:500;}
+.cal-card-foot{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;font-size:9.5px;color:var(--tx3);}
+.cal-card-date{font-variant-numeric:tabular-nums;font-weight:500;white-space:nowrap;}
 .cal-card-avs{display:flex;gap:-3px;margin-left:auto;}
 .cal-card-avs .udot{width:17px;height:17px;font-size:7px;border:1.5px solid var(--bg2);margin-left:-4px;}
 .cal-card-avs .udot:first-child{margin-left:0;}
@@ -1661,6 +1670,7 @@ const KB_COLS = [
 ];
 const CAL_COLS = [
   {id:'idea',      label:'Idea',      icon:'💡', cls:'bb', color:'var(--blu)',  done:false},
+  {id:'grabacion', label:'Grabación', icon:'🎥', cls:'br', color:'var(--red)',  done:false},
   {id:'edicion',   label:'Edición',   icon:'✂️',  cls:'by', color:'var(--yel)', done:false},
   {id:'ajuste',    label:'Ajuste',    icon:'🔧', cls:'bo', color:'var(--org)',  done:false},
   {id:'aprobado',  label:'Aprobado',  icon:'👍', cls:'bg', color:'var(--grn)',  done:false},
@@ -2536,12 +2546,18 @@ function refreshDetailPopup(){
   // title
   document.getElementById('tdp-title').textContent=t.name;
 
-  // dates
+  // dates — el contenido tiene ENTREGA y PUBLICACIÓN; la tarea tiene inicio→fin
+  const isContentT=(t.taskType||(proj?.meth==='calendario'?'contenido':'tarea'))==='contenido';
   const datesEl=document.getElementById('tdp-dates');
   if(s||e){
-    datesEl.innerHTML=(s?`<div class="dd">🟢 ${s}</div>`:'')+
-      (s&&e?`<span style="color:var(--tx3);">→</span>`:'') +
-      (e?`<div class="dd">🔴 ${e}</div>`:'');
+    if(isContentT){
+      datesEl.innerHTML=(s?`<div class="dd" title="Fecha de entrega">📥 Entrega: ${s}</div>`:'')+
+        (e?`<div class="dd" title="Fecha de publicación">🚀 Publica: ${e}</div>`:'');
+    } else {
+      datesEl.innerHTML=(s?`<div class="dd">🟢 ${s}</div>`:'')+
+        (s&&e?`<span style="color:var(--tx3);">→</span>`:'') +
+        (e?`<div class="dd">🔴 ${e}</div>`:'');
+    }
   } else { datesEl.innerHTML='<span style="color:var(--tx3);font-size:11px;">Sin fechas asignadas</span>'; }
 
   // meta chips: area, priority
@@ -3063,6 +3079,10 @@ function renderCalHTML(projId){
       <div class="cal-month">${MONTHS[calMonth]} ${calYear}</div>
       <button class="btn btn-g btn-sm" onclick="calNav(1,'${projId}')">→</button>
     </div>
+    <div class="cal-legend">
+      <span><span class="c-ico">📥</span> Fecha de entrega</span>
+      <span><span class="c-ico">🚀</span> Fecha de publicación</span>
+    </div>
     <div class="cal-grid">
     ${DAYS_SHORT.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('')}`;
 
@@ -3080,18 +3100,40 @@ function renderCalHTML(projId){
       return dStr>=s && dStr<=e;
     });
     const chips=dayTasks.map(t=>{
-      const isStart=(tStart(t)||tEnd(t))===dStr;
       const calCol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
       const color=calCol.color;
       const title=esc(t.name);
+      const doneCls=t.status==='done'?'done-c':'';
       const dragAttrs=isCeo?`draggable="true" ondragstart="calDragStart(event,'${t.id}')" ondragend="calDragEnd(event)"`:'';
-      return `<div class="cal-chip ${t.status==='done'?'done-c':''} ${isStart?'':'span-day'}" id="cchip-${t.id}-${dStr}"
-        ${dragAttrs}
-        style="background:${color}22;color:${color};border:1px solid ${color}44;"
-        onclick="event.stopPropagation();openTaskDetail('${t.id}')"
-        title="${calCol.label} — ${title}">
-        ${isStart?title:'▸'}
-      </div>`;
+      const open=`onclick="event.stopPropagation();openTaskDetail('${t.id}')"`;
+      const baseStyle=`background:${color}22;color:${color};border:1px solid ${color}44;`;
+      const sD=tStart(t), eD=tEnd(t);
+      // En calendario, por defecto es CONTENIDO (salvo que sea tarea explícita)
+      const isContent=(t.taskType!=='tarea');
+      if(isContent){
+        const hasBoth = sD && eD && sD!==eD;
+        if(hasBoth && dStr===sD){
+          // Fecha de ENTREGA — borde punteado
+          return `<div class="cal-chip c-entrega ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${baseStyle}" ${open} title="Entrega — ${title}"><span class="c-ico">📥</span>${title}</div>`;
+        }
+        if(hasBoth && dStr===eD){
+          // Fecha de PUBLICACIÓN — sólido, destacado
+          return `<div class="cal-chip c-publica ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${baseStyle}" ${open} title="Publicación — ${title}"><span class="c-ico">🚀</span>${title}</div>`;
+        }
+        if(hasBoth){
+          // Día intermedio — conector sutil
+          return `<div class="cal-chip c-mid ${doneCls}" style="background:${color}18;color:${color};" ${open} title="${title}">·····</div>`;
+        }
+        // Una sola fecha (o entrega y publicación el mismo día)
+        const sameDay = sD && eD && sD===eD;
+        const isPub = eD && dStr===eD;
+        const ico = sameDay?'📥🚀':(isPub?'🚀':'📥');
+        const lbl = sameDay?'Entrega y publicación':(isPub?'Publicación':'Entrega');
+        return `<div class="cal-chip c-publica ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${baseStyle}" ${open} title="${lbl} — ${title}"><span class="c-ico">${ico}</span>${title}</div>`;
+      }
+      // TAREA: rango start→end como antes
+      const isStart=(sD||eD)===dStr;
+      return `<div class="cal-chip ${doneCls} ${isStart?'':'span-day'}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${baseStyle}" ${open} title="${calCol.label} — ${title}">${isStart?title:'▸'}</div>`;
     }).join('');
     const addHint=isCeo?`<div class="cal-add-hint">+ agregar</div>`:'';
     const clickHandler=isCeo?`calDayClick('${dStr}','${projId}')`:'';
@@ -3116,8 +3158,17 @@ function renderCalHTML(projId){
     const cards=monthContent.map(t=>{
       const calCol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
       const done=t.status==='done';
-      const d=tEnd(t)||tStart(t);
-      const dd=d?d.slice(8,10)+'/'+d.slice(5,7):'';
+      const fmt=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
+      const sD=tStart(t), eD=tEnd(t);
+      // Contenido: muestra ENTREGA 📥 y PUBLICACIÓN 🚀 por separado
+      let datesHtml='';
+      if(sD&&eD&&sD!==eD){
+        datesHtml=`<span class="cal-card-date" title="Entrega">📥 ${fmt(sD)}</span><span class="cal-card-date" title="Publicación">🚀 ${fmt(eD)}</span>`;
+      } else {
+        const only=eD||sD;
+        const ico=eD?'🚀':'📥';
+        if(only) datesHtml=`<span class="cal-card-date" title="${eD?'Publicación':'Entrega'}">${ico} ${fmt(only)}</span>`;
+      }
       const avs=(t.assignedUsers||[]).slice(0,3).map(uid_=>{
         const u=USERS[uid_]; if(!u) return '';
         const rm=ROLES[u.role];
@@ -3130,7 +3181,7 @@ function renderCalHTML(projId){
           <div class="cal-card-status" style="color:${calCol.color};">${calCol.label}</div>
           <div class="cal-card-title">${esc(t.name)}</div>
           <div class="cal-card-foot">
-            ${dd?`<span class="cal-card-date">${dd}</span>`:''}
+            ${datesHtml}
             <div class="cal-card-avs">${avs}</div>
           </div>
         </div>
