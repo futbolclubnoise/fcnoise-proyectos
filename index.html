@@ -614,7 +614,16 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
 .proj-prio-section.drop{background:var(--bg3);box-shadow:inset 0 0 0 2px var(--accent);padding:10px;margin:-10px -10px 14px;}
 .proj-card[draggable="true"]{cursor:grab;}
 .proj-card.dragging{opacity:.4;}
+.proj-card.drop-target{box-shadow:-3px 0 0 0 var(--accent);}
 .proj-drop-empty{grid-column:1/-1;padding:22px;text-align:center;font-size:12px;color:var(--tx3);border:1px dashed var(--bd2);border-radius:12px;}
+
+/* ── BARRA DE BÚSQUEDA (tareas y proyectos) ── */
+.view-search{position:relative;margin-bottom:16px;max-width:420px;}
+.view-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--tx3);pointer-events:none;}
+.view-search input{width:100%;box-sizing:border-box;padding:10px 34px 10px 34px;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);font-size:13px;font-family:var(--font-body);outline:none;transition:border-color .15s;}
+.view-search input:focus{border-color:var(--accent);}
+.view-search .vs-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--tx3);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;display:none;}
+.view-search.has-q .vs-clear{display:block;}
 
 /* ── OPS LANES (Operaciones) ── */
 .ops-lanes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
@@ -990,6 +999,11 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
 
     <!-- ── HOME DASHBOARD ── -->
     <div id="view-tasks" class="hidden">
+      <div class="view-search" id="task-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="task-search" type="text" placeholder="Buscar tarea o contenido…" oninput="onTaskSearch(this.value)">
+        <button class="vs-clear" onclick="clearTaskSearch()" title="Limpiar">✕</button>
+      </div>
       <div id="home-timeline"></div>
       <div id="home-content"></div>
     </div>
@@ -999,6 +1013,11 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
       <div class="page-hdr">
         <div class="page-title">Proyectos</div>
         <div class="ml-auto" id="btn-new-proj-wrap"></div>
+      </div>
+      <div class="view-search" id="proj-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="proj-search" type="text" placeholder="Buscar proyecto…" oninput="onProjSearch(this.value)">
+        <button class="vs-clear" onclick="clearProjSearch()" title="Limpiar">✕</button>
       </div>
       <div class="proj-grid" id="proj-grid"></div>
     </div>
@@ -2281,6 +2300,19 @@ function homeTasks(){
 }
 function selectHomeFilter(f){ _homeFilter=f; renderDashboard(); }
 
+// ── Búsqueda de tareas (barra en la vista Tareas) ──
+let _taskSearch='';
+function onTaskSearch(v){
+  _taskSearch=v;
+  document.getElementById('task-search-wrap')?.classList.toggle('has-q', !!v.trim());
+  renderDashboard();
+}
+function clearTaskSearch(){
+  _taskSearch=''; const i=document.getElementById('task-search'); if(i) i.value='';
+  document.getElementById('task-search-wrap')?.classList.remove('has-q');
+  renderDashboard();
+}
+
 function renderDashboard(){
   const rm=ROLES[currentUser.role];
   document.documentElement.style.setProperty('--accent',rm.color);
@@ -2289,6 +2321,19 @@ function renderDashboard(){
 
   const all=homeTasks();
   const today=todayStr();
+
+  // ── Modo BÚSQUEDA: lista plana de coincidencias (nombre o descripción) ──
+  const sq=_taskSearch.trim().toLowerCase();
+  if(sq){
+    const results=all.filter(t=>(t.name||'').toLowerCase().includes(sq)||((t.contentDesc||t.desc||'')).toLowerCase().includes(sq));
+    const tl=document.getElementById('home-timeline'); if(tl) tl.innerHTML='';
+    document.getElementById('home-content').innerHTML=
+      `<div class="section-title">RESULTADOS <span class="bscnt">${results.length}</span></div>`+
+      (results.length
+        ? `<div class="hcard"><div class="hcard-body">${results.map(t=>taskTicketHTML(t)).join('')}</div></div>`
+        : `<div class="hcard"><div class="hcard-body"><div class="hcard-empty">Sin coincidencias para “${esc(_taskSearch.trim())}”</div></div></div>`);
+    return;
+  }
   const weekEnd=new Date(); weekEnd.setDate(weekEnd.getDate()+7);
   const weekStr=weekEnd.toISOString().split('T')[0];
 
@@ -2766,7 +2811,7 @@ async function tdpDelete(){
 /* ═══════════════════════════════════════
    PROJECTS GRID
 ═══════════════════════════════════════ */
-function projCardHTML(p, _admin){
+function projCardHTML(p, _admin, draggableOn=true){
   const admin=canEditProject(p); // admins + project creator can edit
   const pt=_tasks.filter(t=>t.projectId===p.id);
   const done=pt.filter(t=>t.status==='done').length;
@@ -2786,7 +2831,9 @@ function projCardHTML(p, _admin){
   const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
   const dateStr=p.startDate||p.endDate
     ?`<div class="proj-dates">${p.startDate?`<span>${p.startDate}</span>`:''}${p.endDate?`<span style="color:var(--red);">${p.endDate}</span>`:''}</div>`:'';
-  const drag=admin?`draggable="true" ondragstart="projDragStart(event,'${p.id}')" ondragend="projDragEnd(event)"`:'';
+  const drag=(admin&&draggableOn)
+    ?`draggable="true" ondragstart="projDragStart(event,'${p.id}')" ondragend="projDragEnd(event)" ondragover="projCardDragOver(event)" ondragleave="projCardDragLeave(event)" ondrop="projCardDrop(event,'${p.id}')"`
+    :'';
   return `<div class="proj-card" id="pcard-${p.id}" ${drag} onclick="navigate('proj-detail','${p.id}')">
     ${editBtns}
     <div class="pc-top">
@@ -2810,6 +2857,22 @@ function projCardHTML(p, _admin){
   </div>`;
 }
 
+// Orden manual de proyectos (campo p.order); fallback a createdAt para los que no tienen
+function projOrderVal(p){ return typeof p.order==='number' ? p.order : Number.MAX_SAFE_INTEGER; }
+function byProjOrder(a,b){ const d=projOrderVal(a)-projOrderVal(b); return d!==0?d:((a.createdAt||0)-(b.createdAt||0)); }
+
+let _projSearch='';
+function onProjSearch(v){
+  _projSearch=v;
+  document.getElementById('proj-search-wrap')?.classList.toggle('has-q', !!v.trim());
+  renderProjGrid();
+}
+function clearProjSearch(){
+  _projSearch=''; const i=document.getElementById('proj-search'); if(i) i.value='';
+  document.getElementById('proj-search-wrap')?.classList.remove('has-q');
+  renderProjGrid();
+}
+
 function renderProjGrid(){
   const admin=isAdmin();
   const wrap=document.getElementById('btn-new-proj-wrap');
@@ -2820,10 +2883,20 @@ function renderProjGrid(){
     el.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-ico">📂</div><p>Sin proyectos todavía</p></div>'; return;
   }
 
-  // Segmentar por prioridad
-  const alta  = projs.filter(p=>(p.priority||'media')==='alta');
-  const media = projs.filter(p=>(p.priority||'media')==='media');
-  const baja  = projs.filter(p=>(p.priority||'media')==='baja');
+  // ── Modo BÚSQUEDA: grilla plana filtrada (sin secciones ni arrastre) ──
+  const q=_projSearch.trim().toLowerCase();
+  if(q){
+    const found=projs.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.desc||'').toLowerCase().includes(q)).sort(byProjOrder);
+    el.innerHTML = found.length
+      ? `<div class="proj-grid-inner">${found.map(p=>projCardHTML(p,admin,false)).join('')}</div>`
+      : '<div class="empty" style="grid-column:1/-1"><div class="empty-ico">🔍</div><p>Sin coincidencias</p></div>';
+    return;
+  }
+
+  // Segmentar por prioridad y ordenar cada sección por orden manual
+  const alta  = projs.filter(p=>(p.priority||'media')==='alta').sort(byProjOrder);
+  const media = projs.filter(p=>(p.priority||'media')==='media').sort(byProjOrder);
+  const baja  = projs.filter(p=>(p.priority||'media')==='baja').sort(byProjOrder);
 
   function prioSection(label, color, dotCls, list, prioKey){
     // Las secciones siempre son zona de drop (aunque estén vacías) para admins
@@ -2839,13 +2912,13 @@ function renderProjGrid(){
   }
 
   el.innerHTML=
-    (admin?`<div class="proj-reorder-hint">Arrastra las tarjetas entre secciones para cambiar su prioridad</div>`:'')+
+    (admin?`<div class="proj-reorder-hint">Arrastra las tarjetas para ordenarlas o cambiar su prioridad</div>`:'')+
     prioSection('Alta prioridad','var(--red)','dot-alta',alta,'alta')+
     prioSection('Media prioridad','var(--yel)','dot-media',media,'media')+
     prioSection('Baja prioridad','var(--grn)','dot-baja',baja,'baja');
 }
 
-/* ── Reordenar/organizar proyectos por prioridad (arrastre) ── */
+/* ── Reordenar/organizar proyectos por arrastre (prioridad + orden) ── */
 function projDragStart(e,id){
   dragId=id; e.dataTransfer.effectAllowed='move';
   const c=document.getElementById('pcard-'+id); if(c) setTimeout(()=>c.classList.add('dragging'),0);
@@ -2853,15 +2926,43 @@ function projDragStart(e,id){
 function projDragEnd(){
   if(dragId){ const c=document.getElementById('pcard-'+dragId); if(c) c.classList.remove('dragging'); }
   document.querySelectorAll('.proj-prio-section.drop').forEach(el=>el.classList.remove('drop'));
+  document.querySelectorAll('.proj-card.drop-target').forEach(el=>el.classList.remove('drop-target'));
 }
 function projDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('drop'); }
 function projDragLeave(e){ if(e.currentTarget===e.target||!e.currentTarget.contains(e.relatedTarget)) e.currentTarget.classList.remove('drop'); }
+// Reconstruye el orden de una prioridad, insertando el proyecto arrastrado.
+// targetId = tarjeta sobre la que se soltó (inserta antes); si null, va al final.
+// Devuelve los proyectos que cambiaron (para persistir). NO borra nada.
+function reorderProjects(draggedId, targetId, explicitPrio){
+  const p=_projects.find(x=>x.id===draggedId); if(!p) return [];
+  const t=targetId?_projects.find(x=>x.id===targetId):null;
+  const prio = t ? (t.priority||'media') : (explicitPrio || (p.priority||'media'));
+  p.priority=prio;
+  let list=visibleProjects().filter(x=>(x.priority||'media')===prio && x.id!==p.id).sort(byProjOrder);
+  let idx = t ? list.findIndex(x=>x.id===t.id) : list.length;
+  if(idx<0) idx=list.length;
+  list.splice(idx,0,p);
+  const changed=[];
+  list.forEach((x,i)=>{ if(x.order!==i){ x.order=i; changed.push(x); } });
+  if(!changed.includes(p)) changed.push(p); // asegura persistir prioridad del arrastrado
+  return changed;
+}
 async function projDrop(e, prio){
   e.preventDefault(); e.currentTarget.classList.remove('drop');
-  const p=_projects.find(x=>x.id===dragId); dragId=null;
-  if(!p||(p.priority||'media')===prio){ renderProjGrid(); return; }
-  p.priority=prio;
-  await persistProject(p); // guarda (update, NO borra)
+  if(!dragId){ return; }
+  const changed=reorderProjects(dragId, null, prio); dragId=null;
+  for(const x of changed) await persistProject(x); // update, NO borra
+  renderProjGrid();
+}
+// Soltar SOBRE una tarjeta → inserta antes de ella (reordena)
+function projCardDragOver(e){ e.preventDefault(); e.stopPropagation(); e.currentTarget.classList.add('drop-target'); }
+function projCardDragLeave(e){ e.currentTarget.classList.remove('drop-target'); }
+async function projCardDrop(e, targetId){
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.remove('drop-target');
+  if(!dragId || dragId===targetId){ dragId=null; return; }
+  const changed=reorderProjects(dragId, targetId); dragId=null;
+  for(const x of changed) await persistProject(x);
   renderProjGrid();
 }
 
@@ -4797,6 +4898,8 @@ Object.assign(window,{
   selectPulseArea, selectPulsePerson, editAreaGoals, addAreaGoodNews, delAreaGoodNews,
   pwProjDragStart, pwProjDragEnd, pwProjDragOver, pwProjDragLeave, pwProjDrop,
   projDragStart, projDragEnd, projDragOver, projDragLeave, projDrop,
+  projCardDragOver, projCardDragLeave, projCardDrop,
+  onTaskSearch, clearTaskSearch, onProjSearch, clearProjSearch,
   toggleIdsOpen, addIdsItem, toggleIdsItem, delIdsItem, addIdsComment,
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
@@ -4831,7 +4934,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-1';
+const APP_BUILD='2026-07-13-2';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
