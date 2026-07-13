@@ -409,14 +409,19 @@ body.light select{color:#1a1a1a;}
 .cal-chip{font-size:9px;font-weight:600;padding:2px 6px;border-radius:5px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;transition:opacity .18s;}
 .cal-chip:hover{opacity:.75;}
 .cal-chip.span-day{opacity:.55;font-style:italic;}
-/* Contenido: entrega (borde punteado) vs publicación (sólido, destacado) */
-.cal-chip.c-entrega{border-style:dashed!important;font-weight:600;}
-.cal-chip.c-publica{font-weight:700;box-shadow:inset 0 0 0 1px currentColor;}
-.cal-chip .c-ico{font-style:normal;margin-right:2px;}
-.cal-chip.c-mid{opacity:.32;padding:1px 6px;font-size:8px;}
+/* Contenido: entrega (tinte suave) vs publicación (sólido, destacado) */
+.cal-chip.c-entrega{font-weight:600;}
+.cal-chip.c-publica{font-weight:700;}
+.cal-chip .c-ico{font-style:normal;margin-right:3px;}
 /* Leyenda del calendario */
 .cal-legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:10px;color:var(--tx3);}
 .cal-legend span{display:inline-flex;align-items:center;gap:4px;}
+/* Plataformas de contenido */
+.plat-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:9px;border:1.5px solid var(--bd2);background:var(--bg4);color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;user-select:none;}
+.plat-chip .plat-ico{width:18px;height:18px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;}
+.plat-chip.on{color:#fff;}
+.plat-badge{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;font-size:8px;font-weight:800;color:#fff;letter-spacing:.02em;}
+.plat-badges{display:inline-flex;gap:3px;align-items:center;}
 .cal-add-hint{font-size:9px;color:var(--tx3);opacity:0;transition:opacity .18s;text-align:center;margin-top:4px;}
 .cal-cell:hover .cal-add-hint{opacity:1;}
 .cal-no-date{margin-top:14px;padding:14px;background:var(--bg3);border-radius:var(--r);}
@@ -1363,6 +1368,10 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
         <input type="hidden" id="tf-calstatus" value="idea">
       </div>
       <div class="fi">
+        <label>Plataforma <span style="color:var(--tx3);font-weight:400;">(elige 1, 2 o todas)</span></label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-platforms"></div>
+      </div>
+      <div class="fi">
         <label>Recursos / Links</label>
         <textarea id="tf-resources" placeholder="Pega links de carpetas, Google Drive, referencias…" style="min-height:52px;font-size:12px;"></textarea>
         <div style="font-size:9px;color:var(--tx3);margin-top:4px;">Un link por línea</div>
@@ -1682,6 +1691,12 @@ const TASK_STATES = [
   {id:'revision',   label:'Revisión',   icon:'🟡', cls:'by', done:false},
   {id:'completada', label:'Completada', icon:'✅', cls:'bg', done:true },
 ];
+// Plataformas de publicación de CONTENIDO (multi-selección)
+const PLATFORMS = {
+  linkedin:  {label:'LinkedIn',  color:'#0a66c2', short:'in'},
+  instagram: {label:'Instagram', color:'#8b5cf6', short:'IG'},
+  tiktok:    {label:'TikTok',    color:'#111827', short:'TT'},
+};
 const EVENT_TYPES = [
   {id:'partido',      label:'Partido',      icon:'⚽', cls:'br', color:'var(--red)'},
   {id:'entrenamiento',label:'Entrenamiento',icon:'🏃', cls:'bo', color:'var(--org)'},
@@ -1761,20 +1776,10 @@ function canSeePulse(){
 ═══════════════════════════════════════ */
 function tStart(t){ return t.startDate || ''; }
 function tEnd(t)  { return t.endDate || t.dueDate || ''; }
-// Clave de identidad de una tarea (proyecto + nombre) para detectar copias duplicadas
-function taskKey(t){ return (t.projectId||'')+'|'+(t.name||'').trim().toLowerCase(); }
-// Conjunto de claves que YA están hechas (cualquier copia hecha marca todo el grupo)
-function doneKeySet(){
-  const s=new Set();
-  _tasks.forEach(t=>{ if(t.status==='done') s.add(taskKey(t)); });
-  return s;
-}
-// Una tarea cuenta como HECHA si su copia lo está, o si CUALQUIER copia gemela lo está.
-// Así, al terminar una tarea desaparece de urgentes/pendientes aunque exista duplicada.
-function taskDone(t, doneKeys){
-  if(t.status==='done') return true;
-  return (doneKeys||doneKeySet()).has(taskKey(t));
-}
+// CADA tarea/contenido es INDEPENDIENTE. No se agrupan por nombre: tres
+// "REEL: versus" en fechas distintas son tres piezas separadas.
+function taskDone(t){ return t.status==='done'; }
+function doneKeySet(){ return null; } // compat: los filtros lo pasan pero ya no se usa
 
 function saveProjects(d){ _projects=d; localStorage.setItem(LS.proj,JSON.stringify(d)); }
 function saveTasks(d)   { _tasks=d;    localStorage.setItem(LS.task,JSON.stringify(d)); }
@@ -2284,16 +2289,8 @@ function renderDashboard(){
   const weekEnd=new Date(); weekEnd.setDate(weekEnd.getDate()+7);
   const weekStr=weekEnd.toISOString().split('T')[0];
 
-  // Pendientes SIN duplicados (mismo proyecto+nombre → una sola copia).
-  // Si CUALQUIER copia está hecha, el grupo se considera hecho y no aparece.
-  const doneKeys=doneKeySet();
-  const seenKeys=new Set();
-  const pend=all.filter(t=>{
-    if(taskDone(t,doneKeys)) return false;
-    const k=taskKey(t);
-    if(seenKeys.has(k)) return false;
-    seenKeys.add(k); return true;
-  });
+  // Cada tarea/contenido es independiente (sin agrupar por nombre)
+  const pend=all.filter(t=>t.status!=='done');
 
   // Clasificación mutuamente excluyente — una tarea solo cae en UN bloque
   const overdue=[], todayT=[], weekT=[];
@@ -2560,10 +2557,12 @@ function refreshDetailPopup(){
     }
   } else { datesEl.innerHTML='<span style="color:var(--tx3);font-size:11px;">Sin fechas asignadas</span>'; }
 
-  // meta chips: area, priority
+  // meta chips: area, priority (contenido: muestra plataformas en vez de prioridad)
+  const platChips=isContentT
+    ? (Array.isArray(t.platforms)?t.platforms:[]).map(id=>{const p=PLATFORMS[id];return p?`<span class="bdg" style="background:${p.color}22;color:${p.color};border-color:${p.color}55;">${p.short} ${p.label}</span>`:'';}).join('')
+    : `<span class="bdg ${pm.cls}">${pm.label}</span>`;
   document.getElementById('tdp-meta-chips').innerHTML=
-    `<span class="bdg ${am.cls}">${am.icon} ${am.label}</span>
-     <span class="bdg ${pm.cls}">${pm.label}</span>`;
+    `<span class="bdg ${am.cls}">${am.icon} ${am.label}</span>${platChips}`;
 
   // description
   const descEl=document.getElementById('tdp-desc');
@@ -2723,14 +2722,6 @@ function applyDoneState(t, done){
     }
   }
 }
-// Marca hecha/pendiente una tarea Y todas sus copias duplicadas, y persiste cada una.
-// Así "ya terminé" limpia el pendiente en TODAS partes (sin borrar datos).
-async function persistDoneAllCopies(t, done){
-  const key=taskKey(t);
-  const copies=_tasks.filter(x=>taskKey(x)===key);
-  for(const c of copies){ applyDoneState(c, done); await persistTask(c); }
-}
-
 async function tdpSetState(colId, type){
   const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
   let done=t.status==='done';
@@ -2744,17 +2735,14 @@ async function tdpSetState(colId, type){
     t.kStatus=colId; done=colId==='cierre';
   }
   t.status=done?'done':'pending';
-  await persistTask(t);
-  // Propaga el hecho/pendiente a las copias duplicadas (mantiene consistencia)
-  const key=taskKey(t);
-  for(const c of _tasks.filter(x=>taskKey(x)===key&&x.id!==t.id)){ applyDoneState(c, done); await persistTask(c); }
+  await persistTask(t); // SOLO esta tarjeta (cada contenido es independiente)
   refreshDetailPopup(); onDataChange();
 }
 
 async function tdpToggleDone(){
   const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
-  const done=t.status!=='done'; // nuevo estado
-  await persistDoneAllCopies(t, done);
+  applyDoneState(t, t.status!=='done');
+  await persistTask(t); // SOLO esta tarjeta
   refreshDetailPopup(); onDataChange();
 }
 
@@ -3018,10 +3006,7 @@ async function kbMove(t,colId){
   t.kStatus=colId; t.status=done?'done':'pending';
   t.kbMovedAt=Date.now(); // para que quede arriba en su nueva columna
   renderProjDetail(currentProjId); // optimista: se ve de una
-  await persistTask(t);
-  // Propaga hecho/pendiente a las copias duplicadas (sin borrar nada)
-  const key=taskKey(t);
-  for(const c of _tasks.filter(x=>taskKey(x)===key&&x.id!==t.id)){ applyDoneState(c, done); await persistTask(c); }
+  await persistTask(t); // SOLO esta tarjeta (independiente)
 }
 async function kbDrop(e,colId){
   e.preventDefault(); e.currentTarget.classList.remove('drag-over');
@@ -3111,25 +3096,23 @@ function renderCalHTML(projId){
       // En calendario, por defecto es CONTENIDO (salvo que sea tarea explícita)
       const isContent=(t.taskType!=='tarea');
       if(isContent){
+        // Entrega = chip suave (tinte); Publicación = chip sólido (destaca el momento clave)
+        const softStyle =`background:${color}1a;color:${color};border:1px solid ${color}33;`;
+        const solidStyle=`background:${color};color:#fff;border:1px solid ${color};`;
         const hasBoth = sD && eD && sD!==eD;
         if(hasBoth && dStr===sD){
-          // Fecha de ENTREGA — borde punteado
-          return `<div class="cal-chip c-entrega ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${baseStyle}" ${open} title="Entrega — ${title}"><span class="c-ico">📥</span>${title}</div>`;
+          return `<div class="cal-chip c-entrega ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${softStyle}" ${open} title="Entrega — ${title}"><span class="c-ico">📥</span>${title}</div>`;
         }
         if(hasBoth && dStr===eD){
-          // Fecha de PUBLICACIÓN — sólido, destacado
-          return `<div class="cal-chip c-publica ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${baseStyle}" ${open} title="Publicación — ${title}"><span class="c-ico">🚀</span>${title}</div>`;
+          return `<div class="cal-chip c-publica ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${solidStyle}" ${open} title="Publicación — ${title}"><span class="c-ico">🚀</span>${title}</div>`;
         }
-        if(hasBoth){
-          // Día intermedio — conector sutil
-          return `<div class="cal-chip c-mid ${doneCls}" style="background:${color}18;color:${color};" ${open} title="${title}">·····</div>`;
-        }
+        if(hasBoth){ return ''; } // días intermedios: sin ruido visual
         // Una sola fecha (o entrega y publicación el mismo día)
         const sameDay = sD && eD && sD===eD;
         const isPub = eD && dStr===eD;
         const ico = sameDay?'📥🚀':(isPub?'🚀':'📥');
         const lbl = sameDay?'Entrega y publicación':(isPub?'Publicación':'Entrega');
-        return `<div class="cal-chip c-publica ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${baseStyle}" ${open} title="${lbl} — ${title}"><span class="c-ico">${ico}</span>${title}</div>`;
+        return `<div class="cal-chip c-publica ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${solidStyle}" ${open} title="${lbl} — ${title}"><span class="c-ico">${ico}</span>${title}</div>`;
       }
       // TAREA: rango start→end como antes
       const isStart=(sD||eD)===dStr;
@@ -3178,7 +3161,10 @@ function renderCalHTML(projId){
       return `<div class="cal-card ${done?'done':''}" id="ccard-${t.id}" ${dragAttrs} style="--c:${calCol.color};" onclick="openTaskDetail('${t.id}')">
         <span style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${calCol.color};"></span>
         <div class="cal-card-body">
-          <div class="cal-card-status" style="color:${calCol.color};">${calCol.label}</div>
+          <div class="cal-card-status" style="color:${calCol.color};display:flex;width:100%;align-items:center;gap:6px;">
+            <span>${calCol.label}</span>
+            <span style="margin-left:auto;">${platBadgesHTML(t.platforms)}</span>
+          </div>
           <div class="cal-card-title">${esc(t.name)}</div>
           <div class="cal-card-foot">
             ${datesHtml}
@@ -3234,11 +3220,7 @@ function calPickOpen(type){
 ═══════════════════════════════════════ */
 function showAlerts(){
   const today=todayStr();
-  const dk=doneKeySet(), seen=new Set();
-  const urgent=myTasks().filter(t=>{
-    if(taskDone(t,dk)||!tEnd(t)||tEnd(t)>today) return false;
-    const k=taskKey(t); if(seen.has(k)) return false; seen.add(k); return true;
-  });
+  const urgent=myTasks().filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<=today);
   if(!urgent.length) return;
   document.getElementById('m-alert-list').innerHTML=urgent.map(t=>{
     const over=tEnd(t)<today;
@@ -3599,6 +3581,36 @@ function selectCalPill(btn, id){
   btn.classList.add('on');
   document.getElementById('tf-calstatus').value=id;
 }
+// ── Plataformas de contenido (multi-selección) ──
+function populatePlatformChips(selected){
+  const c=document.getElementById('tf-platforms'); if(!c) return;
+  const sel=Array.isArray(selected)?selected:[];
+  c.innerHTML=Object.entries(PLATFORMS).map(([id,p])=>{
+    const on=sel.includes(id);
+    const style=on?`background:${p.color};border-color:${p.color};`:'';
+    const icoBg=on?'rgba(255,255,255,.28)':p.color;
+    return `<div class="plat-chip ${on?'on':''}" data-value="${id}" style="${style}" onclick="togglePlatform(this)">
+      <span class="plat-ico" style="background:${icoBg};">${p.short}</span>${p.label}</div>`;
+  }).join('');
+}
+function togglePlatform(el){
+  const on=el.classList.toggle('on');
+  const p=PLATFORMS[el.dataset.value]; if(!p) return;
+  el.style.cssText = on?`background:${p.color};border-color:${p.color};`:'';
+  const ico=el.querySelector('.plat-ico');
+  if(ico) ico.style.background = on?'rgba(255,255,255,.28)':p.color;
+}
+function selectedPlatforms(){
+  return [...document.querySelectorAll('#tf-platforms .plat-chip.on')].map(c=>c.dataset.value);
+}
+// Badges de plataforma para tarjetas y detalle
+function platBadgesHTML(platforms){
+  if(!Array.isArray(platforms)||!platforms.length) return '';
+  return `<span class="plat-badges">`+platforms.map(id=>{
+    const p=PLATFORMS[id]; if(!p) return '';
+    return `<span class="plat-badge" style="background:${p.color};" title="${p.label}">${p.short}</span>`;
+  }).join('')+`</span>`;
+}
 
 /* ── Task type toggle (Tarea / Contenido) ── */
 function switchTaskType(type){
@@ -3615,6 +3627,7 @@ function switchTaskType(type){
   // Populate states
   if(isContent){
     populateCalPills(document.getElementById('tf-calstatus').value||'idea');
+    populatePlatformChips(selectedPlatforms()); // conserva selección si ya había
   } else {
     updateTaskFormStates(document.getElementById('tf-proj').value);
   }
@@ -3656,7 +3669,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     const currentState=editType==='contenido'?(t.calStatus||'idea'):(t.taskStatus||'pendiente');
     switchTaskType(editType);
     if(editType==='tarea') updateTaskFormStates(t.projectId, currentState);
-    if(editType==='contenido') populateCalPills(currentState);
+    if(editType==='contenido'){ populateCalPills(currentState); populatePlatformChips(t.platforms||[]); }
     document.getElementById('tf-id').value            =t.id;
     document.getElementById('tf-name').value          =t.name;
     document.getElementById('tf-desc').value          =t.desc||'';
@@ -3692,7 +3705,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     document.getElementById('tf-ttl').textContent=defaultType==='contenido'?'Nuevo Contenido':'Nueva Tarea';
     switchTaskType(defaultType);
     if(defaultType==='tarea') updateTaskFormStates(useProjId);
-    if(defaultType==='contenido') populateCalPills('idea');
+    if(defaultType==='contenido'){ populateCalPills('idea'); populatePlatformChips([]); }
   }
   // Handle project selector lock/unlock
   const lockEl=document.getElementById('tf-proj-locked');
@@ -3754,6 +3767,7 @@ async function saveTaskForm(){
     kStatus, calStatus, taskStatus, status,
     resources:    taskType==='contenido'?(document.getElementById('tf-resources').value.trim()||null):existing?.resources||null,
     contentDesc:  taskType==='contenido'?(document.getElementById('tf-content-desc').value.trim()||null):null,
+    platforms:    taskType==='contenido'?selectedPlatforms():(existing?.platforms||null),
     subtasks:     taskType==='contenido'?(existing?.subtasks||[]):[..._tfSubs],
     createdAt:existing?.createdAt||Date.now(),
   };
@@ -3769,9 +3783,9 @@ function openNewTask(){ _taskFromProjId=null; openTaskForm(null); }
 
 async function toggleTask(id){
   const t=_tasks.find(x=>x.id===id); if(!t) return;
-  // Aplica a TODAS las copias duplicadas (mismo proyecto + nombre) para que
-  // no quede una copia pendiente "fantasma" en urgentes / por hacer
-  await persistDoneAllCopies(t, t.status!=='done');
+  // SOLO esta tarjeta — cada tarea/contenido es independiente
+  applyDoneState(t, t.status!=='done');
+  await persistTask(t);
   onDataChange(); // actualiza la vista al instante (el listener de Firebase reconcilia)
 }
 
@@ -4799,7 +4813,7 @@ Object.assign(window,{
   adminSetPass, adminAddUser, adminAddArea, adminDelArea, exportData, importData,
   renderAdminPassList, renderAdminUserList, renderAdminAreaList,
   openNewEvent, openEditEvent, saveEvent, deleteEvent,
-  selectCalPill, toggleLive,
+  selectCalPill, togglePlatform, toggleLive,
   // Feature 1
   setTaskFormMode,
   // Feature 2
