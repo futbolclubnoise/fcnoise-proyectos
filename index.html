@@ -1259,6 +1259,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
           <option value="ventas">💰 Ventas</option>
           <option value="edicion">✂️ Edición</option>
           <option value="eventos">🎟 Eventos</option>
+          <option value="lig">⚽ LIG</option>
           <option value="general">💼 General</option>
         </select>
       </div>
@@ -1348,6 +1349,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
           <option value="ventas">💰 Ventas</option>
           <option value="edicion">✂️ Edición</option>
           <option value="eventos">🎟 Eventos</option>
+          <option value="lig">⚽ LIG</option>
           <option value="general">💼 General</option>
         </select>
       </div>
@@ -1685,6 +1687,7 @@ const AREAS = {
   ventas:     {label:'Ventas',      icon:'💰', cls:'by', color:'var(--yel)'},
   edicion:    {label:'Edición',     icon:'✂️',  cls:'br', color:'var(--red)'},
   eventos:    {label:'Eventos',     icon:'🎟', cls:'bp', color:'var(--pur)'},
+  lig:        {label:'LIG',         icon:'⚽', cls:'bg', color:'var(--grn)'},
   general:    {label:'General',     icon:'💼', cls:'bw', color:'var(--tx3)'},
 };
 const PRIOS = {
@@ -4649,9 +4652,12 @@ function areasForUser(uid){
   const set=new Set(projectsForUser(uid).map(p=>p.area||'general'));
   return Object.keys(AREAS).filter(a=>set.has(a));
 }
-// Áreas del pulse según la persona en vista
+// Áreas del pulse según la persona en vista.
+// LIG es un área fija: siempre aparece en el Pulse aunque no tenga proyectos.
 function myPulseAreas(){
-  return areasForUser(pulseViewUser());
+  const areas=areasForUser(pulseViewUser());
+  if(!areas.includes('lig')) areas.push('lig');
+  return areas;
 }
 // Obtiene (o crea plantilla) el pulse de un área
 function getAreaPulse(area){
@@ -4934,7 +4940,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-2';
+const APP_BUILD='2026-07-13-3';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
