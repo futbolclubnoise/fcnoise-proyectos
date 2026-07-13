@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>FCNOISE — Proyectos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -4823,9 +4826,31 @@ Object.assign(window,{
 });
 
 /* ═══════════════════════════════════════
+   AUTO-ACTUALIZACIÓN — evita quedarse con versión vieja en caché
+   Al desplegar, se sube build.txt con el mismo id que APP_BUILD.
+   Si el navegador tiene un index.html viejo (APP_BUILD anterior),
+   detecta el build nuevo y recarga forzando descarga fresca.
+═══════════════════════════════════════ */
+const APP_BUILD='2026-07-13-1';
+async function checkForUpdate(){
+  try{
+    const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
+    if(!r.ok) return false;
+    const latest=(await r.text()).trim();
+    if(!latest||latest===APP_BUILD) return false;
+    const u=new URL(location.href);
+    if(u.searchParams.get('_v')===latest) return false; // evita bucle
+    u.searchParams.set('_v',latest);
+    location.replace(u.toString()); // recarga con query nuevo → bypass caché
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
 (async()=>{
+  if(await checkForUpdate()) return; // si hay versión nueva, recarga y no sigue
   loadUserOverrides(); // apply any saved name/password changes
   applyTheme();
   await initData();
