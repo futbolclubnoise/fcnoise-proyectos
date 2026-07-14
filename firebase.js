@@ -9,6 +9,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebas
 import { getDatabase, ref, set, remove, update,
          onValue, off, serverTimestamp }
          from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged }
+         from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 /* ── CONFIG ── */
 const FIREBASE_CONFIG = {
@@ -34,6 +36,8 @@ const P_USERS    = "fcn_users";
 const P_AREAS    = "fcn_areas";
 
 let db = null;
+let auth = null;
+let _authReady = null; // Promise que resuelve cuando la sesión anónima está lista (o falló)
 const _refs = {}; // path → ref con listener activo
 
 /* ── INIT ── */
@@ -42,6 +46,27 @@ export function firebaseInit() {
     if (db) return true;
     const app = initializeApp(FIREBASE_CONFIG, "fcnoise-proyectos");
     db = getDatabase(app);
+
+    // ── Autenticación ANÓNIMA ──
+    // Permite cerrar las reglas de la base ("auth != null") sin romper la app.
+    // Si "Anónimo" NO está activado en la consola de Firebase, falla en silencio
+    // y la app sigue funcionando con las reglas actuales (nada se rompe ni se pierde).
+    try {
+      auth = getAuth(app);
+      _authReady = new Promise(resolve => {
+        let done = false;
+        const finish = () => { if (!done) { done = true; resolve(); } };
+        onAuthStateChanged(auth, user => { if (user) { console.log("[FCN] Sesión anónima ✓"); finish(); } });
+        signInAnonymously(auth).catch(e => {
+          console.warn("[FCN] Auth anónima no disponible (actívala en Firebase Console → Authentication → Anonymous):", e.code || e.message || e);
+          finish(); // no bloquea: la app sigue con las reglas actuales
+        });
+        setTimeout(finish, 4000); // salvaguarda: nunca esperar más de 4s
+      });
+    } catch (e) {
+      _authReady = Promise.resolve();
+    }
+
     console.log("[FCN] Realtime Database lista ✓");
     return true;
   } catch (e) {
@@ -49,6 +74,10 @@ export function firebaseInit() {
     return db !== null;
   }
 }
+
+/* Espera a que la sesión anónima esté lista antes de leer/escribir.
+   Resuelve siempre (aunque falle) para no bloquear la app. */
+export function ensureAuth() { return _authReady || Promise.resolve(); }
 
 /* ── STOP ALL LISTENERS ── */
 export function fbStopListening() {
