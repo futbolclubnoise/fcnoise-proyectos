@@ -1216,6 +1216,26 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
   </div>
 </div>
 
+<!-- ═══ MODAL METAS / OBJETIVOS ═══ -->
+<div class="mov" id="m-goals">
+  <div class="modal" style="max-width:440px;">
+    <div class="mhdr">
+      <span class="mttl" id="goals-ttl">Metas</span>
+      <button class="mclose" onclick="closeMod('m-goals')">✕</button>
+    </div>
+    <input type="hidden" id="goals-area">
+    <input type="hidden" id="goals-kind">
+    <div class="fi">
+      <label>Una meta por línea — agrega las que quieras</label>
+      <textarea id="goals-input" placeholder="Escribe una meta por línea, por ejemplo:&#10;Aumentar seguidores 20%&#10;Lanzar 3 campañas&#10;Cerrar 5 sponsors" style="min-height:160px;font-size:13px;line-height:1.7;"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-goals')">Cancelar</button>
+      <button class="btn btn-p btn-sm" onclick="saveAreaGoals()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ MODAL ALERT ═══ -->
 <div class="mov" id="m-alert">
   <div class="modal" style="border-top:3px solid var(--org);">
@@ -4825,15 +4845,24 @@ function renderAreaDash(area){
 }
 
 /* ── Metas ── */
-async function editAreaGoals(area, kind){
+function editAreaGoals(area, kind){
   const pulse=getAreaPulse(area);
   const cur=(kind==='q'?pulse.quarterGoals:pulse.yearGoals)||[];
-  const label=kind==='q'?'Metas del Q':'Metas del Año';
-  const txt=prompt(`${label} (una por línea):`, cur.join('\n'));
-  if(txt===null) return;
-  const arr=txt.split('\n').map(s=>s.trim()).filter(Boolean);
+  document.getElementById('goals-area').value=area;
+  document.getElementById('goals-kind').value=kind;
+  document.getElementById('goals-ttl').textContent=kind==='q'?'🎯 Metas del Trimestre':'📅 Metas del Año';
+  document.getElementById('goals-input').value=cur.join('\n');
+  openMod('m-goals');
+}
+async function saveAreaGoals(){
+  const area=document.getElementById('goals-area').value;
+  const kind=document.getElementById('goals-kind').value;
+  const txt=document.getElementById('goals-input').value;
+  const arr=txt.split('\n').map(s=>s.trim()).filter(Boolean); // varias metas, una por línea
+  const pulse=getAreaPulse(area);
   if(kind==='q') pulse.quarterGoals=arr; else pulse.yearGoals=arr;
   await saveAreaPulse(pulse);
+  closeMod('m-goals');
   renderAreaDash(area);
 }
 
@@ -4904,7 +4933,7 @@ function renderWeekAnalysis(){ /* no-op */ }
 ═══════════════════════════════════════ */
 Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
-  selectPulseArea, selectPulsePerson, editAreaGoals, addAreaGoodNews, delAreaGoodNews,
+  selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addAreaGoodNews, delAreaGoodNews,
   pwProjDragStart, pwProjDragEnd, pwProjDragOver, pwProjDragLeave, pwProjDrop,
   projDragStart, projDragEnd, projDragOver, projDragLeave, projDrop,
   projCardDragOver, projCardDragLeave, projCardDrop,
@@ -4943,7 +4972,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-4';
+const APP_BUILD='2026-07-13-5';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
