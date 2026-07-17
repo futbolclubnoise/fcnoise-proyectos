@@ -482,12 +482,11 @@ body.light .cal-card-avs .udot{border-color:#fff;}
 @media(max-width:480px){.form-row{grid-template-columns:1fr;}}
 
 /* ── MODAL ── */
-.mov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px);}
-@media(min-width:600px){.mov{align-items:center;}}
+/* Overlay: SIEMPRE centra el modal (vertical y horizontal), en móvil y escritorio */
+.mov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px);}
 .mov.open{opacity:1;pointer-events:all;}
-.modal{background:linear-gradient(180deg,rgba(18,22,30,0.97) 0%,rgba(12,16,22,0.98) 100%);border:1px solid var(--glass-bd);border-top-color:rgba(255,255,255,.1);border-radius:20px 20px 0 0;padding:22px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;transform:translateY(20px);transition:transform .22s cubic-bezier(.22,.68,0,1.2);box-shadow:0 -4px 40px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.07);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);}
-@media(min-width:600px){.modal{border-radius:20px;transform:translateY(8px);}}
-.mov.open .modal{transform:translateY(0);}
+.modal{background:linear-gradient(180deg,rgba(18,22,30,0.97) 0%,rgba(12,16,22,0.98) 100%);border:1px solid var(--glass-bd);border-top-color:rgba(255,255,255,.1);border-radius:20px;padding:22px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-sizing:border-box;margin:auto;transform:translateY(8px) scale(.99);transition:transform .22s cubic-bezier(.22,.68,0,1.2);box-shadow:0 12px 48px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.07);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);}
+.mov.open .modal{transform:translateY(0) scale(1);}
 .mhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
 .mttl{font-family:var(--font-display);font-size:18px;letter-spacing:.04em;}
 .mclose{width:28px;height:28px;border:none;background:var(--bg5);border-radius:7px;color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;}
@@ -4972,7 +4971,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-5';
+const APP_BUILD='2026-07-13-6';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
