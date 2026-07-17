@@ -425,6 +425,10 @@ body.light select{color:#1a1a1a;}
 .plat-chip.on{color:#fff;}
 .plat-badge{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;font-size:8px;font-weight:800;color:#fff;letter-spacing:.02em;}
 .plat-badges{display:inline-flex;gap:3px;align-items:center;}
+/* Chip de proyecto en temas IDS + items de meta en el editor */
+.ids-proj-chip{display:inline-flex;align-items:center;gap:4px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--ac2);color:var(--accent);border:1px solid var(--ac3);cursor:pointer;flex-shrink:0;}
+.goal-draft-item{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--bd2);border-radius:9px;padding:8px 10px;font-size:13px;}
+.goal-draft-item .gi-mark{color:var(--accent);font-weight:700;}
 .cal-add-hint{font-size:9px;color:var(--tx3);opacity:0;transition:opacity .18s;text-align:center;margin-top:4px;}
 .cal-cell:hover .cal-add-hint{opacity:1;}
 .cal-no-date{margin-top:14px;padding:14px;background:var(--bg3);border-radius:var(--r);}
@@ -1225,12 +1229,39 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <input type="hidden" id="goals-area">
     <input type="hidden" id="goals-kind">
     <div class="fi">
-      <label>Una meta por línea — agrega las que quieras</label>
-      <textarea id="goals-input" placeholder="Escribe una meta por línea, por ejemplo:&#10;Aumentar seguidores 20%&#10;Lanzar 3 campañas&#10;Cerrar 5 sponsors" style="min-height:160px;font-size:13px;line-height:1.7;"></textarea>
+      <label>Agrega las metas que quieras</label>
+      <div class="sub-add">
+        <input type="text" id="goals-add-input" placeholder="Escribe una meta y presiona Agregar…" onkeydown="if(event.key==='Enter'){event.preventDefault();addGoalDraft();}">
+        <button type="button" class="btn btn-g btn-sm" onclick="addGoalDraft()">Agregar</button>
+      </div>
+      <div id="goals-list" style="margin-top:12px;display:flex;flex-direction:column;gap:6px;"></div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
       <button class="btn btn-g btn-sm" onclick="closeMod('m-goals')">Cancelar</button>
       <button class="btn btn-p btn-sm" onclick="saveAreaGoals()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL IDS / SITUACIÓN A RESOLVER ═══ -->
+<div class="mov" id="m-ids">
+  <div class="modal" style="max-width:440px;">
+    <div class="mhdr">
+      <span class="mttl">Situación a resolver</span>
+      <button class="mclose" onclick="closeMod('m-ids')">✕</button>
+    </div>
+    <input type="hidden" id="ids-area">
+    <div class="fi">
+      <label>Tema / situación</label>
+      <textarea id="ids-text" placeholder="Describe el problema o tema a resolver…" style="min-height:64px;"></textarea>
+    </div>
+    <div class="fi">
+      <label>¿A qué proyecto pertenece? (opcional)</label>
+      <select id="ids-proj"><option value="">— Sin proyecto —</option></select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-ids')">Cancelar</button>
+      <button class="btn btn-p btn-sm" onclick="saveIdsItem()">Guardar</button>
     </div>
   </div>
 </div>
@@ -4798,6 +4829,7 @@ function renderAreaDash(area){
               ${it.done?'<svg viewBox=\"0 0 12 10\" fill=\"none\" stroke-width=\"2.5\"><polyline points=\"1,5 4.5,8.5 11,1\"/></svg>':''}
             </div>
             <span class="pw-ids-title ${it.done?'done':''}">${esc(it.title)}</span>
+            ${(()=>{ const pr=it.projectId?_projects.find(p=>p.id===it.projectId):null; return pr?`<span class="ids-proj-chip" onclick="event.stopPropagation();navigate('proj-detail','${pr.id}')" title="Proyecto responsable: ${esc(pr.name)}">${pr.icon||'📁'} ${esc(pr.name)}</span>`:''; })()}
             <span class="pw-ids-cnt">${(it.comments||[]).length} 💬</span>
             ${admin?`<button class="btn-icon btn-del" style="flex-shrink:0;" onclick="event.stopPropagation();delIdsItem('${area}','${it.id}')">✕</button>`:''}
           </div>
@@ -4843,21 +4875,40 @@ function renderAreaDash(area){
     </div>`;
 }
 
-/* ── Metas ── */
+/* ── Metas (lista con Agregar) ── */
+let _goalsDraft=[];
 function editAreaGoals(area, kind){
   const pulse=getAreaPulse(area);
   const cur=(kind==='q'?pulse.quarterGoals:pulse.yearGoals)||[];
+  _goalsDraft=[...cur];
   document.getElementById('goals-area').value=area;
   document.getElementById('goals-kind').value=kind;
   document.getElementById('goals-ttl').textContent=kind==='q'?'🎯 Metas del Trimestre':'📅 Metas del Año';
-  document.getElementById('goals-input').value=cur.join('\n');
+  document.getElementById('goals-add-input').value='';
+  renderGoalsDraft();
   openMod('m-goals');
 }
+function renderGoalsDraft(){
+  const el=document.getElementById('goals-list'); if(!el) return;
+  el.innerHTML=_goalsDraft.length
+    ? _goalsDraft.map((g,i)=>`<div class="goal-draft-item"><span class="gi-mark">›</span><span style="flex:1;">${esc(g)}</span><button class="btn-icon btn-del" onclick="removeGoalDraft(${i})">✕</button></div>`).join('')
+    : `<div style="font-size:11px;color:var(--tx3);padding:4px 0;">Aún no hay metas. Escribe una arriba y presiona Agregar.</div>`;
+}
+function addGoalDraft(){
+  const inp=document.getElementById('goals-add-input');
+  const v=(inp.value||'').trim();
+  if(!v) return;
+  _goalsDraft.push(v);
+  inp.value=''; inp.focus();
+  renderGoalsDraft();
+}
+function removeGoalDraft(i){ _goalsDraft.splice(i,1); renderGoalsDraft(); }
 async function saveAreaGoals(){
   const area=document.getElementById('goals-area').value;
   const kind=document.getElementById('goals-kind').value;
-  const txt=document.getElementById('goals-input').value;
-  const arr=txt.split('\n').map(s=>s.trim()).filter(Boolean); // varias metas, una por línea
+  // Incluye lo que quedó escrito en el input sin haber presionado Agregar
+  const pend=(document.getElementById('goals-add-input').value||'').trim();
+  const arr=[..._goalsDraft, ...(pend?[pend]:[])];
   const pulse=getAreaPulse(area);
   if(kind==='q') pulse.quarterGoals=arr; else pulse.yearGoals=arr;
   await saveAreaPulse(pulse);
@@ -4896,11 +4947,24 @@ async function pwProjDrop(e,area,prio){
 
 /* ── IDS — temas y comentarios ── */
 function toggleIdsOpen(hdr){ const b=hdr.nextElementSibling; if(b) b.style.display=b.style.display==='none'?'block':'none'; }
-async function addIdsItem(area){
-  const txt=prompt('Tema a discutir / resolver:'); if(!txt||!txt.trim()) return;
+function addIdsItem(area){
+  document.getElementById('ids-area').value=area;
+  document.getElementById('ids-text').value='';
+  // Poblar el selector de proyectos (los visibles para quien está viendo)
+  const projs=projectsForUser(pulseViewUser());
+  const sel=document.getElementById('ids-proj');
+  sel.innerHTML='<option value="">— Sin proyecto —</option>'+
+    projs.map(p=>`<option value="${p.id}">${p.icon||'📁'} ${esc(p.name)}</option>`).join('');
+  openMod('m-ids');
+}
+async function saveIdsItem(){
+  const area=document.getElementById('ids-area').value;
+  const txt=(document.getElementById('ids-text').value||'').trim(); if(!txt) return;
+  const projectId=document.getElementById('ids-proj').value||null;
   const pulse=getAreaPulse(area);
-  pulse.ids=[...(pulse.ids||[]),{id:uid(),title:txt.trim(),done:false,comments:[]}];
+  pulse.ids=[...(pulse.ids||[]),{id:uid(),title:txt,projectId,done:false,comments:[]}];
   await saveAreaPulse(pulse);
+  closeMod('m-ids');
   renderAreaDash(area);
 }
 async function toggleIdsItem(area,id){
@@ -4932,12 +4996,12 @@ function renderWeekAnalysis(){ /* no-op */ }
 ═══════════════════════════════════════ */
 Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
-  selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addAreaGoodNews, delAreaGoodNews,
+  selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, addAreaGoodNews, delAreaGoodNews,
   pwProjDragStart, pwProjDragEnd, pwProjDragOver, pwProjDragLeave, pwProjDrop,
   projDragStart, projDragEnd, projDragOver, projDragLeave, projDrop,
   projCardDragOver, projCardDragLeave, projCardDrop,
   onTaskSearch, clearTaskSearch, onProjSearch, clearProjSearch,
-  toggleIdsOpen, addIdsItem, toggleIdsItem, delIdsItem, addIdsComment,
+  toggleIdsOpen, addIdsItem, saveIdsItem, toggleIdsItem, delIdsItem, addIdsComment,
   openMod, closeMod,
   openNewProj, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask, selectHomeFilter,
@@ -4971,7 +5035,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-6';
+const APP_BUILD='2026-07-13-7';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
