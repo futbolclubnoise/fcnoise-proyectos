@@ -1945,16 +1945,14 @@ async function initData(){
   try{ applyCustomAreas(JSON.parse(localStorage.getItem(LS.careas)||'{}')); }catch(e){}
 }
 
-/* Sube al vuelo los items locales que no están en Firebase (merge por ID).
-   Así cada dispositivo aporta sus datos únicos sin pisar los de otros. */
+/* DESACTIVADO — causaba que los borrados reaparecieran.
+   Antes, cada dispositivo re-subía a Firebase los items que tenía en memoria
+   local pero que ya no estaban en Firebase. Si otro dispositivo borraba algo,
+   este lo volvía a subir ("borro y reaparece"). Ahora Firebase es la ÚNICA
+   fuente de verdad; los borrados se respetan. Las creaciones hechas sin
+   conexión las encola el propio SDK de Firebase y se suben al reconectar. */
 async function mergeLocalToFb(localArr, fbDocs, saveFn){
-  const fbIds=new Set(fbDocs.map(d=>d.id));
-  const missing=localArr.filter(x=>x.id&&!fbIds.has(x.id));
-  if(missing.length){
-    setSyncDot('uploading');
-    console.log(`[FCN] Subiendo ${missing.length} items locales…`);
-    for(const x of missing) await saveFn(x);
-  }
+  return; // no-op: no re-subir items locales (evita resurrección de borrados)
 }
 
 /* (Eliminada la limpieza automática de duplicados: borraba tareas reales.
@@ -5035,7 +5033,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-7';
+const APP_BUILD='2026-07-13-8';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
