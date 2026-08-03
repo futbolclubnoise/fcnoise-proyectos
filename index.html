@@ -427,8 +427,17 @@ body.light select{color:#1a1a1a;}
 .plat-badges{display:inline-flex;gap:3px;align-items:center;}
 /* Chip de proyecto en temas IDS + items de meta en el editor */
 .ids-proj-chip{display:inline-flex;align-items:center;gap:4px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--ac2);color:var(--accent);border:1px solid var(--ac3);cursor:pointer;flex-shrink:0;}
-.goal-draft-item{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--bd2);border-radius:9px;padding:8px 10px;font-size:13px;}
+.goal-draft-item{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--bg3);border:1px solid var(--bd2);border-radius:9px;padding:8px 10px;font-size:13px;}
 .goal-draft-item .gi-mark{color:var(--accent);font-weight:700;}
+.goal-draft-text{flex:1;min-width:120px;background:var(--inp);border:1px solid var(--bd2);border-radius:7px;padding:6px 8px;color:var(--tx);font-size:13px;font-family:var(--font-body);outline:none;}
+.goal-draft-text:focus{border-color:var(--accent);}
+.goal-st-pills{display:inline-flex;gap:4px;flex-shrink:0;}
+.goal-st-pill{font-size:10px;font-weight:600;padding:4px 9px;border-radius:20px;border:1px solid var(--bd2);background:var(--bg4);color:var(--tx3);cursor:pointer;transition:all .12s;}
+.goal-st-pill.on{color:#fff;}
+/* Display de metas con estado */
+.goal-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;}
+.goal-status-tag{font-size:9px;font-weight:700;letter-spacing:.03em;padding:1px 7px;border-radius:20px;border:1px solid;flex-shrink:0;margin-left:auto;}
+.goal-done{text-decoration:line-through;opacity:.6;}
 .cal-add-hint{font-size:9px;color:var(--tx3);opacity:0;transition:opacity .18s;text-align:center;margin-top:4px;}
 .cal-cell:hover .cal-add-hint{opacity:1;}
 .cal-no-date{margin-top:14px;padding:14px;background:var(--bg3);border-radius:var(--r);}
@@ -855,7 +864,7 @@ body.light .pw-goal-card{background:#fff!important;border:1px solid rgba(0,0,0,.
 .pw-goal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .pw-goal-ttl{font-family:var(--font-display);font-size:12px;letter-spacing:.08em;color:var(--tx2);}
 .pw-goal-list{display:flex;flex-direction:column;gap:5px;}
-.pw-goal-item{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--tx2);line-height:1.4;}
+.pw-goal-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--tx2);line-height:1.4;margin-bottom:5px;}
 .pw-goal-item .gi-mark{flex-shrink:0;font-weight:700;}
 .pw-goal-empty{font-size:11px;color:var(--tx3);font-style:italic;}
 /* Layout 2 columnas: good news (izq) + proyectos (der) */
@@ -1306,7 +1315,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
           <option value="operaciones">⚡ Operaciones</option>
           <option value="diseno">🎨 Diseño</option>
           <option value="admin">🗂 Admin</option>
-          <option value="ventas">💰 Ventas</option>
+          <option value="ventas">🐐 FCnoise</option>
           <option value="edicion">✂️ Edición</option>
           <option value="eventos">🎟 Eventos</option>
           <option value="lig">⚽ LIG</option>
@@ -1396,7 +1405,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
           <option value="operaciones">⚡ Operaciones</option>
           <option value="diseno">🎨 Diseño</option>
           <option value="admin">🗂 Admin</option>
-          <option value="ventas">💰 Ventas</option>
+          <option value="ventas">🐐 FCnoise</option>
           <option value="edicion">✂️ Edición</option>
           <option value="eventos">🎟 Eventos</option>
           <option value="lig">⚽ LIG</option>
@@ -1734,7 +1743,7 @@ const AREAS = {
   operaciones:{label:'Operaciones', icon:'⚡', cls:'bg', color:'var(--grn)'},
   diseno:     {label:'Diseño',      icon:'🎨', cls:'bp', color:'var(--pur)'},
   admin:      {label:'Admin',       icon:'🗂',  cls:'bw', color:'var(--tx3)'},
-  ventas:     {label:'Ventas',      icon:'💰', cls:'by', color:'var(--yel)'},
+  ventas:     {label:'FCnoise',     icon:'🐐', cls:'by', color:'var(--yel)'},
   edicion:    {label:'Edición',     icon:'✂️',  cls:'br', color:'var(--red)'},
   eventos:    {label:'Eventos',     icon:'🎟', cls:'bp', color:'var(--pur)'},
   lig:        {label:'LIG',         icon:'⚽', cls:'bg', color:'var(--grn)'},
@@ -1772,6 +1781,18 @@ const PLATFORMS = {
   instagram: {label:'Instagram', color:'#8b5cf6', short:'IG'},
   tiktok:    {label:'TikTok',    color:'#111827', short:'TT'},
 };
+// Estados de una meta/objetivo del Pulse
+const GOAL_STATUS = {
+  ontrack: {label:'On track', color:'var(--blu)'},
+  done:    {label:'Done',     color:'var(--grn)'},
+  no:      {label:'No',       color:'var(--red)'},
+};
+// Compat: metas antiguas eran texto simple → {text, status}
+function normalizeGoal(g){
+  if(g && typeof g==='object') return {text:g.text||'', status:GOAL_STATUS[g.status]?g.status:'ontrack'};
+  return {text:String(g||''), status:'ontrack'};
+}
+function normalizeGoals(arr){ return (Array.isArray(arr)?arr:[]).map(normalizeGoal); }
 const EVENT_TYPES = [
   {id:'partido',      label:'Partido',      icon:'⚽', cls:'br', color:'var(--red)'},
   {id:'entrenamiento',label:'Entrenamiento',icon:'🏃', cls:'bo', color:'var(--org)'},
@@ -4796,10 +4817,12 @@ function renderAreaDash(area){
     </div>`;
   }).join('');
 
-  // Metas
-  const goalsHTML=(arr,kind)=>arr.length
-    ? arr.map(g=>`<div class="pw-goal-item"><span class="gi-mark" style="color:${kind==='q'?'var(--orange)':'var(--blu)'};">›</span><span>${esc(g)}</span></div>`).join('')
-    : `<div class="pw-goal-empty">Sin metas definidas${admin?' — toca editar':''}</div>`;
+  // Metas (con estado: On track / Done / No)
+  const goalsHTML=(arr,kind)=>{ const gs=normalizeGoals(arr); return gs.length
+    ? gs.map(g=>{const st=GOAL_STATUS[g.status]||GOAL_STATUS.ontrack;
+        return `<div class="pw-goal-item"><span class="goal-status-dot" style="background:${st.color};" title="${st.label}"></span><span class="${g.status==='done'?'goal-done':''}" style="flex:1;">${esc(g.text)}</span><span class="goal-status-tag" style="color:${st.color};border-color:${st.color}55;">${st.label}</span></div>`;
+      }).join('')
+    : `<div class="pw-goal-empty">Sin metas definidas${admin?' — toca editar':''}</div>`; };
 
   // Good news
   const gnHTML=(pulse.goodnews||[]).length
@@ -4873,12 +4896,12 @@ function renderAreaDash(area){
     </div>`;
 }
 
-/* ── Metas (lista con Agregar) ── */
-let _goalsDraft=[];
+/* ── Metas (editables + estado On track / Done / No) ── */
+let _goalsDraft=[]; // [{text, status}]
 function editAreaGoals(area, kind){
   const pulse=getAreaPulse(area);
   const cur=(kind==='q'?pulse.quarterGoals:pulse.yearGoals)||[];
-  _goalsDraft=[...cur];
+  _goalsDraft=normalizeGoals(cur); // copia normalizada (compat con metas viejas de texto)
   document.getElementById('goals-area').value=area;
   document.getElementById('goals-kind').value=kind;
   document.getElementById('goals-ttl').textContent=kind==='q'?'🎯 Metas del Trimestre':'📅 Metas del Año';
@@ -4888,25 +4911,40 @@ function editAreaGoals(area, kind){
 }
 function renderGoalsDraft(){
   const el=document.getElementById('goals-list'); if(!el) return;
-  el.innerHTML=_goalsDraft.length
-    ? _goalsDraft.map((g,i)=>`<div class="goal-draft-item"><span class="gi-mark">›</span><span style="flex:1;">${esc(g)}</span><button class="btn-icon btn-del" onclick="removeGoalDraft(${i})">✕</button></div>`).join('')
-    : `<div style="font-size:11px;color:var(--tx3);padding:4px 0;">Aún no hay metas. Escribe una arriba y presiona Agregar.</div>`;
+  if(!_goalsDraft.length){
+    el.innerHTML=`<div style="font-size:11px;color:var(--tx3);padding:4px 0;">Aún no hay metas. Escribe una arriba y presiona Agregar.</div>`;
+    return;
+  }
+  el.innerHTML=_goalsDraft.map((g,i)=>{
+    const pills=Object.entries(GOAL_STATUS).map(([k,s])=>
+      `<button type="button" class="goal-st-pill ${g.status===k?'on':''}" style="${g.status===k?`background:${s.color};border-color:${s.color};color:#fff;`:''}" onclick="setGoalDraftStatus(${i},'${k}')">${s.label}</button>`
+    ).join('');
+    return `<div class="goal-draft-item">
+      <input type="text" class="goal-draft-text" value="${esc(g.text)}" oninput="updateGoalDraftText(${i},this.value)" placeholder="Meta…">
+      <div class="goal-st-pills">${pills}</div>
+      <button class="btn-icon btn-del" onclick="removeGoalDraft(${i})" title="Quitar">✕</button>
+    </div>`;
+  }).join('');
 }
 function addGoalDraft(){
   const inp=document.getElementById('goals-add-input');
   const v=(inp.value||'').trim();
   if(!v) return;
-  _goalsDraft.push(v);
+  _goalsDraft.push({text:v, status:'ontrack'});
   inp.value=''; inp.focus();
   renderGoalsDraft();
 }
+function updateGoalDraftText(i,val){ if(_goalsDraft[i]) _goalsDraft[i].text=val; }
+function setGoalDraftStatus(i,st){ if(_goalsDraft[i]){ _goalsDraft[i].status=st; renderGoalsDraft(); } }
 function removeGoalDraft(i){ _goalsDraft.splice(i,1); renderGoalsDraft(); }
 async function saveAreaGoals(){
   const area=document.getElementById('goals-area').value;
   const kind=document.getElementById('goals-kind').value;
   // Incluye lo que quedó escrito en el input sin haber presionado Agregar
   const pend=(document.getElementById('goals-add-input').value||'').trim();
-  const arr=[..._goalsDraft, ...(pend?[pend]:[])];
+  const arr=[..._goalsDraft, ...(pend?[{text:pend,status:'ontrack'}]:[])]
+    .map(g=>({text:(g.text||'').trim(), status:g.status||'ontrack'}))
+    .filter(g=>g.text); // descarta metas vacías
   const pulse=getAreaPulse(area);
   if(kind==='q') pulse.quarterGoals=arr; else pulse.yearGoals=arr;
   await saveAreaPulse(pulse);
@@ -4994,7 +5032,7 @@ function renderWeekAnalysis(){ /* no-op */ }
 ═══════════════════════════════════════ */
 Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
-  selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, addAreaGoodNews, delAreaGoodNews,
+  selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, delAreaGoodNews,
   pwProjDragStart, pwProjDragEnd, pwProjDragOver, pwProjDragLeave, pwProjDrop,
   projDragStart, projDragEnd, projDragOver, projDragLeave, projDrop,
   projCardDragOver, projCardDragLeave, projCardDrop,
@@ -5033,7 +5071,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-8';
+const APP_BUILD='2026-07-13-9';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
