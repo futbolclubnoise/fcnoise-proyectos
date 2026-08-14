@@ -1461,7 +1461,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="form-row">
       <div class="fi" id="tf-proj-fi">
         <label>Proyecto</label>
-        <select id="tf-proj" onchange="updateTaskFormStates(this.value)"></select>
+        <select id="tf-proj" onchange="updateTaskFormStates(this.value);syncTaskAreaToProj(this.value)"></select>
         <div id="tf-proj-locked" class="proj-locked-display" style="display:none;"></div>
       </div>
       <div class="fi" id="tf-area-fi"><label>Área</label>
@@ -3821,6 +3821,11 @@ function openNewProj(){
   document.getElementById('mp-ttl').textContent='Nuevo Proyecto';
   openMod('m-proj');
 }
+// Crear proyecto ya anclado a un área (desde el Pulse)
+function openNewProjForArea(area){
+  openNewProj();
+  if(area && AREAS[area]) document.getElementById('mp-area').value=area;
+}
 function openEditProj(id){
   const p=_projects.find(x=>x.id===id); if(!p) return;
   document.getElementById('mp-id').value    =p.id;
@@ -3875,7 +3880,7 @@ async function saveProject(){
   };
   await persistProject(proj);
   closeMod('m-proj'); clearProjForm();
-  renderProjGrid();
+  onDataChange(); // refresca la vista actual (grilla de proyectos o Pulse)
 }
 function clearProjForm(){
   ['mp-id','mp-name','mp-desc','mp-icon','mp-start','mp-end','mp-qyear','mp-goals'].forEach(i=>document.getElementById(i).value='');
@@ -4050,7 +4055,8 @@ function openTaskForm(taskId, projId, preDate, forceType){
     document.getElementById('tf-id').value   ='';
     document.getElementById('tf-name').value ='';
     document.getElementById('tf-desc').value ='';
-    document.getElementById('tf-area').value ='marketing';
+    // Por defecto hereda el área del proyecto donde se crea la tarea
+    document.getElementById('tf-area').value =(usedProj?.area && AREAS[usedProj.area]) ? usedProj.area : 'marketing';
     document.getElementById('tf-prio').value ='media';
     document.getElementById('tf-start').value=preDate||'';
     document.getElementById('tf-end').value  =preDate||'';
@@ -4546,6 +4552,12 @@ function uploadSettingsPhoto2(input){ uploadSettingsPhoto(input); }
 ═══════════════════════════════════════ */
 function toggleChip(chip){ chip.classList.toggle('sel'); chip.blur(); }
 
+// Al cambiar el proyecto en el formulario, el área sigue al proyecto
+function syncTaskAreaToProj(projId){
+  const p=_projects.find(x=>x.id===projId);
+  const areaSel=document.getElementById('tf-area');
+  if(p && p.area && AREAS[p.area] && areaSel) areaSel.value=p.area;
+}
 function populateProjSels(targetId, selectedId){
   const ids=targetId?[targetId]:['tf-proj'];
   const projs=visibleProjects();
@@ -5058,7 +5070,7 @@ function renderAreaDash(area){
     <!-- 2 columnas: Proyectos (izq) + Good News (der) -->
     <div class="pw-cols">
       <div class="pw-col-card">
-        <div class="pw-col-hdr"><span class="pw-col-ttl">PROYECTOS · por prioridad</span>${admin?'<span style="font-size:9px;color:var(--tx3);">Arrastra entre columnas</span>':''}</div>
+        <div class="pw-col-hdr"><span class="pw-col-ttl">PROYECTOS · por prioridad</span>${admin?`<button class="btn btn-p btn-xs" onclick="openNewProjForArea('${area}')">+ Proyecto</button>`:''}</div>
         <div class="pw-prio-cols">${prioColsHTML}</div>
       </div>
       <div class="pw-col-card">
@@ -5366,7 +5378,7 @@ Object.assign(window,{
   onTaskSearch, clearTaskSearch, onProjSearch, clearProjSearch,
   toggleIdsOpen, addIdsItem, saveIdsItem, toggleIdsItem, delIdsItem, addIdsComment,
   openMod, closeMod,
-  openNewProj, openEditProj, saveProject, deleteProject,
+  openNewProj, openNewProjForArea, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask, selectHomeFilter,
   openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, openAreaModal, renderPulseTaskSections, pwTaskHTML, formatResources, togglePwSection,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
@@ -5376,7 +5388,7 @@ Object.assign(window,{
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
   calDragStart, calDragEnd, calDragOver, calDragLeave, calDrop,
   toggleChip,
-  updateTaskFormStates, updateGestionStates,
+  updateTaskFormStates, updateGestionStates, syncTaskAreaToProj,
   switchTaskType,
   openProfile, saveProfile, openSettingsModal, renderSettingsModal,
   saveSettingsModal, uploadSettingsPhoto, removeSettingsPhoto,
@@ -5398,7 +5410,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-16';
+const APP_BUILD='2026-07-13-17';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
