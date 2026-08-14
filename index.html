@@ -343,6 +343,15 @@ body.light select{color:#1a1a1a;}
 .sub-chk svg{width:10px;height:10px;stroke:#fff;}
 .sub-txt{flex:1;font-size:12.5px;color:var(--tx2);}
 .sub-txt.done{text-decoration:line-through;color:var(--tx3);}
+/* Subtarea editable + botones de mover */
+.sub-txt-input{flex:1;min-width:60px;font-size:12.5px;color:var(--tx2);background:transparent;border:1px solid transparent;border-radius:6px;padding:4px 6px;outline:none;font-family:var(--font-body);transition:all .12s;}
+.sub-txt-input:hover{background:var(--inp);}
+.sub-txt-input:focus{background:var(--inp);border-color:var(--accent);color:var(--tx);}
+.sub-txt-input.done{text-decoration:line-through;color:var(--tx3);}
+.sub-moves{display:inline-flex;flex-direction:column;gap:1px;flex-shrink:0;}
+.sub-move{width:20px;height:14px;line-height:1;padding:0;font-size:8px;background:var(--bg4);border:1px solid var(--bd2);border-radius:4px;color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.sub-move:hover:not(:disabled){background:var(--bg5);color:var(--tx);}
+.sub-move:disabled{opacity:.3;cursor:default;}
 .sub-add{display:flex;gap:6px;}
 .sub-add input{flex:1;padding:8px 11px;background:var(--inp);border:1px solid var(--bd2);border-radius:9px;color:var(--tx);font-size:12px;font-family:var(--font-body);outline:none;}
 .sub-add input:focus{border-color:var(--orange);}
@@ -433,6 +442,14 @@ body.light select{color:#1a1a1a;}
 .ctype-tally b{font-family:var(--font-display);font-size:15px;color:var(--accent);margin-left:2px;letter-spacing:.02em;}
 /* Chip de proyecto en temas IDS + items de meta en el editor */
 .ids-proj-chip{display:inline-flex;align-items:center;gap:4px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--ac2);color:var(--accent);border:1px solid var(--ac3);cursor:pointer;flex-shrink:0;}
+/* Repositorios / links del área */
+.repo-list{display:flex;flex-direction:column;gap:6px;}
+.repo-item{display:flex;align-items:center;gap:6px;}
+.repo-main{flex:1;display:flex;align-items:center;gap:8px;min-width:0;background:var(--bg3);border:1px solid var(--bd2);border-radius:9px;padding:9px 11px;cursor:pointer;transition:all .15s;}
+.repo-main:hover{border-color:var(--accent);background:var(--ac2);}
+.repo-ico{flex-shrink:0;}
+.repo-name{flex:1;font-size:13px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.repo-open{flex-shrink:0;color:var(--accent);font-weight:700;font-size:13px;}
 .goal-draft-item{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--bg3);border:1px solid var(--bd2);border-radius:9px;padding:8px 10px;font-size:13px;}
 .goal-draft-item .gi-mark{color:var(--accent);font-weight:700;}
 .goal-draft-text{flex:1;min-width:120px;background:var(--inp);border:1px solid var(--bd2);border-radius:7px;padding:6px 8px;color:var(--tx);font-size:13px;font-family:var(--font-body);outline:none;}
@@ -1277,6 +1294,24 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
       <button class="btn btn-g btn-sm" onclick="closeMod('m-ids')">Cancelar</button>
       <button class="btn btn-p btn-sm" onclick="saveIdsItem()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL REPOSITORIO / LINK ═══ -->
+<div class="mov" id="m-repo">
+  <div class="modal" style="max-width:420px;">
+    <div class="mhdr">
+      <span class="mttl" id="repo-ttl">Repositorio</span>
+      <button class="mclose" onclick="closeMod('m-repo')">✕</button>
+    </div>
+    <input type="hidden" id="repo-area">
+    <input type="hidden" id="repo-id">
+    <div class="fi"><label>Nombre</label><input type="text" id="repo-name" placeholder="Ej. Drive de Diseño"></div>
+    <div class="fi"><label>Link (URL)</label><input type="text" id="repo-url" placeholder="https://drive.google.com/…"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-repo')">Cancelar</button>
+      <button class="btn btn-p btn-sm" onclick="saveAreaRepo()">Guardar</button>
     </div>
   </div>
 </div>
@@ -2762,11 +2797,15 @@ function refreshDetailPopup(){
     document.getElementById('tdp-sub-pct').textContent=subs.length?pct+'%':'';
     document.getElementById('tdp-sub-fill').style.width=pct+'%';
     document.getElementById('tdp-subs-list').innerHTML=subs.length
-      ? subs.map(st=>`<div class="sub-item">
+      ? subs.map((st,i)=>`<div class="sub-item">
           <div class="sub-chk ${st.done?'on':''}" onclick="tdpToggleSubtask('${st.id}')">
             ${st.done?'<svg viewBox=\"0 0 12 10\" fill=\"none\" stroke-width=\"2.5\"><polyline points=\"1,5 4.5,8.5 11,1\"/></svg>':''}
           </div>
-          <span class="sub-txt ${st.done?'done':''}">${esc(st.text)}</span>
+          <input class="sub-txt-input ${st.done?'done':''}" value="${esc(st.text)}" onchange="tdpEditSubtask('${st.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+          <div class="sub-moves">
+            <button class="sub-move" ${i===0?'disabled':''} onclick="tdpMoveSubtask('${st.id}',-1)" title="Subir">▲</button>
+            <button class="sub-move" ${i===subs.length-1?'disabled':''} onclick="tdpMoveSubtask('${st.id}',1)" title="Bajar">▼</button>
+          </div>
           <button class="btn-icon btn-del" style="width:22px;height:22px;" onclick="tdpDelSubtask('${st.id}')">✕</button>
         </div>`).join('')
       : '<div style="font-size:11px;color:var(--tx3);padding:4px 0;">Sin subtareas. Agrega la primera abajo.</div>';
@@ -2819,14 +2858,35 @@ async function tdpDelSubtask(sid){
   await persistTask(t);
   refreshDetailPopup(); onDataChange();
 }
+async function tdpEditSubtask(sid, val){
+  const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
+  const st=(t.subtasks||[]).find(x=>x.id===sid); if(!st) return;
+  const v=(val||'').trim();
+  if(!v || v===st.text) return; // no vaciar ni guardar si no cambió
+  st.text=v;
+  await persistTask(t);
+  onDataChange();
+}
+async function tdpMoveSubtask(sid, dir){
+  const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
+  const arr=t.subtasks||[]; const i=arr.findIndex(x=>x.id===sid); const j=i+dir;
+  if(i<0 || j<0 || j>=arr.length) return;
+  [arr[i],arr[j]]=[arr[j],arr[i]]; // intercambia posiciones
+  await persistTask(t);
+  refreshDetailPopup(); onDataChange();
+}
 
 /* ── Subtareas dentro del formulario de creación ── */
 function renderTfSubs(){
   const el=document.getElementById('tf-subs-list'); if(!el) return;
   el.innerHTML=_tfSubs.length
-    ? _tfSubs.map(st=>`<div class="sub-item">
+    ? _tfSubs.map((st,i)=>`<div class="sub-item">
         <div class="sub-chk ${st.done?'on':''}" onclick="tfToggleSubtask('${st.id}')">${st.done?'<svg viewBox=\"0 0 12 10\" fill=\"none\" stroke-width=\"2.5\"><polyline points=\"1,5 4.5,8.5 11,1\"/></svg>':''}</div>
-        <span class="sub-txt ${st.done?'done':''}">${esc(st.text)}</span>
+        <input class="sub-txt-input ${st.done?'done':''}" value="${esc(st.text)}" onchange="tfEditSubtask('${st.id}',this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+        <div class="sub-moves">
+          <button type="button" class="sub-move" ${i===0?'disabled':''} onclick="tfMoveSubtask('${st.id}',-1)" title="Subir">▲</button>
+          <button type="button" class="sub-move" ${i===_tfSubs.length-1?'disabled':''} onclick="tfMoveSubtask('${st.id}',1)" title="Bajar">▼</button>
+        </div>
         <button type="button" class="btn-icon btn-del" style="width:22px;height:22px;" onclick="tfDelSubtask('${st.id}')">✕</button>
       </div>`).join('')
     : '<div style="font-size:11px;color:var(--tx3);padding:2px 0;">Sin subtareas todavía.</div>';
@@ -2838,6 +2898,16 @@ function tfAddSubtask(text){
 }
 function tfToggleSubtask(id){
   const st=_tfSubs.find(x=>x.id===id); if(st) st.done=!st.done;
+  renderTfSubs();
+}
+function tfEditSubtask(id,val){
+  const st=_tfSubs.find(x=>x.id===id); const v=(val||'').trim();
+  if(st && v) st.text=v; // no vaciar
+}
+function tfMoveSubtask(id,dir){
+  const i=_tfSubs.findIndex(x=>x.id===id); const j=i+dir;
+  if(i<0||j<0||j>=_tfSubs.length) return;
+  [_tfSubs[i],_tfSubs[j]]=[_tfSubs[j],_tfSubs[i]];
   renderTfSubs();
 }
 function tfDelSubtask(id){
@@ -4872,7 +4942,7 @@ function renderAreaDash(area){
         <div class="gn-bullet"></div>
         <div class="gn-text">${esc(g.text)}</div>
         <div class="gn-date">${g.date||''}</div>
-        ${admin?`<button class="btn-icon btn-del" style="flex-shrink:0;" onclick="delAreaGoodNews('${area}','${g.id}')">✕</button>`:''}
+        ${admin?`<button class="btn-icon" style="flex-shrink:0;" title="Editar" onclick="editAreaGoodNews('${area}','${g.id}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-icon btn-del" style="flex-shrink:0;" onclick="delAreaGoodNews('${area}','${g.id}')">✕</button>`:''}
       </div>`).join('')
     : '<div style="font-size:11px;color:var(--tx3);padding:8px 0;">Sin buenas noticias aún.</div>';
 
@@ -4935,6 +5005,19 @@ function renderAreaDash(area){
     <div class="pw-col-card">
       <div class="pw-col-hdr"><span class="pw-col-ttl">IDS · Temas a resolver</span><button class="btn btn-p btn-xs" onclick="addIdsItem('${area}')">+ Tema</button></div>
       <div>${idsHTML}</div>
+    </div>
+
+    <!-- Repositorios del área -->
+    <div class="pw-col-card">
+      <div class="pw-col-hdr"><span class="pw-col-ttl">🔗 REPOSITORIOS · Links del área</span>${admin?`<button class="btn btn-p btn-xs" onclick="addAreaRepo('${area}')">+ Agregar</button>`:''}</div>
+      <div class="repo-list">${
+        (pulse.repos||[]).length
+          ? pulse.repos.map(r=>`<div class="repo-item">
+              <div class="repo-main" onclick="openRepo('${area}','${r.id}')" title="${esc(r.url)}"><span class="repo-ico">🔗</span><span class="repo-name">${esc(r.name)}</span><span class="repo-open">↗</span></div>
+              ${admin?`<button class="btn-icon" title="Editar" onclick="editAreaRepo('${area}','${r.id}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-icon btn-del" onclick="delAreaRepo('${area}','${r.id}')">✕</button>`:''}
+            </div>`).join('')
+          : `<div style="font-size:11px;color:var(--tx3);padding:8px 0;">Sin repositorios.${admin?' Agrega un link (Drive de diseño, de contenido, etc.).':''}</div>`
+      }</div>
     </div>`;
 }
 
@@ -5002,11 +5085,67 @@ async function addAreaGoodNews(area){
   await saveAreaPulse(pulse);
   renderAreaDash(area);
 }
+async function editAreaGoodNews(area,id){
+  const pulse=getAreaPulse(area);
+  const g=(pulse.goodnews||[]).find(x=>x.id===id); if(!g) return;
+  const txt=prompt('Editar buena noticia:', g.text); if(txt===null) return;
+  if(!txt.trim()) return;
+  g.text=txt.trim();
+  await saveAreaPulse(pulse);
+  renderAreaDash(area);
+}
 async function delAreaGoodNews(area,id){
   const pulse=getAreaPulse(area);
   pulse.goodnews=(pulse.goodnews||[]).filter(g=>g.id!==id);
   await saveAreaPulse(pulse);
   renderAreaDash(area);
+}
+
+/* ── Repositorios / Links del área ── */
+function normalizeUrl(u){ u=(u||'').trim(); if(!u) return ''; return /^https?:\/\//i.test(u)?u:'https://'+u; }
+function addAreaRepo(area){
+  document.getElementById('repo-ttl').textContent='Nuevo repositorio';
+  document.getElementById('repo-area').value=area;
+  document.getElementById('repo-id').value='';
+  document.getElementById('repo-name').value='';
+  document.getElementById('repo-url').value='';
+  openMod('m-repo');
+}
+function editAreaRepo(area,id){
+  const pulse=getAreaPulse(area);
+  const r=(pulse.repos||[]).find(x=>x.id===id); if(!r) return;
+  document.getElementById('repo-ttl').textContent='Editar repositorio';
+  document.getElementById('repo-area').value=area;
+  document.getElementById('repo-id').value=id;
+  document.getElementById('repo-name').value=r.name||'';
+  document.getElementById('repo-url').value=r.url||'';
+  openMod('m-repo');
+}
+async function saveAreaRepo(){
+  const area=document.getElementById('repo-area').value;
+  const id=document.getElementById('repo-id').value;
+  const name=(document.getElementById('repo-name').value||'').trim();
+  const url=normalizeUrl(document.getElementById('repo-url').value);
+  if(!name || !url){ alert('Escribe un nombre y un link.'); return; }
+  const pulse=getAreaPulse(area);
+  const repos=pulse.repos||[];
+  if(id){ const r=repos.find(x=>x.id===id); if(r){ r.name=name; r.url=url; } }
+  else { repos.push({id:uid(), name, url}); }
+  pulse.repos=repos;
+  await saveAreaPulse(pulse);
+  closeMod('m-repo');
+  renderAreaDash(area);
+}
+async function delAreaRepo(area,id){
+  const pulse=getAreaPulse(area);
+  pulse.repos=(pulse.repos||[]).filter(r=>r.id!==id);
+  await saveAreaPulse(pulse);
+  renderAreaDash(area);
+}
+function openRepo(area,id){
+  const pulse=getAreaPulse(area);
+  const r=(pulse.repos||[]).find(x=>x.id===id); if(!r||!r.url) return;
+  window.open(r.url,'_blank','noopener');
 }
 
 /* ── Proyectos: arrastrar por prioridad ── */
@@ -5074,7 +5213,8 @@ function renderWeekAnalysis(){ /* no-op */ }
 ═══════════════════════════════════════ */
 Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
-  selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, delAreaGoodNews,
+  selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, editAreaGoodNews, delAreaGoodNews,
+  addAreaRepo, editAreaRepo, saveAreaRepo, delAreaRepo, openRepo,
   pwProjDragStart, pwProjDragEnd, pwProjDragOver, pwProjDragLeave, pwProjDrop,
   projDragStart, projDragEnd, projDragOver, projDragLeave, projDrop,
   projCardDragOver, projCardDragLeave, projCardDrop,
@@ -5085,8 +5225,8 @@ Object.assign(window,{
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask, selectHomeFilter,
   openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, openAreaModal, renderPulseTaskSections, pwTaskHTML, formatResources, togglePwSection,
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
-  tdpAddSubtask, tdpToggleSubtask, tdpDelSubtask,
-  tfAddSubtask, tfToggleSubtask, tfDelSubtask,
+  tdpAddSubtask, tdpToggleSubtask, tdpDelSubtask, tdpEditSubtask, tdpMoveSubtask,
+  tfAddSubtask, tfToggleSubtask, tfDelSubtask, tfEditSubtask, tfMoveSubtask,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
   calDragStart, calDragEnd, calDragOver, calDragLeave, calDrop,
@@ -5113,7 +5253,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-10';
+const APP_BUILD='2026-07-13-11';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
