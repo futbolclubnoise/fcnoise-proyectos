@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>FCNOISE — Sponsors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e1218;--bg2:#151a21;--bg3:#1c2028;--bg4:#242a33;--bg5:#2c333d;
+  --bd:rgba(255,255,255,.06);--bd2:rgba(255,255,255,.10);--bd3:rgba(255,255,255,.16);
+  --tx:#f2f2f5;--tx2:#c7c7cc;--tx3:#8e8e93;--inp:rgba(255,255,255,.04);
+  --orange:#ff7a00;--blu:#3b82f6;--grn:#28c76f;--red:#e84040;--yel:#f59e0b;--pur:#8b5cf6;
+  --font-display:'Bebas Neue','Impact',sans-serif;
+  --font-body:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--font-body);font-size:14px;-webkit-text-size-adjust:100%;}
+.hidden{display:none!important;}
+button{font-family:var(--font-body);cursor:pointer;}
+input,select{font-family:var(--font-body);}
+a{color:var(--blu);}
+.btn{border:none;border-radius:9px;padding:9px 14px;font-size:12px;font-weight:700;letter-spacing:.02em;transition:opacity .15s,background .15s;}
+.btn-p{background:var(--blu);color:#fff;}
+.btn-o{background:var(--orange);color:#fff;}
+.btn-g{background:var(--bg4);color:var(--tx2);border:1px solid var(--bd2);}
+.btn-sm{padding:7px 11px;font-size:11px;}
+.btn-xs{padding:5px 9px;font-size:10px;border-radius:7px;}
+.btn:hover{opacity:.9;}
+.btn-del{background:transparent;border:1px solid var(--bd2);color:var(--red);width:26px;height:26px;padding:0;border-radius:7px;font-size:12px;display:inline-flex;align-items:center;justify-content:center;}
+.icobtn{background:var(--bg4);border:1px solid var(--bd2);color:var(--tx3);width:28px;height:28px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;}
+label{display:block;font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-weight:600;}
+.fi{margin-bottom:14px;}
+.fi input,.fi select,.fi textarea{width:100%;background:var(--inp);border:1px solid var(--bd2);border-radius:9px;padding:11px 12px;color:var(--tx);font-size:14px;outline:none;transition:border-color .15s;}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:var(--blu);}
+.row{display:flex;gap:10px;}
+.row>*{flex:1;}
+
+/* login */
+#screen-login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;background:radial-gradient(1000px 500px at 50% -10%,rgba(59,130,246,.08),transparent 60%),var(--bg);}
+.brand{font-family:var(--font-display);font-size:52px;letter-spacing:.02em;line-height:1;}
+.brand em{color:var(--orange);font-style:normal;}
+.login-sub{font-size:11px;letter-spacing:.26em;color:var(--tx3);text-transform:uppercase;margin:6px 0 30px;}
+.login-card{width:100%;max-width:360px;background:var(--bg2);border:1px solid var(--bd2);border-radius:18px;padding:24px;}
+.login-err{color:var(--red);font-size:12px;margin-top:8px;display:none;}
+.login-err.show{display:block;}
+.back-hub{position:fixed;top:16px;left:16px;font-size:12px;color:var(--tx3);text-decoration:none;background:var(--bg3);border:1px solid var(--bd2);padding:7px 12px;border-radius:9px;}
+
+/* app shell */
+.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(14,18,25,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd2);}
+.topbar .tb-brand{font-family:var(--font-display);font-size:20px;letter-spacing:.03em;}
+.topbar .tb-brand em{color:var(--orange);font-style:normal;}
+.tb-role{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:20px;}
+.tb-role.admin{background:rgba(255,122,0,.14);color:var(--orange);}
+.tb-role.sponsor{background:rgba(59,130,246,.14);color:var(--blu);}
+.wrap{max-width:920px;margin:0 auto;padding:18px 16px 60px;}
+.page-title{font-family:var(--font-display);font-size:26px;letter-spacing:.03em;margin:4px 0 16px;}
+.card{background:var(--bg2);border:1px solid var(--bd2);border-radius:16px;padding:16px;margin-bottom:14px;}
+.card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.card-ttl{font-family:var(--font-display);font-size:15px;letter-spacing:.06em;color:var(--tx2);flex:1;}
+
+/* sponsors admin list */
+.sp-item{display:flex;align-items:center;gap:12px;padding:11px;border:1px solid var(--bd2);border-radius:11px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s;}
+.sp-item:hover{border-color:var(--blu);background:var(--bg3);}
+.sp-item.on{border-color:var(--blu);background:rgba(59,130,246,.08);}
+.sp-logo{width:40px;height:40px;border-radius:11px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.sp-name{font-weight:700;font-size:14px;}
+.sp-meta{font-size:11px;color:var(--tx3);}
+
+/* stat tiles */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.stat{background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;padding:14px;text-align:center;}
+.stat-num{font-family:var(--font-display);font-size:30px;line-height:1;letter-spacing:.02em;}
+.stat-lbl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-top:5px;}
+
+/* content type badge */
+.ct{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--bg4);color:var(--tx2);border:1px solid var(--bd2);}
+
+/* publications */
+.pub{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--bd);}
+.pub:last-child{border-bottom:none;}
+.pub-main{flex:1;min-width:0;}
+.pub-ttl{font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pub-sub{font-size:11px;color:var(--tx3);margin-top:2px;display:flex;gap:10px;flex-wrap:wrap;}
+.pub-metric{font-variant-numeric:tabular-nums;font-weight:600;color:var(--tx2);}
+.pub-link{font-size:11px;font-weight:700;color:var(--blu);text-decoration:none;flex-shrink:0;}
+.pub-actions{display:flex;gap:5px;flex-shrink:0;}
+
+/* week group */
+.wk-hdr{display:flex;align-items:center;justify-content:space-between;margin:14px 0 6px;padding-bottom:6px;border-bottom:1px solid var(--bd2);}
+.wk-title{font-size:12px;font-weight:700;color:var(--tx2);}
+.wk-total{font-size:11px;color:var(--tx3);}
+
+/* month bars */
+.mbar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.mbar-lbl{width:74px;font-size:11px;color:var(--tx3);flex-shrink:0;text-transform:capitalize;}
+.mbar-track{flex:1;height:20px;background:var(--bg3);border-radius:6px;overflow:hidden;}
+.mbar-fill{height:100%;background:linear-gradient(90deg,var(--blu),var(--pur));border-radius:6px;}
+.mbar-val{width:64px;text-align:right;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0;}
+
+/* modal */
+.mov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px);}
+.mov.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--bd2);border-radius:18px;padding:20px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;}
+.mhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.mttl{font-family:var(--font-display);font-size:18px;letter-spacing:.04em;}
+.mclose{background:var(--bg4);border:none;color:var(--tx2);width:30px;height:30px;border-radius:8px;font-size:15px;}
+.empty{text-align:center;padding:34px 10px;color:var(--tx3);font-size:13px;}
+.ctype-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.ctype-pill{padding:7px 12px;border-radius:9px;background:var(--bg4);border:1px solid var(--bd2);color:var(--tx2);font-size:12px;font-weight:600;}
+.ctype-pill.on{background:var(--blu);border-color:var(--blu);color:#fff;}
+.sync{margin-left:auto;font-size:10px;color:var(--tx3);display:flex;align-items:center;gap:5px;}
+.sync .dot{width:7px;height:7px;border-radius:50%;background:var(--tx3);}
+.sync.live .dot{background:var(--grn);}
+@media(max-width:520px){ .stats{grid-template-columns:repeat(3,1fr);} .stat-num{font-size:22px;} }
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="screen-login">
+  <a class="back-hub" href="./index.html">← Base</a>
+  <div class="brand">FC<em>NOISE</em></div>
+  <div class="login-sub">Sponsors</div>
+  <div class="login-card">
+    <div class="fi"><label>Usuario</label><select id="l-user"><option value="">Selecciona…</option></select></div>
+    <div class="fi"><label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••"></div>
+    <button class="btn btn-p" style="width:100%;padding:12px;" id="l-btn">Entrar</button>
+    <div class="login-err" id="l-err">Usuario o contraseña incorrectos</div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="screen-app" class="hidden">
+  <div class="topbar">
+    <span class="tb-brand">FC<em>NOISE</em> Sponsors</span>
+    <span class="tb-role" id="tb-role"></span>
+    <span class="sync" id="sync"><span class="dot"></span><span id="sync-lbl">Conectando…</span></span>
+    <button class="btn btn-g btn-sm" id="logout-btn" style="margin-left:8px;">Salir</button>
+  </div>
+  <div class="wrap" id="app-body"></div>
+</div>
+
+<!-- ═══ MODAL SPONSOR ═══ -->
+<div class="mov" id="m-sponsor">
+  <div class="modal">
+    <div class="mhdr"><span class="mttl" id="sp-mttl">Nuevo Sponsor</span><button class="mclose" onclick="closeMod('m-sponsor')">✕</button></div>
+    <input type="hidden" id="sp-id">
+    <div class="fi"><label>Nombre del sponsor</label><input type="text" id="sp-fname" placeholder="Ej. Peroni"></div>
+    <div class="row">
+      <div class="fi"><label>Contraseña</label><input type="text" id="sp-fpass" placeholder="123456"></div>
+      <div class="fi" style="flex:0 0 90px;"><label>Emoji</label><input type="text" id="sp-flogo" placeholder="🏷️" maxlength="4" style="text-align:center;"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-sponsor')">Cancelar</button>
+      <button class="btn btn-p btn-sm" id="sp-save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL PUBLICACIÓN ═══ -->
+<div class="mov" id="m-post">
+  <div class="modal">
+    <div class="mhdr"><span class="mttl" id="po-mttl">Nueva Publicación</span><button class="mclose" onclick="closeMod('m-post')">✕</button></div>
+    <input type="hidden" id="po-id">
+    <input type="hidden" id="po-sponsor">
+    <div class="fi"><label>Tipo de contenido</label><div class="ctype-pills" id="po-types"></div><input type="hidden" id="po-type" value="carrusel"></div>
+    <div class="fi"><label>Título</label><input type="text" id="po-title" placeholder="Ej. Reel lanzamiento"></div>
+    <div class="fi"><label>Fecha</label><input type="date" id="po-date"></div>
+    <div class="row">
+      <div class="fi"><label>Visualizaciones</label><input type="number" id="po-views" placeholder="0" min="0"></div>
+      <div class="fi"><label>Alcance (opcional)</label><input type="number" id="po-reach" placeholder="0" min="0"></div>
+    </div>
+    <div class="fi" id="po-link-wrap"><label>Link</label><input type="text" id="po-link" placeholder="https://instagram.com/…"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-post')">Cancelar</button>
+      <button class="btn btn-p btn-sm" id="po-save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+const CFG={apiKey:"AIzaSyAMgsbJ2rOqLDofRMl6porBY7yczcJgZTA",authDomain:"fcnoise-proyectos.firebaseapp.com",databaseURL:"https://fcnoise-proyectos-default-rtdb.firebaseio.com",projectId:"fcnoise-proyectos",storageBucket:"fcnoise-proyectos.firebasestorage.app",messagingSenderId:"996777317756",appId:"1:996777317756:web:bdc555f3c288903b07c0f9"};
+const P_SP="fcn_sponsors", P_PO="fcn_sponsor_posts";
+let db=null;
+try{
+  const app=initializeApp(CFG,"fcnoise-sponsor");
+  db=getDatabase(app);
+  try{ const auth=getAuth(app); signInAnonymously(auth).catch(()=>{}); }catch(e){}
+}catch(e){ console.warn("db init",e); }
+
+/* ── Admins (pueden cambiar la contraseña aquí) ── */
+const ADMINS={
+  leonardo:{name:'Leonardo', pass:'123456'},
+  veronica:{name:'Verónica', pass:'123456'},
+};
+const CTYPES={
+  carrusel:{label:'Carrusel', icon:'🎠', link:true},
+  post:    {label:'Post',     icon:'🖼️', link:true},
+  reel:    {label:'Reel',     icon:'🎬', link:true},
+  historia:{label:'Historia', icon:'📸', link:false},
+};
+const MONTHS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+let _sponsors={}, _posts={}, currentUser=null, selSponsor=null, _range={from:'',to:''};
+
+/* ── helpers ── */
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const nfmt=n=>Number(n||0).toLocaleString('es');
+function weekStart(dStr){ const d=new Date(dStr+'T00:00:00'); const off=(d.getDay()+6)%7; d.setDate(d.getDate()-off); return d.toISOString().slice(0,10); }
+function fmtD(dStr){ if(!dStr) return ''; const [y,m,dd]=dStr.split('-'); return `${dd}/${m}`; }
+function normUrl(u){ u=(u||'').trim(); if(!u) return ''; return /^https?:\/\//i.test(u)?u:'https://'+u; }
+function sponsorPosts(sid){ return Object.values(_posts).filter(p=>p&&p.sponsorId===sid); }
+function inRange(p){ const d=p.date||''; if(_range.from && d<_range.from) return false; if(_range.to && d>_range.to) return false; return true; }
+
+/* ── Firebase writes ── */
+async function saveSponsor(s){ if(db) try{ await set(ref(db,`${P_SP}/${s.id}`),s); }catch(e){alert('Error al guardar');} }
+async function delSponsorFb(id){ if(db) try{ await remove(ref(db,`${P_SP}/${id}`)); }catch(e){} }
+async function savePost(p){ if(db) try{ await set(ref(db,`${P_PO}/${p.id}`),p); }catch(e){alert('Error al guardar');} }
+async function delPostFb(id){ if(db) try{ await remove(ref(db,`${P_PO}/${id}`)); }catch(e){} }
+
+/* ── listeners ── */
+function startListening(){
+  if(!db) return;
+  onValue(ref(db,P_SP), snap=>{ _sponsors=snap.val()||{}; setSync(true); populateLoginUsers(); if(currentUser) render(); });
+  onValue(ref(db,P_PO), snap=>{ _posts=snap.val()||{}; setSync(true); if(currentUser) render(); });
+}
+function setSync(live){ const s=document.getElementById('sync'); const l=document.getElementById('sync-lbl'); if(l)l.textContent=live?'En vivo':'Conectando…'; if(s)s.classList.toggle('live',!!live); }
+
+/* ── login ── */
+function populateLoginUsers(){
+  const sel=document.getElementById('l-user'); if(!sel) return;
+  const cur=sel.value;
+  let html='<option value="">Selecciona…</option>';
+  html+='<optgroup label="Admin">'+Object.entries(ADMINS).map(([k,a])=>`<option value="admin:${k}">${esc(a.name)}</option>`).join('')+'</optgroup>';
+  const sps=Object.values(_sponsors);
+  if(sps.length) html+='<optgroup label="Sponsors">'+sps.map(s=>`<option value="sp:${s.id}">${esc(s.logo||'🏷️')} ${esc(s.name)}</option>`).join('')+'</optgroup>';
+  sel.innerHTML=html; if(cur) sel.value=cur;
+}
+function doLogin(){
+  const v=document.getElementById('l-user').value;
+  const pass=document.getElementById('l-pass').value;
+  const err=document.getElementById('l-err');
+  if(v.startsWith('admin:')){
+    const a=ADMINS[v.slice(6)];
+    if(a && a.pass===pass){ currentUser={role:'admin', id:v.slice(6), name:a.name}; enterApp(); return; }
+  } else if(v.startsWith('sp:')){
+    const s=_sponsors[v.slice(3)];
+    if(s && (s.pass||'')===pass){ currentUser={role:'sponsor', id:s.id, name:s.name}; selSponsor=s.id; enterApp(); return; }
+  }
+  err.classList.add('show');
+}
+function enterApp(){
+  document.getElementById('l-err').classList.remove('show');
+  document.getElementById('l-pass').value='';
+  document.getElementById('screen-login').classList.add('hidden');
+  document.getElementById('screen-app').classList.remove('hidden');
+  const r=document.getElementById('tb-role');
+  r.textContent=currentUser.role==='admin'?'Admin · '+currentUser.name:'Sponsor';
+  r.className='tb-role '+currentUser.role;
+  // rango por defecto: últimos ~2 meses
+  const to=new Date(); const from=new Date(); from.setDate(from.getDate()-60);
+  _range={from:from.toISOString().slice(0,10), to:to.toISOString().slice(0,10)};
+  render();
+}
+function logout(){ currentUser=null; selSponsor=null; document.getElementById('screen-app').classList.add('hidden'); document.getElementById('screen-login').classList.remove('hidden'); }
+
+/* ── RENDER ── */
+function render(){
+  if(!currentUser) return;
+  const el=document.getElementById('app-body');
+  if(currentUser.role==='admin') el.innerHTML=renderAdmin();
+  else el.innerHTML=renderSponsorDash(selSponsor, false);
+}
+
+function renderAdmin(){
+  const sps=Object.values(_sponsors).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  let h=`<div class="page-title">Sponsors</div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl">SPONSORS</span><button class="btn btn-o btn-xs" onclick="openSponsor()">+ Crear sponsor</button></div>
+    ${sps.length?sps.map(s=>`<div class="sp-item ${s.id===selSponsor?'on':''}" onclick="selectSponsor('${s.id}')">
+      <div class="sp-logo">${esc(s.logo||'🏷️')}</div>
+      <div style="flex:1;"><div class="sp-name">${esc(s.name)}</div><div class="sp-meta">${sponsorPosts(s.id).length} publicaciones</div></div>
+      <button class="icobtn" onclick="event.stopPropagation();openSponsor('${s.id}')" title="Editar">✎</button>
+      <button class="btn-del" onclick="event.stopPropagation();deleteSponsor('${s.id}')">✕</button>
+    </div>`).join(''):'<div class="empty">Sin sponsors. Crea el primero con “+ Crear sponsor”.</div>'}
+  </div>`;
+  if(selSponsor && _sponsors[selSponsor]) h+=renderSponsorDash(selSponsor, true);
+  return h;
+}
+
+/* dashboard de un sponsor. admin=true agrega controles de edición */
+function renderSponsorDash(sid, admin){
+  const s=_sponsors[sid];
+  if(!s) return `<div class="empty">${admin?'Selecciona un sponsor arriba para ver/editar sus métricas.':'Sponsor no encontrado.'}</div>`;
+  const all=sponsorPosts(sid).filter(inRange).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const totV=all.reduce((s,p)=>s+Number(p.views||0),0);
+  const totR=all.reduce((s,p)=>s+Number(p.reach||0),0);
+
+  // header + rango
+  let h=`<div class="card">
+    <div class="card-hdr">
+      <div class="sp-logo">${esc(s.logo||'🏷️')}</div>
+      <div style="flex:1;"><div class="page-title" style="margin:0;">${esc(s.name)}</div></div>
+      ${admin?`<button class="btn btn-o btn-xs" onclick="openPost('${sid}')">+ Publicación</button>`:''}
+    </div>
+    <div class="row">
+      <div class="fi" style="margin:0;"><label>Desde</label><input type="date" id="rng-from" value="${_range.from}" onchange="setRange('from',this.value)"></div>
+      <div class="fi" style="margin:0;"><label>Hasta</label><input type="date" id="rng-to" value="${_range.to}" onchange="setRange('to',this.value)"></div>
+    </div>
+  </div>`;
+
+  // resumen
+  h+=`<div class="stats">
+    <div class="stat"><div class="stat-num" style="color:var(--blu);">${nfmt(totV)}</div><div class="stat-lbl">👁 Visualizaciones</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--pur);">${nfmt(totR)}</div><div class="stat-lbl">Alcance</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--orange);">${all.length}</div><div class="stat-lbl">Publicaciones</div></div>
+  </div>`;
+
+  // Alcance / publicaciones semanales (agrupado por semana)
+  const weeks={};
+  all.forEach(p=>{ const w=weekStart(p.date||todayStr()); (weeks[w]=weeks[w]||[]).push(p); });
+  const weekKeys=Object.keys(weeks).sort((a,b)=>b.localeCompare(a));
+  h+=`<div class="card"><div class="card-hdr"><span class="card-ttl">ALCANCE Y PUBLICACIONES · POR SEMANA</span></div>`;
+  if(!weekKeys.length){ h+='<div class="empty">Sin publicaciones en este rango.</div>'; }
+  else weekKeys.forEach(w=>{
+    const items=weeks[w].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    const wv=items.reduce((s,p)=>s+Number(p.views||0),0);
+    const we=new Date(w+'T00:00:00'); we.setDate(we.getDate()+6);
+    h+=`<div class="wk-hdr"><span class="wk-title">Semana ${fmtD(w)} – ${fmtD(we.toISOString().slice(0,10))}</span><span class="wk-total">👁 ${nfmt(wv)} · ${items.length} pub.</span></div>`;
+    h+=items.map(p=>pubHTML(p,admin)).join('');
+  });
+  h+=`</div>`;
+
+  // Evolución mes a mes
+  const months={};
+  all.forEach(p=>{ const mk=(p.date||'').slice(0,7); if(mk){ months[mk]=(months[mk]||0)+Number(p.views||0); } });
+  const mKeys=Object.keys(months).sort();
+  const maxM=Math.max(1,...Object.values(months));
+  h+=`<div class="card"><div class="card-hdr"><span class="card-ttl">EVOLUCIÓN MES A MES · Visualizaciones</span></div>`;
+  if(!mKeys.length){ h+='<div class="empty">Sin datos.</div>'; }
+  else h+=mKeys.map(mk=>{
+    const [y,m]=mk.split('-'); const val=months[mk];
+    return `<div class="mbar-row"><div class="mbar-lbl">${MONTHS[+m-1]} ${y.slice(2)}</div><div class="mbar-track"><div class="mbar-fill" style="width:${Math.round(val/maxM*100)}%;"></div></div><div class="mbar-val">${nfmt(val)}</div></div>`;
+  }).join('');
+  h+=`</div>`;
+  return h;
+}
+
+function pubHTML(p, admin){
+  const ct=CTYPES[p.type]||CTYPES.carrusel;
+  const link=(ct.link && p.link)?`<a class="pub-link" href="${esc(normUrl(p.link))}" target="_blank" rel="noopener">Ver ↗</a>`:'';
+  return `<div class="pub">
+    <div class="pub-main">
+      <div class="pub-ttl">${esc(p.title||'(sin título)')}</div>
+      <div class="pub-sub"><span class="ct">${ct.icon} ${ct.label}</span><span>${fmtD(p.date)}</span><span class="pub-metric">👁 ${nfmt(p.views)}</span>${p.reach?`<span class="pub-metric">📣 ${nfmt(p.reach)}</span>`:''}</div>
+    </div>
+    ${link}
+    ${admin?`<div class="pub-actions"><button class="icobtn" onclick="openPost('${p.sponsorId}','${p.id}')">✎</button><button class="btn-del" onclick="deletePost('${p.id}')">✕</button></div>`:''}
+  </div>`;
+}
+
+/* ── acciones ── */
+function setRange(k,v){ _range[k]=v; render(); }
+function selectSponsor(id){ selSponsor=id; render(); }
+
+function openSponsor(id){
+  document.getElementById('sp-id').value=id||'';
+  const s=id?_sponsors[id]:null;
+  document.getElementById('sp-mttl').textContent=id?'Editar Sponsor':'Nuevo Sponsor';
+  document.getElementById('sp-fname').value=s?.name||'';
+  document.getElementById('sp-fpass').value=s?.pass||'';
+  document.getElementById('sp-flogo').value=s?.logo||'';
+  openMod('m-sponsor');
+}
+async function saveSponsorForm(){
+  const id=document.getElementById('sp-id').value||uid();
+  const name=document.getElementById('sp-fname').value.trim();
+  const pass=document.getElementById('sp-fpass').value.trim()||'123456';
+  const logo=document.getElementById('sp-flogo').value.trim()||'🏷️';
+  if(!name){ alert('Escribe el nombre del sponsor.'); return; }
+  const existing=_sponsors[id];
+  await saveSponsor({id,name,pass,logo,createdAt:existing?.createdAt||Date.now()});
+  selSponsor=id;
+  closeMod('m-sponsor');
+}
+async function deleteSponsor(id){
+  const s=_sponsors[id]; if(!s) return;
+  if(!confirm(`¿Borrar el sponsor "${s.name}" y todas sus publicaciones?`)) return;
+  for(const p of sponsorPosts(id)) await delPostFb(p.id);
+  await delSponsorFb(id);
+  if(selSponsor===id) selSponsor=null;
+}
+
+function openPost(sid, pid){
+  document.getElementById('po-sponsor').value=sid;
+  document.getElementById('po-id').value=pid||'';
+  const p=pid?_posts[pid]:null;
+  document.getElementById('po-mttl').textContent=pid?'Editar Publicación':'Nueva Publicación';
+  document.getElementById('po-title').value=p?.title||'';
+  document.getElementById('po-date').value=p?.date||todayStr();
+  document.getElementById('po-views').value=p?.views??'';
+  document.getElementById('po-reach').value=p?.reach??'';
+  document.getElementById('po-link').value=p?.link||'';
+  selectPostType(p?.type||'carrusel');
+  openMod('m-post');
+}
+function renderTypePills(){
+  document.getElementById('po-types').innerHTML=Object.entries(CTYPES).map(([id,c])=>
+    `<button type="button" class="ctype-pill" data-t="${id}" onclick="selectPostType('${id}')">${c.icon} ${c.label}</button>`).join('');
+}
+function selectPostType(t){
+  document.getElementById('po-type').value=t;
+  document.querySelectorAll('#po-types .ctype-pill').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  // Historia: sin link
+  document.getElementById('po-link-wrap').style.display=CTYPES[t]?.link?'block':'none';
+}
+async function savePostForm(){
+  const sid=document.getElementById('po-sponsor').value;
+  const id=document.getElementById('po-id').value||uid();
+  const type=document.getElementById('po-type').value;
+  const title=document.getElementById('po-title').value.trim();
+  const date=document.getElementById('po-date').value||todayStr();
+  const views=Number(document.getElementById('po-views').value||0);
+  const reachRaw=document.getElementById('po-reach').value;
+  const reach=reachRaw===''?null:Number(reachRaw);
+  const link=CTYPES[type]?.link?(normUrl(document.getElementById('po-link').value)||null):null;
+  if(!title){ alert('Escribe un título.'); return; }
+  const existing=_posts[id];
+  await savePost({id,sponsorId:sid,type,title,date,views,reach,link,createdAt:existing?.createdAt||Date.now()});
+  closeMod('m-post');
+}
+async function deletePost(id){ if(!confirm('¿Borrar esta publicación?')) return; await delPostFb(id); }
+
+/* ── modal helpers ── */
+function openMod(id){ document.getElementById(id)?.classList.add('open'); }
+function closeMod(id){ document.getElementById(id)?.classList.remove('open'); }
+
+/* ── wire up ── */
+renderTypePills();
+document.getElementById('l-btn').onclick=doLogin;
+document.getElementById('l-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('logout-btn').onclick=logout;
+document.getElementById('sp-save').onclick=saveSponsorForm;
+document.getElementById('po-save').onclick=savePostForm;
+document.querySelectorAll('.mov').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
+
+Object.assign(window,{ closeMod, openSponsor, selectSponsor, deleteSponsor, openPost, deletePost, selectPostType, setRange });
+
+startListening();
+populateLoginUsers();
+</script>
+</body>
+</html>
