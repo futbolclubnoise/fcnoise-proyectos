@@ -34,6 +34,7 @@ const P_PULSES   = "fcn_pulses";
 const P_PROFILES = "fcn_profiles";
 const P_USERS    = "fcn_users";
 const P_AREAS    = "fcn_areas";
+const P_REPOS    = "fcn_repos";
 
 let db = null;
 let auth = null;
@@ -118,6 +119,7 @@ export function listenPresence(cb)   { listenMap(P_PRESENCE, cb); }
 export function listenProfiles(cb)   { listenMap(P_PROFILES, cb); }
 export function listenUsers(cb)      { listenMap(P_USERS, cb); }
 export function listenAreas(cb)      { listenMap(P_AREAS, cb); }
+export function listenRepos(cb)      { listenCollection(P_REPOS, cb, "order"); }
 
 /* ── Helper de escritura: limpia undefined (RTDB no los acepta) ── */
 function clean(obj) {
@@ -152,6 +154,8 @@ export async function fbDeletePulse(id) { await delDoc(P_PULSES, id); }
 export async function fbSaveUser(u)     { await saveDoc(P_USERS, u.id, u); }
 export async function fbSaveArea(a)     { await saveDoc(P_AREAS, a.id, a); }
 export async function fbDeleteArea(id)  { await delDoc(P_AREAS, id); }
+export async function fbSaveRepo(r)     { await saveDoc(P_REPOS, r.id, { ...r, createdAt: r.createdAt || Date.now() }); }
+export async function fbDeleteRepo(id)  { await delDoc(P_REPOS, id); }
 
 export async function fbSaveProfile(userId, profile) {
   if (!db || !userId) return;

@@ -1307,11 +1307,28 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
   </div>
 </div>
 
-<!-- ═══ MODAL REPOSITORIO / LINK ═══ -->
+<!-- ═══ MODAL ÁREA DE REPOSITORIO ═══ -->
+<div class="mov" id="m-repo-area">
+  <div class="modal" style="max-width:400px;">
+    <div class="mhdr">
+      <span class="mttl" id="repoarea-ttl">Nueva área</span>
+      <button class="mclose" onclick="closeMod('m-repo-area')">✕</button>
+    </div>
+    <input type="hidden" id="repoarea-id">
+    <div class="fi"><label>Nombre del área</label><input type="text" id="repoarea-name" placeholder="Ej. Diseño, Contenido, Legal…"></div>
+    <div class="fi"><label>Emoji (opcional)</label><input type="text" id="repoarea-icon" placeholder="📁" maxlength="4" style="width:80px;text-align:center;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-repo-area')">Cancelar</button>
+      <button class="btn btn-p btn-sm" onclick="saveRepoArea()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL LINK DE REPOSITORIO ═══ -->
 <div class="mov" id="m-repo">
   <div class="modal" style="max-width:420px;">
     <div class="mhdr">
-      <span class="mttl" id="repo-ttl">Repositorio</span>
+      <span class="mttl" id="repo-ttl">Nuevo link</span>
       <button class="mclose" onclick="closeMod('m-repo')">✕</button>
     </div>
     <input type="hidden" id="repo-area">
@@ -1320,7 +1337,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="fi"><label>Link (URL)</label><input type="text" id="repo-url" placeholder="https://drive.google.com/…"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
       <button class="btn btn-g btn-sm" onclick="closeMod('m-repo')">Cancelar</button>
-      <button class="btn btn-p btn-sm" onclick="saveAreaRepo()">Guardar</button>
+      <button class="btn btn-p btn-sm" onclick="saveRepoLink()">Guardar</button>
     </div>
   </div>
 </div>
@@ -1769,14 +1786,15 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
 import { firebaseInit, isConnected, ensureAuth,
          listenProjects, listenTasks, listenEvents, listenPresence,
          listenMilestones, listenGoodnews, listenPulses, listenProfiles,
-         listenUsers, listenAreas,
+         listenUsers, listenAreas, listenRepos,
          fbSaveProject, fbDeleteProject, fbSaveTask, fbDeleteTask,
          fbSaveEvent, fbDeleteEvent, fbSetPresence,
          fbSaveMilestone, fbDeleteMilestone,
          fbSaveGoodnews, fbDeleteGoodnews,
          fbSavePulse, fbDeletePulse, fbSaveProfile,
          fbSaveUser, fbSaveArea, fbDeleteArea,
-         fbStopListening } from './firebase.js?v=2026-07-13-4';
+         fbSaveRepo, fbDeleteRepo,
+         fbStopListening } from './firebase.js?v=2026-07-13-13';
 
 /* ═══════════════════════════════════════
    CONSTANTS
@@ -1920,8 +1938,9 @@ let _pulseAreaAccess = {}; // (legacy, sistema viejo de áreas — mantenido par
 let _profiles        = {}; // {userId: {name, photo}} — perfiles compartidos en Firebase
 let _customUsers     = {}; // usuarios extra / overrides sincronizados
 let _customAreas     = {}; // áreas personalizadas sincronizadas
+let _repos           = []; // áreas de Repositorios (independientes del pool): {id,name,icon,order,links:[]}
 
-const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulses:'fcn_pulses', pulseAreaAccess:'fcn_pulse_area_access', cusers:'fcn_custom_users', careas:'fcn_custom_areas' };
+const LS = { proj:'fcn_projects', task:'fcn_tasks', events:'fcn_events', user:'fcn_session', theme:'fcn_theme', milestones:'fcn_milestones', goodnews:'fcn_goodnews', pulses:'fcn_pulses', pulseAreaAccess:'fcn_pulse_area_access', cusers:'fcn_custom_users', careas:'fcn_custom_areas', repos:'fcn_repos' };
 
 function canSeePulse(){
   if(isSuperAdmin()) return true; // Leo siempre
@@ -2007,6 +2026,17 @@ async function removePulse(id){
   if(isConnected()) await fbDeletePulse(id);
 }
 
+/* ── Repositorios (áreas propias) ── */
+function saveReposLocal(d){ _repos=d; localStorage.setItem(LS.repos,JSON.stringify(d)); }
+async function persistRepo(r){
+  saveReposLocal([..._repos.filter(x=>x.id!==r.id),r].sort((a,b)=>(a.order??0)-(b.order??0)));
+  if(isConnected()) await fbSaveRepo(r);
+}
+async function removeRepoArea(id){
+  saveReposLocal(_repos.filter(x=>x.id!==id));
+  if(isConnected()) await fbDeleteRepo(id);
+}
+
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function todayStr(){ return new Date().toISOString().split('T')[0]; }
 
@@ -2023,6 +2053,7 @@ async function initData(){
   _milestones  =JSON.parse(localStorage.getItem(LS.milestones)||'[]');
   _goodnews    =JSON.parse(localStorage.getItem(LS.goodnews)||'[]');
   _pulses =JSON.parse(localStorage.getItem(LS.pulses)||'[]');
+  _repos  =JSON.parse(localStorage.getItem(LS.repos)||'[]');
   // Usuarios y áreas personalizadas (desde localStorage; Firebase los reconcilia)
   try{ applyCustomUsers(JSON.parse(localStorage.getItem(LS.cusers)||'{}')); }catch(e){}
   try{ applyCustomAreas(JSON.parse(localStorage.getItem(LS.careas)||'{}')); }catch(e){}
@@ -2125,6 +2156,12 @@ async function goLive(){
     _pulses=docs; localStorage.setItem(LS.pulses,JSON.stringify(docs));
     renderNav();
     if(currentView==='gestion') renderPulseWeek();
+  });
+
+  // ── Repositorios (áreas propias): Firebase manda ──
+  listenRepos(async docs=>{
+    _repos=docs; localStorage.setItem(LS.repos,JSON.stringify(docs));
+    if(currentView==='repos') renderRepos();
   });
 
   // ── Perfiles: nombre + foto compartidos ──
@@ -5093,80 +5130,115 @@ async function delAreaGoodNews(area,id){
   renderAreaDash(area);
 }
 
-/* ── Repositorios / Links del área ── */
+/* ── Repositorios: ÁREAS PROPIAS (independientes del pool) + sus links ── */
 function normalizeUrl(u){ u=(u||'').trim(); if(!u) return ''; return /^https?:\/\//i.test(u)?u:'https://'+u; }
-// Re-renderiza donde estén viviendo los repos (vista Repositorios o Pulse)
-function rerenderRepoHost(area){
-  if(currentView==='repos') renderRepos();
-  else renderAreaDash(area);
-}
-function repoItemHTML(area, r, admin){
+const _repoEditSvg='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+function repoLinkHTML(areaId, l, admin){
   return `<div class="repo-item">
-    <div class="repo-main" onclick="openRepo('${area}','${r.id}')" title="${esc(r.url)}"><span class="repo-ico">🔗</span><span class="repo-name">${esc(r.name)}</span><span class="repo-open">↗</span></div>
-    ${admin?`<button class="btn-icon" title="Editar" onclick="editAreaRepo('${area}','${r.id}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-icon btn-del" onclick="delAreaRepo('${area}','${r.id}')">✕</button>`:''}
+    <div class="repo-main" onclick="openRepoLink('${areaId}','${l.id}')" title="${esc(l.url)}"><span class="repo-ico">🔗</span><span class="repo-name">${esc(l.name)}</span><span class="repo-open">↗</span></div>
+    ${admin?`<button class="btn-icon" title="Editar link" onclick="editRepoLink('${areaId}','${l.id}')">${_repoEditSvg}</button><button class="btn-icon btn-del" onclick="delRepoLink('${areaId}','${l.id}')">✕</button>`:''}
   </div>`;
 }
-// Vista de Repositorios (nav) — links agrupados por área
 function renderRepos(){
   const el=document.getElementById('view-repos-body'); if(!el) return;
   const admin=isAdmin();
-  const areas=getMyPulseAreas();
-  el.innerHTML=areas.map(ak=>{
-    const am=AREAS[ak]||AREAS.general;
-    const repos=getAreaPulse(ak).repos||[];
+  const areas=[..._repos].sort((a,b)=>(a.order??0)-(b.order??0));
+  let h = admin ? `<button class="btn btn-p btn-sm" style="margin-bottom:16px;" onclick="createRepoArea()">+ Crear área</button>` : '';
+  if(!areas.length){
+    h += `<div class="empty" style="padding:30px 0;"><div class="empty-ico">📁</div><p>Sin áreas todavía.${admin?' Crea la primera con “+ Crear área”.':''}</p></div>`;
+    el.innerHTML=h; return;
+  }
+  h += areas.map(a=>{
+    const links=a.links||[];
     return `<div class="pw-col-card" style="margin-bottom:14px;">
-      <div class="pw-col-hdr"><span class="pw-col-ttl" style="color:${am.color};">${am.icon} ${esc(am.label)}</span>${admin?`<button class="btn btn-p btn-xs" onclick="addAreaRepo('${ak}')">+ Agregar</button>`:''}</div>
-      <div class="repo-list">${
-        repos.length
-          ? repos.map(r=>repoItemHTML(ak,r,admin)).join('')
-          : `<div style="font-size:11px;color:var(--tx3);padding:8px 0;">Sin links.${admin?' Agrega uno (Drive de diseño, de contenido, etc.).':''}</div>`
-      }</div>
+      <div class="pw-col-hdr">
+        <span class="pw-col-ttl">${a.icon||'📁'} ${esc(a.name)}</span>
+        ${admin?`<span style="display:inline-flex;gap:6px;align-items:center;">
+          <button class="btn btn-p btn-xs" onclick="addRepoLink('${a.id}')">+ Link</button>
+          <button class="btn-icon" title="Editar área" onclick="editRepoArea('${a.id}')">${_repoEditSvg}</button>
+          <button class="btn-icon btn-del" title="Borrar área" onclick="delRepoArea('${a.id}')">✕</button>
+        </span>`:''}
+      </div>
+      <div class="repo-list">${ links.length ? links.map(l=>repoLinkHTML(a.id,l,admin)).join('') : `<div style="font-size:11px;color:var(--tx3);padding:8px 0;">Sin links.${admin?' Agrega uno con “+ Link”.':''}</div>` }</div>
     </div>`;
   }).join('');
+  el.innerHTML=h;
 }
-function addAreaRepo(area){
-  document.getElementById('repo-ttl').textContent='Nuevo repositorio';
-  document.getElementById('repo-area').value=area;
+/* Áreas de repositorio */
+function createRepoArea(){
+  document.getElementById('repoarea-ttl').textContent='Nueva área';
+  document.getElementById('repoarea-id').value='';
+  document.getElementById('repoarea-name').value='';
+  document.getElementById('repoarea-icon').value='';
+  openMod('m-repo-area');
+}
+function editRepoArea(id){
+  const a=_repos.find(x=>x.id===id); if(!a) return;
+  document.getElementById('repoarea-ttl').textContent='Editar área';
+  document.getElementById('repoarea-id').value=id;
+  document.getElementById('repoarea-name').value=a.name||'';
+  document.getElementById('repoarea-icon').value=a.icon||'';
+  openMod('m-repo-area');
+}
+async function saveRepoArea(){
+  const id=document.getElementById('repoarea-id').value;
+  const name=(document.getElementById('repoarea-name').value||'').trim();
+  const icon=(document.getElementById('repoarea-icon').value||'').trim()||'📁';
+  if(!name){ alert('Escribe un nombre para el área.'); return; }
+  if(id){ const a=_repos.find(x=>x.id===id); if(a){ a.name=name; a.icon=icon; await persistRepo(a); } }
+  else { await persistRepo({id:uid(), name, icon, order:_repos.length, links:[], createdAt:Date.now()}); }
+  closeMod('m-repo-area');
+  renderRepos();
+}
+async function delRepoArea(id){
+  const a=_repos.find(x=>x.id===id); if(!a) return;
+  if(!confirm(`¿Borrar el área "${a.name}" y todos sus links?`)) return;
+  await removeRepoArea(id);
+  renderRepos();
+}
+/* Links dentro de un área */
+function addRepoLink(areaId){
+  document.getElementById('repo-ttl').textContent='Nuevo link';
+  document.getElementById('repo-area').value=areaId;
   document.getElementById('repo-id').value='';
   document.getElementById('repo-name').value='';
   document.getElementById('repo-url').value='';
   openMod('m-repo');
 }
-function editAreaRepo(area,id){
-  const pulse=getAreaPulse(area);
-  const r=(pulse.repos||[]).find(x=>x.id===id); if(!r) return;
-  document.getElementById('repo-ttl').textContent='Editar repositorio';
-  document.getElementById('repo-area').value=area;
-  document.getElementById('repo-id').value=id;
-  document.getElementById('repo-name').value=r.name||'';
-  document.getElementById('repo-url').value=r.url||'';
+function editRepoLink(areaId, linkId){
+  const a=_repos.find(x=>x.id===areaId); if(!a) return;
+  const l=(a.links||[]).find(x=>x.id===linkId); if(!l) return;
+  document.getElementById('repo-ttl').textContent='Editar link';
+  document.getElementById('repo-area').value=areaId;
+  document.getElementById('repo-id').value=linkId;
+  document.getElementById('repo-name').value=l.name||'';
+  document.getElementById('repo-url').value=l.url||'';
   openMod('m-repo');
 }
-async function saveAreaRepo(){
-  const area=document.getElementById('repo-area').value;
-  const id=document.getElementById('repo-id').value;
+async function saveRepoLink(){
+  const areaId=document.getElementById('repo-area').value;
+  const linkId=document.getElementById('repo-id').value;
   const name=(document.getElementById('repo-name').value||'').trim();
   const url=normalizeUrl(document.getElementById('repo-url').value);
   if(!name || !url){ alert('Escribe un nombre y un link.'); return; }
-  const pulse=getAreaPulse(area);
-  const repos=pulse.repos||[];
-  if(id){ const r=repos.find(x=>x.id===id); if(r){ r.name=name; r.url=url; } }
-  else { repos.push({id:uid(), name, url}); }
-  pulse.repos=repos;
-  await saveAreaPulse(pulse);
+  const a=_repos.find(x=>x.id===areaId); if(!a){ alert('Área no encontrada.'); return; }
+  a.links=a.links||[];
+  if(linkId){ const l=a.links.find(x=>x.id===linkId); if(l){ l.name=name; l.url=url; } }
+  else a.links.push({id:uid(), name, url});
+  await persistRepo(a);
   closeMod('m-repo');
-  rerenderRepoHost(area);
+  renderRepos();
 }
-async function delAreaRepo(area,id){
-  const pulse=getAreaPulse(area);
-  pulse.repos=(pulse.repos||[]).filter(r=>r.id!==id);
-  await saveAreaPulse(pulse);
-  rerenderRepoHost(area);
+async function delRepoLink(areaId, linkId){
+  const a=_repos.find(x=>x.id===areaId); if(!a) return;
+  a.links=(a.links||[]).filter(x=>x.id!==linkId);
+  await persistRepo(a);
+  renderRepos();
 }
-function openRepo(area,id){
-  const pulse=getAreaPulse(area);
-  const r=(pulse.repos||[]).find(x=>x.id===id); if(!r||!r.url) return;
-  window.open(r.url,'_blank','noopener');
+function openRepoLink(areaId, linkId){
+  const a=_repos.find(x=>x.id===areaId); if(!a) return;
+  const l=(a.links||[]).find(x=>x.id===linkId); if(!l||!l.url) return;
+  window.open(l.url,'_blank','noopener');
 }
 
 /* ── Proyectos: arrastrar por prioridad ── */
@@ -5235,7 +5307,8 @@ function renderWeekAnalysis(){ /* no-op */ }
 Object.assign(window,{
   login, logout, navigate, goBack, toggleTheme, setTheme,
   selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, editAreaGoodNews, delAreaGoodNews,
-  addAreaRepo, editAreaRepo, saveAreaRepo, delAreaRepo, openRepo,
+  createRepoArea, editRepoArea, saveRepoArea, delRepoArea,
+  addRepoLink, editRepoLink, saveRepoLink, delRepoLink, openRepoLink,
   pwProjDragStart, pwProjDragEnd, pwProjDragOver, pwProjDragLeave, pwProjDrop,
   projDragStart, projDragEnd, projDragOver, projDragLeave, projDrop,
   projCardDragOver, projCardDragLeave, projCardDrop,
@@ -5274,7 +5347,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-12';
+const APP_BUILD='2026-07-13-13';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
