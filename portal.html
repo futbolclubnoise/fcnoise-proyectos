@@ -328,6 +328,13 @@ body.light select{color:#1a1a1a;}
 .tdp-dates{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--tx2);margin-bottom:14px;}
 .tdp-dates .dd{background:var(--bg4);border:1px solid var(--bd2);padding:4px 10px;border-radius:8px;font-weight:500;}
 .tdp-desc{font-size:12px;color:var(--tx2);background:var(--bg4);border-radius:10px;padding:11px 13px;margin-bottom:14px;white-space:pre-wrap;line-height:1.6;}
+/* Fotos adjuntas */
+.ph-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.ph-thumb{position:relative;width:74px;height:74px;border-radius:10px;overflow:hidden;border:1px solid var(--bd2);cursor:pointer;flex-shrink:0;background:var(--bg4);}
+.ph-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.ph-thumb .ph-del{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:6px;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.ph-add{cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.ph-empty{font-size:11px;color:var(--tx3);padding:2px 0 6px;}
 .tdp-slbl{font-size:0.68rem;font-weight:600;color:var(--gray-500);letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px;}
 .tdp-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
 .tdp-user{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid var(--bd2);background:var(--bg4);cursor:pointer;font-size:11px;font-weight:600;transition:all .18s;user-select:none;}
@@ -1356,6 +1363,11 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
   </div>
 </div>
 
+<!-- ═══ VISOR DE FOTO (lightbox) ═══ -->
+<div class="mov" id="m-lightbox" onclick="closeMod('m-lightbox')" style="background:rgba(0,0,0,.92);z-index:400;padding:20px;">
+  <img id="lightbox-img" src="" alt="" style="max-width:100%;max-height:92vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.7);">
+</div>
+
 <!-- ═══ MODAL PROYECTO ═══ -->
 <div class="mov" id="m-proj">
   <div class="modal">
@@ -1547,6 +1559,13 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
       </div>
     </div>
 
+    <!-- Fotos / adjuntos -->
+    <div class="fi">
+      <label>Fotos</label>
+      <div id="tf-photos-list" class="ph-grid"></div>
+      <label class="btn btn-g btn-sm ph-add"><span>📷 Adjuntar foto</span><input type="file" accept="image/*" multiple style="display:none;" onchange="tfAddPhotos(this)"></label>
+    </div>
+
     <!-- Dates — labels change by type -->
     <div class="form-row">
       <div class="fi" id="tf-start-fi"><label id="tf-start-lbl">Fecha inicio</label><input type="date" id="tf-start"></div>
@@ -1571,6 +1590,13 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="tdp-chips" id="tdp-meta-chips"></div>
     <div class="tdp-desc" id="tdp-desc" style="display:none;"></div>
     <div id="tdp-resources" style="display:none;margin-bottom:14px;"></div>
+
+    <!-- Fotos -->
+    <div id="tdp-photos-wrap" style="margin-bottom:14px;">
+      <div class="tdp-slbl">Fotos</div>
+      <div id="tdp-photos-list" class="ph-grid"></div>
+      <label class="btn btn-g btn-sm ph-add" id="tdp-photo-add"><span>📷 Adjuntar</span><input type="file" accept="image/*" multiple style="display:none;" onchange="tdpAddPhotos(this)"></label>
+    </div>
 
     <div class="tdp-slbl">Asignados</div>
     <div class="tdp-chips" id="tdp-users"></div>
@@ -1934,6 +1960,7 @@ let dragId         = null;
 let _tdpId         = null; // task currently open in detail popup
 let _taskFromProjId= null; // when opening task form from inside a project, lock to that project
 let _tfSubs        = []; // subtareas en construcción dentro del formulario de tarea
+let _tfPhotos      = []; // fotos (dataURI) en construcción dentro del formulario de tarea
 let _editEventId   = null; // event currently being edited
 let _milestones    = []; // brand timeline milestones
 let _goodnews      = []; // pulse week good news items
@@ -2814,6 +2841,12 @@ function refreshDetailPopup(){
     else { resEl.style.display='none'; }
   }
 
+  // fotos (todos ven; admins + asignados pueden adjuntar/borrar)
+  const canEdit=isAdmin()||(t.assignedUsers||[]).includes(currentUser?.id);
+  const phList=document.getElementById('tdp-photos-list');
+  if(phList) phList.innerHTML=photoThumbsHTML(t.photos||[], canEdit?'tdpDelPhoto':null);
+  const phAdd=document.getElementById('tdp-photo-add'); if(phAdd) phAdd.style.display=canEdit?'':'none';
+
   // assignees (toggleable)
   document.getElementById('tdp-users').innerHTML=Object.values(USERS).map(u=>{
     const rm=ROLES[u.role];
@@ -2933,6 +2966,61 @@ async function tdpMoveSubtask(sid, dir){
   [arr[i],arr[j]]=[arr[j],arr[i]]; // intercambia posiciones
   await persistTask(t);
   refreshDetailPopup(); onDataChange();
+}
+
+/* ── Fotos adjuntas (comprime a dataURI y guarda en la tarea) ── */
+function compressImage(file){
+  return new Promise((resolve,reject)=>{
+    const rd=new FileReader();
+    rd.onerror=reject;
+    rd.onload=e=>{
+      const img=new Image();
+      img.onerror=reject;
+      img.onload=()=>{
+        const MAX=1100; let w=img.width,h=img.height;
+        if(w>h && w>MAX){ h=Math.round(h*MAX/w); w=MAX; }
+        else if(h>MAX){ w=Math.round(w*MAX/h); h=MAX; }
+        const c=document.createElement('canvas'); c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(c.toDataURL('image/jpeg',0.62));
+      };
+      img.src=e.target.result;
+    };
+    rd.readAsDataURL(file);
+  });
+}
+function photoThumbsHTML(arr, delFn){
+  if(!arr||!arr.length) return `<div class="ph-empty">Sin fotos.</div>`;
+  return arr.map((src,i)=>`<div class="ph-thumb" onclick="openLightbox(this.querySelector('img').src)">
+    <img src="${src}" alt="">
+    ${delFn?`<button type="button" class="ph-del" onclick="event.stopPropagation();${delFn}(${i})">✕</button>`:''}
+  </div>`).join('');
+}
+function openLightbox(src){ const im=document.getElementById('lightbox-img'); if(im){ im.src=src; openMod('m-lightbox'); } }
+// Formulario
+function renderTfPhotos(){
+  const el=document.getElementById('tf-photos-list'); if(!el) return;
+  el.innerHTML=photoThumbsHTML(_tfPhotos,'tfRemovePhoto');
+}
+async function tfAddPhotos(input){
+  const files=[...(input.files||[])]; input.value='';
+  for(const f of files){ try{ _tfPhotos.push(await compressImage(f)); }catch(e){} }
+  renderTfPhotos();
+}
+function tfRemovePhoto(i){ _tfPhotos.splice(i,1); renderTfPhotos(); }
+// Detalle
+async function tdpAddPhotos(input){
+  const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
+  const files=[...(input.files||[])]; input.value='';
+  const add=[]; for(const f of files){ try{ add.push(await compressImage(f)); }catch(e){} }
+  if(!add.length) return;
+  t.photos=[...(t.photos||[]),...add];
+  await persistTask(t); refreshDetailPopup(); onDataChange();
+}
+async function tdpDelPhoto(i){
+  const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
+  t.photos=(t.photos||[]).filter((_,idx)=>idx!==i);
+  await persistTask(t); refreshDetailPopup(); onDataChange();
 }
 
 /* ── Subtareas dentro del formulario de creación ── */
@@ -4050,6 +4138,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
       c.classList.toggle('sel', (t.assignedUsers||[]).includes(c.dataset.value));
     });
     _tfSubs=(t.subtasks||[]).map(s=>({...s}));
+    _tfPhotos=(t.photos||[]).slice(); renderTfPhotos();
     document.getElementById('tf-ttl').textContent='Editar Tarea';
   } else {
     // new
@@ -4070,6 +4159,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     document.getElementById('tf-resources').value='';
     document.getElementById('tf-content-desc').value='';
     _tfSubs=[];
+    _tfPhotos=[]; renderTfPhotos();
     document.getElementById('tf-ttl').textContent=defaultType==='contenido'?'Nuevo Contenido':'Nueva Tarea';
     switchTaskType(defaultType);
     if(defaultType==='tarea') updateTaskFormStates(useProjId);
@@ -4138,6 +4228,7 @@ async function saveTaskForm(){
     platforms:    taskType==='contenido'?selectedPlatforms():(existing?.platforms||null),
     contentType:  taskType==='contenido'?(document.getElementById('tf-content-type').value||'carrusel'):(existing?.contentType||null),
     subtasks:     taskType==='contenido'?(existing?.subtasks||[]):[..._tfSubs],
+    photos:       [..._tfPhotos],
     createdAt:existing?.createdAt||Date.now(),
   };
   await persistTask(t);
@@ -4621,7 +4712,7 @@ function setTaskFormMode(simple){
   const taskType=document.getElementById('tf-type')?.value||'tarea';
   const isContenido=taskType==='contenido';
   show('tf-type-toggle',   !simple||isCalProj);
-  show('tf-desc-wrap',     !simple&&!isContenido); // desc hidden for contenido (uses tf-content-desc)
+  show('tf-desc-wrap',     !isContenido); // descripción visible también en modo rápido (contenido usa su propio campo)
   show('tf-proj-fi',       !simple);
   show('tf-area-fi',       !simple);
   show('tf-state-wrap',    !simple&&!isContenido); // estado hidden for contenido in simple mode
@@ -5390,6 +5481,7 @@ Object.assign(window,{
   openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
   tdpAddSubtask, tdpToggleSubtask, tdpDelSubtask, tdpEditSubtask, tdpMoveSubtask,
   tfAddSubtask, tfToggleSubtask, tfDelSubtask, tfEditSubtask, tfMoveSubtask,
+  tfAddPhotos, tfRemovePhoto, tdpAddPhotos, tdpDelPhoto, openLightbox,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
   calDragStart, calDragEnd, calDragOver, calDragLeave, calDrop,
@@ -5416,7 +5508,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-20';
+const APP_BUILD='2026-07-13-21';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
