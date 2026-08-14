@@ -5416,7 +5416,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-19';
+const APP_BUILD='2026-07-13-20';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
@@ -5440,8 +5440,8 @@ async function checkForUpdate(){
   applyTheme();
   await initData();
   populateLoginUsers();
-  const saved=localStorage.getItem(LS.user);
-  if(saved&&USERS[saved]){ currentUser=USERS[saved]; showApp(); }
+  // Siempre pedir login al abrir el portal (no auto-entrar desde sesión guardada)
+  localStorage.removeItem(LS.user);
 })();
 </script>
 </body>
