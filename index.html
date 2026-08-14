@@ -1343,10 +1343,10 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
 
 <!-- ═══ MODAL ALERT ═══ -->
 <div class="mov" id="m-alert">
-  <div class="modal" style="border-top:3px solid var(--org);">
-    <div class="mhdr"><span class="mttl">⚠️ Tareas Urgentes</span><button class="mclose" onclick="closeMod('m-alert')">✕</button></div>
-    <div id="m-alert-list"></div>
-    <div style="margin-top:14px;"><button class="btn btn-p w-full" onclick="closeMod('m-alert')">Entendido</button></div>
+  <div class="modal" style="border-top:3px solid var(--org);display:flex;flex-direction:column;max-height:88vh;">
+    <div class="mhdr"><span class="mttl">⚠️ Tareas Vencidas <span id="m-alert-count" style="color:var(--tx3);font-weight:400;"></span></span><button class="mclose" onclick="closeMod('m-alert')">✕</button></div>
+    <div id="m-alert-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;"></div>
+    <div style="margin-top:14px;flex-shrink:0;"><button class="btn btn-p w-full" onclick="closeMod('m-alert')">Entendido</button></div>
   </div>
 </div>
 
@@ -2316,6 +2316,8 @@ function onDataChange(){
   if(currentView==='eventos')     renderEventos();
   // refresh open detail popup if needed
   if(_tdpId) refreshDetailPopup();
+  // refresca el popup de vencidas si está abierto (para que se actualice al completar)
+  if(document.getElementById('m-alert')?.classList.contains('open')) renderAlertList();
 }
 
 /* ═══════════════════════════════════════
@@ -2579,17 +2581,17 @@ function renderDashboard(){
   </div>
 
   <!-- Banner urgente -->
-  ${overdue.length?`<div class="urgent-banner">
+  ${overdue.length?`<div class="urgent-banner" onclick="openAlerts()" style="cursor:pointer;">
     <div class="urgent-banner-ico">⚠️</div>
     <div class="urgent-banner-txt">
       <div class="urgent-banner-ttl">${overdue.length} ${overdue.length===1?'tarea vencida':'tareas vencidas'}</div>
-      <div class="urgent-banner-sub">Requieren tu atención lo antes posible</div>
+      <div class="urgent-banner-sub">Toca para ver todas →</div>
     </div>
   </div>`:''}
 
   <!-- Stats -->
   <div class="home-stats">
-    <div class="hstat"><div class="hstat-num" style="color:var(--red);">${overdue.length}</div><div class="hstat-lbl">Vencidas</div></div>
+    <div class="hstat" onclick="openAlerts()" style="cursor:pointer;"><div class="hstat-num" style="color:var(--red);">${overdue.length}</div><div class="hstat-lbl">Vencidas</div></div>
     <div class="hstat"><div class="hstat-num" style="color:${rm.color};">${todayT.length}</div><div class="hstat-lbl">Para hoy</div></div>
     <div class="hstat"><div class="hstat-num" style="color:var(--blu);">${weekT.length}</div><div class="hstat-lbl">Esta semana</div></div>
     <div class="hstat"><div class="hstat-num" style="color:var(--grn);">${done.length}</div><div class="hstat-lbl">Completadas</div></div>
@@ -3544,23 +3546,36 @@ function calPickOpen(type){
 /* ═══════════════════════════════════════
    ALERTS
 ═══════════════════════════════════════ */
-function showAlerts(){
+// Construye/actualiza la lista del popup de vencidas. Devuelve cuántas hay.
+function renderAlertList(){
   const today=todayStr();
-  const urgent=myTasks().filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<=today);
-  if(!urgent.length) return;
-  document.getElementById('m-alert-list').innerHTML=urgent.map(t=>{
-    const over=tEnd(t)<today;
-    const proj=_projects.find(p=>p.id===t.projectId);
-    return `<div class="al-item">
-      <div class="al-dot" style="background:${over?'var(--red)':'var(--org)'}"></div>
-      <div>
-        <div style="font-size:12px;font-weight:600;">${esc(t.name)}</div>
-        <div class="txt-xs txt-muted">${proj?proj.name:''} · ${over?'Vencida':'Hoy'}: ${tEnd(t)}</div>
-      </div>
-    </div>`;
-  }).join('');
+  const urgent=myTasks()
+    .filter(t=>t.status!=='done'&&tEnd(t)&&tEnd(t)<=today)
+    .sort((a,b)=>(tEnd(a)||'').localeCompare(tEnd(b)||'')); // más vencidas primero
+  const el=document.getElementById('m-alert-list');
+  const cnt=document.getElementById('m-alert-count');
+  if(cnt) cnt.textContent=urgent.length?`(${urgent.length})`:'';
+  if(el){
+    el.innerHTML=urgent.length ? urgent.map(t=>{
+      const over=tEnd(t)<today;
+      const proj=_projects.find(p=>p.id===t.projectId);
+      return `<div class="al-item" onclick="closeMod('m-alert');openTaskDetail('${t.id}')" style="cursor:pointer;">
+        <div class="al-dot" style="background:${over?'var(--red)':'var(--org)'}"></div>
+        <div>
+          <div style="font-size:12px;font-weight:600;">${esc(t.name)}</div>
+          <div class="txt-xs txt-muted">${proj?esc(proj.name):''} · ${over?'Vencida':'Hoy'}: ${tEnd(t)}</div>
+        </div>
+      </div>`;
+    }).join('') : '<div style="text-align:center;padding:26px 10px;color:var(--tx3);font-size:12px;">🎉 No tienes tareas vencidas.</div>';
+  }
+  return urgent.length;
+}
+function showAlerts(){
+  if(!renderAlertList()) return; // no abrir si no hay vencidas
   openMod('m-alert');
 }
+// Abrir manualmente (desde el banner/stat de Vencidas) — siempre muestra la lista, aunque esté vacía
+function openAlerts(){ renderAlertList(); openMod('m-alert'); }
 
 /* ═══════════════════════════════════════
    GESTIÓN (Admin)
@@ -5341,7 +5356,7 @@ function renderWeekAnalysis(){ /* no-op */ }
    WINDOW EXPORTS
 ═══════════════════════════════════════ */
 Object.assign(window,{
-  login, logout, navigate, goBack, toggleTheme, setTheme,
+  login, logout, navigate, goBack, toggleTheme, setTheme, openAlerts,
   selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, editAreaGoodNews, delAreaGoodNews,
   createRepoArea, editRepoArea, saveRepoArea, delRepoArea, moveRepoArea,
   addRepoLink, editRepoLink, saveRepoLink, delRepoLink, openRepoLink, moveRepoLink,
@@ -5383,7 +5398,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-15';
+const APP_BUILD='2026-07-13-16';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
