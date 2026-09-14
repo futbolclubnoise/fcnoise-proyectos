@@ -120,6 +120,9 @@ option{background:#fff;color:var(--tx);}
 .mg-val{width:72px;text-align:right;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0;}
 .mg-delta{width:64px;text-align:right;font-size:11px;font-weight:800;flex-shrink:0;font-variant-numeric:tabular-nums;}
 .mg-delta.up{color:var(--grn);}.mg-delta.down{color:var(--red);}.mg-delta.flat{color:var(--tx3);}
+.cmp-pills{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
+.cmp-pill{padding:7px 13px;border-radius:20px;background:var(--inp);border:1px solid var(--bd);color:var(--tx2);font-size:12px;font-weight:700;}
+.cmp-pill.on{background:var(--tx);border-color:var(--tx);color:#fff;}
 
 .mov{position:fixed;inset:0;background:rgba(20,25,40,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(5px);}
 .mov.open{opacity:1;pointer-events:all;}
@@ -144,8 +147,8 @@ option{background:#fff;color:var(--tx);}
   <div class="brand">FC<em>NOISE</em></div>
   <div class="login-sub">Sponsors</div>
   <div class="login-card glass">
-    <div class="fi"><label id="lbl-user">User</label><select id="l-user"><option value="">…</option></select></div>
-    <div class="fi"><label id="lbl-pass">Password</label><input type="password" id="l-pass" placeholder="••••••"></div>
+    <div class="fi"><label id="lbl-user">User</label><input type="text" id="l-user" placeholder="ADMIN" autocapitalize="off" autocorrect="off" autocomplete="username"></div>
+    <div class="fi"><label id="lbl-pass">Password</label><input type="password" id="l-pass" placeholder="••••••" autocomplete="current-password"></div>
     <button class="btn btn-p" style="width:100%;padding:13px;" id="l-btn">Sign in</button>
     <div class="login-err" id="l-err">Wrong user or password</div>
   </div>
@@ -235,7 +238,7 @@ const T={
     totalViews:'Visualizaciones totales',totalLikes:'Me gusta totales',totalPubs:'Publicaciones',
     createCycle:'+ Crear ciclo',noCycles:'Sin ciclos. Crea el primero (un mes).',addPub:'+ Publicación',
     reachTile:'Alcance de la cuenta',viewsTile:'Visualizaciones',likesTile:'Me gusta',noPubsCycle:'Sin publicaciones en este ciclo.',
-    growth:'Crecimiento mensual · Alcance de la cuenta',noData:'Sin datos.',notitle:'(sin título)',
+    growth:'Crecimiento mensual · Alcance de la cuenta',report:'Reporte comparativo por ciclo',noData:'Sin datos.',notitle:'(sin título)',
     newSp:'Nuevo Sponsor',editSp:'Editar Sponsor',spName:'Nombre del sponsor',spPass:'Contraseña',cancel:'Cancelar',save:'Guardar',
     newCy:'Nuevo Ciclo',editCy:'Editar Ciclo',month:'Mes',reachField:'Alcance de la cuenta (impacto a la marca)',
     newPo:'Nueva Publicación',editPo:'Editar Publicación',ctype:'Tipo de contenido',title:'Título',views:'Visualizaciones',likes:'Me gusta',link:'Link',
@@ -247,7 +250,7 @@ const T={
     totalViews:'Total views',totalLikes:'Total likes',totalPubs:'Posts',
     createCycle:'+ New cycle',noCycles:'No cycles yet. Create the first one (a month).',addPub:'+ New post',
     reachTile:'Account reach',viewsTile:'Views',likesTile:'Likes',noPubsCycle:'No posts in this cycle.',
-    growth:'Monthly growth · Account reach',noData:'No data.',notitle:'(untitled)',
+    growth:'Monthly growth · Account reach',report:'Comparative report · by cycle',noData:'No data.',notitle:'(untitled)',
     newSp:'New Sponsor',editSp:'Edit Sponsor',spName:'Sponsor name',spPass:'Password',cancel:'Cancel',save:'Save',
     newCy:'New Cycle',editCy:'Edit Cycle',month:'Month',reachField:'Account reach (brand impact)',
     newPo:'New Post',editPo:'Edit Post',ctype:'Content type',title:'Title',views:'Views',likes:'Likes',link:'Link',
@@ -255,7 +258,7 @@ const T={
     delSp:'Delete this sponsor and all its content?',delCy:'Delete this cycle and its posts?',delPo:'Delete this post?',view:'View ↗'}
 };
 
-let _sponsors={}, _posts={}, _cycles={}, currentUser=null, selSponsor=null, lang='en';
+let _sponsors={}, _posts={}, _cycles={}, currentUser=null, selSponsor=null, lang='en', _cmpMetric='reach';
 const t=k=>(T[lang]&&T[lang][k])||k;
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const thisMonth=()=>new Date().toISOString().slice(0,7);
@@ -303,17 +306,13 @@ function applyStaticI18n(){
   renderTypePills();
 }
 
-function populateLoginUsers(){
-  const sel=document.getElementById('l-user'); if(!sel) return; const cur=sel.value;
-  let h=`<option value="">${t('pick')}</option><option value="admin">ADMIN</option>`;
-  const sps=Object.values(_sponsors);
-  if(sps.length) h+=sps.map(s=>`<option value="sp:${s.id}">${esc(s.logo||'🏷️')} ${esc(s.name)}</option>`).join('');
-  sel.innerHTML=h; if(cur) sel.value=cur;
-}
+function populateLoginUsers(){ /* login por texto: sin lista */ }
 function doLogin(){
-  const v=document.getElementById('l-user').value, pass=document.getElementById('l-pass').value;
-  if(v==='admin' && pass===ADMIN_PASS){ currentUser={role:'admin',name:'Admin'}; lang='es'; enterApp(); return; }
-  if(v.startsWith('sp:')){ const s=_sponsors[v.slice(3)]; if(s&&(s.pass||'')===pass){ currentUser={role:'sponsor',id:s.id,name:s.name}; selSponsor=s.id; lang='en'; enterApp(); return; } }
+  const raw=(document.getElementById('l-user').value||'').trim(), pass=document.getElementById('l-pass').value;
+  if(raw.toLowerCase()==='admin' && pass===ADMIN_PASS){ currentUser={role:'admin',name:'Admin'}; lang='es'; enterApp(); return; }
+  // Sponsor: se escribe el nombre (sin distinguir mayúsculas) + su contraseña
+  const s=Object.values(_sponsors).find(x=>(x.name||'').trim().toLowerCase()===raw.toLowerCase());
+  if(s && (s.pass||'')===pass){ currentUser={role:'sponsor',id:s.id,name:s.name}; selSponsor=s.id; lang='en'; enterApp(); return; }
   document.getElementById('l-err').classList.add('show');
 }
 function enterApp(){
@@ -362,17 +361,27 @@ function renderDash(sid,admin){
     <div class="stat" style="box-shadow:none;border:none;background:var(--inp);"><div class="stat-num" style="color:var(--orange);">${allPosts.length}</div><div class="stat-lbl">${t('totalPubs')}</div></div>
   </div></div>`;
 
-  // Crecimiento mensual (alcance de la cuenta)
+  // Reporte comparativo por ciclo (métrica seleccionable: alcance / visualizaciones / me gusta)
   const months=sponsorMonths(sid);
-  const reachByMonth={}; months.forEach(m=>{ const c=cycleForMonth(sid,m); reachByMonth[m]=c?Number(c.accountReach||0):0; });
-  const asc=[...months].sort(); const maxR=Math.max(1,...Object.values(reachByMonth));
-  h+=`<div class="card"><div class="card-hdr"><span class="card-ttl">${t('growth').toUpperCase()}</span></div>`;
-  if(!asc.length || asc.every(m=>!reachByMonth[m])) h+=`<div class="empty">${t('noData')}</div>`;
-  else h+=asc.map((m,i)=>{ const val=reachByMonth[m]; const prev=i>0?reachByMonth[asc[i-1]]:null;
+  const metricVal={
+    reach:m=>{ const c=cycleForMonth(sid,m); return c?Number(c.accountReach||0):0; },
+    views:m=>postsInMonth(sid,m).reduce((a,p)=>a+Number(p.views||0),0),
+    likes:m=>postsInMonth(sid,m).reduce((a,p)=>a+Number(p.likes||0),0),
+  };
+  const metricMeta={reach:{lbl:t('reachTile'),color:'var(--pur)'},views:{lbl:t('viewsTile'),color:'var(--blu)'},likes:{lbl:t('likesTile'),color:'var(--red)'}};
+  if(!metricVal[_cmpMetric]) _cmpMetric='reach';
+  const byMonth={}; months.forEach(m=>byMonth[m]=metricVal[_cmpMetric](m));
+  const asc=[...months].sort(); const maxV=Math.max(1,...Object.values(byMonth));
+  const meta=metricMeta[_cmpMetric];
+  const pills=['reach','views','likes'].map(k=>`<button type="button" class="cmp-pill ${k===_cmpMetric?'on':''}" onclick="setCmpMetric('${k}')">${metricMeta[k].lbl}</button>`).join('');
+  h+=`<div class="card"><div class="card-hdr"><span class="card-ttl">${t('report').toUpperCase()}</span></div>
+    <div class="cmp-pills">${pills}</div>`;
+  if(!asc.length || asc.every(m=>!byMonth[m])) h+=`<div class="empty">${t('noData')}</div>`;
+  else h+=asc.map((m,i)=>{ const val=byMonth[m]; const prev=i>0?byMonth[asc[i-1]]:null;
     let dh='<span class="mg-delta flat">—</span>';
     if(prev!=null&&prev>0){ const d=(val-prev)/prev*100; const up=d>=0; dh=`<span class="mg-delta ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(d).toFixed(0)}%</span>`; }
     else if(prev===0&&val>0){ dh='<span class="mg-delta up">▲</span>'; }
-    return `<div class="mg-row"><div class="mg-mon">${monthLabel(m)}</div><div class="mg-track"><div class="mg-fill" style="width:${Math.round(val/maxR*100)}%;"></div></div><div class="mg-val">${nfmt(val)}</div>${dh}</div>`;
+    return `<div class="mg-row"><div class="mg-mon">${monthLabel(m)}</div><div class="mg-track"><div class="mg-fill" style="width:${Math.round(val/maxV*100)}%;background:${meta.color};"></div></div><div class="mg-val">${nfmt(val)}</div>${dh}</div>`;
   }).join('');
   h+=`</div>`;
 
@@ -414,6 +423,7 @@ function pubHTML(p,admin){
 
 /* actions */
 function selectSponsor(id){ selSponsor=id; render(); }
+function setCmpMetric(k){ _cmpMetric=k; render(); }
 function openSponsor(id){
   document.getElementById('sp-id').value=id||''; const s=id?_sponsors[id]:null;
   document.getElementById('sp-mttl').textContent=id?t('editSp'):t('newSp');
@@ -480,7 +490,7 @@ document.getElementById('sp-save').onclick=saveSponsorForm;
 document.getElementById('cy-save').onclick=saveCycleForm;
 document.getElementById('po-save').onclick=savePostForm;
 document.querySelectorAll('.mov').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
-Object.assign(window,{ closeMod,openSponsor,selectSponsor,deleteSponsor,openCycle,deleteCycle,openPost,deletePost,selectPostType,setLang });
+Object.assign(window,{ closeMod,openSponsor,selectSponsor,setCmpMetric,deleteSponsor,openCycle,deleteCycle,openPost,deletePost,selectPostType,setLang });
 
 startListening(); setLang('en');
 </script>
