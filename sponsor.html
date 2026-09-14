@@ -12,52 +12,49 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0b0e13;--tx:#f4f4f7;--tx2:#c7c9d1;--tx3:#8b909a;
-  --glass:linear-gradient(155deg,rgba(255,255,255,.08),rgba(255,255,255,.025));
-  --glass2:linear-gradient(155deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
-  --bd:rgba(255,255,255,.12);--bdt:rgba(255,255,255,.24);--bd2:rgba(255,255,255,.09);
-  --inp:rgba(255,255,255,.05);
-  --orange:#ff7a00;--blu:#3b82f6;--grn:#28c76f;--red:#ff5a5a;--yel:#f5b23f;--pur:#8b5cf6;
+  --bg:#eceef3;--card:#ffffff;--tx:#16181d;--tx2:#4a4d55;--tx3:#8a8f99;
+  --glass:linear-gradient(155deg,rgba(255,255,255,.82),rgba(255,255,255,.62));
+  --bd:rgba(0,0,0,.09);--bdt:rgba(255,255,255,.7);--bd2:rgba(0,0,0,.06);
+  --inp:#f3f4f7;
+  --orange:#ff7a00;--blu:#2f74e6;--grn:#1faa55;--red:#e5484d;--yel:#e8a017;--pur:#7c5cff;
   --font-display:'Bebas Neue','Impact',sans-serif;
   --font-body:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-  --shadow:0 20px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.14);
+  --shadow:0 10px 34px rgba(20,30,60,.10),inset 0 1px 0 rgba(255,255,255,.7);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--font-body);font-size:14px;-webkit-text-size-adjust:100%;min-height:100dvh;}
 .bgfx{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
-.blob{position:absolute;border-radius:50%;filter:blur(100px);opacity:.4;}
-.blob.o{width:480px;height:480px;background:radial-gradient(circle,rgba(255,122,0,.4),transparent 70%);top:-160px;right:-120px;}
-.blob.b{width:520px;height:520px;background:radial-gradient(circle,rgba(59,130,246,.42),transparent 70%);bottom:-200px;left:-140px;}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35;}
+.blob.o{width:460px;height:460px;background:radial-gradient(circle,rgba(255,150,60,.55),transparent 70%);top:-150px;right:-110px;}
+.blob.b{width:520px;height:520px;background:radial-gradient(circle,rgba(90,150,255,.5),transparent 70%);bottom:-190px;left:-140px;}
 .hidden{display:none!important;}
 button{font-family:var(--font-body);cursor:pointer;}
 input,select{font-family:var(--font-body);}
 a{color:var(--blu);}
 
-/* glass primitives */
-.glass{background:var(--glass);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid var(--bd);border-top-color:var(--bdt);box-shadow:var(--shadow);}
-.btn{border:1px solid transparent;border-radius:11px;padding:10px 15px;font-size:12px;font-weight:700;letter-spacing:.02em;transition:transform .15s,opacity .15s,box-shadow .2s;}
+.glass{background:var(--glass);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);border:1px solid var(--bd);box-shadow:var(--shadow);}
+.btn{border:1px solid transparent;border-radius:11px;padding:10px 15px;font-size:12px;font-weight:700;letter-spacing:.02em;transition:transform .15s,opacity .15s;}
 .btn:active{transform:scale(.97);}
-.btn-p{background:linear-gradient(180deg,#4a90ff,#2f74e6);color:#fff;box-shadow:0 6px 20px rgba(59,130,246,.35),inset 0 1px 0 rgba(255,255,255,.3);}
-.btn-o{background:linear-gradient(180deg,#ff9127,#ff6a00);color:#fff;box-shadow:0 6px 20px rgba(255,122,0,.32),inset 0 1px 0 rgba(255,255,255,.3);}
-.btn-g{background:var(--glass);border-color:var(--bd);color:var(--tx2);backdrop-filter:blur(12px);}
+.btn-p{background:linear-gradient(180deg,#3d82f0,#2f6fe0);color:#fff;box-shadow:0 6px 16px rgba(47,116,230,.28);}
+.btn-o{background:linear-gradient(180deg,#ff9127,#ff6f05);color:#fff;box-shadow:0 6px 16px rgba(255,122,0,.28);}
+.btn-g{background:#fff;border-color:var(--bd);color:var(--tx2);}
 .btn-sm{padding:8px 12px;font-size:11px;}
 .btn-xs{padding:6px 10px;font-size:10.5px;border-radius:9px;}
 .btn:hover{opacity:.94;}
-.btn-del{background:rgba(255,90,90,.08);border:1px solid rgba(255,90,90,.25);color:var(--red);width:28px;height:28px;padding:0;border-radius:9px;font-size:12px;display:inline-flex;align-items:center;justify-content:center;}
-.icobtn{background:var(--glass);border:1px solid var(--bd);color:var(--tx3);width:29px;height:29px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;backdrop-filter:blur(12px);}
-label{display:block;font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;font-weight:600;}
+.btn-del{background:#fff;border:1px solid rgba(229,72,77,.3);color:var(--red);width:28px;height:28px;padding:0;border-radius:9px;font-size:12px;display:inline-flex;align-items:center;justify-content:center;}
+.icobtn{background:#fff;border:1px solid var(--bd);color:var(--tx3);width:29px;height:29px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;}
+label{display:block;font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:700;}
 .fi{margin-bottom:15px;}
 .fi input,.fi select,.fi textarea{width:100%;background:var(--inp);border:1px solid var(--bd);border-radius:12px;padding:12px 13px;color:var(--tx);font-size:14px;outline:none;transition:border-color .15s,box-shadow .15s;}
-.fi input:focus,.fi select:focus{border-color:rgba(59,130,246,.6);box-shadow:0 0 0 3px rgba(59,130,246,.15);}
+.fi input:focus,.fi select:focus{border-color:var(--blu);box-shadow:0 0 0 3px rgba(47,116,230,.14);background:#fff;}
 .row{display:flex;gap:11px;}.row>*{flex:1;}
-option{background:#141821;color:var(--tx);}
+option{background:#fff;color:var(--tx);}
 
-/* login */
 #screen-login{position:relative;z-index:1;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;}
-.langsw{position:fixed;top:16px;right:16px;z-index:5;display:flex;background:var(--glass);border:1px solid var(--bd);border-radius:11px;overflow:hidden;backdrop-filter:blur(16px);}
+.langsw{position:fixed;top:16px;right:16px;z-index:5;display:flex;background:#fff;border:1px solid var(--bd);border-radius:11px;overflow:hidden;box-shadow:var(--shadow);}
 .langsw button{background:transparent;border:none;color:var(--tx3);font-size:11px;font-weight:700;padding:7px 12px;letter-spacing:.05em;}
-.langsw button.on{background:rgba(255,255,255,.12);color:var(--tx);}
-.back-hub{position:fixed;top:16px;left:16px;z-index:5;font-size:12px;color:var(--tx3);text-decoration:none;background:var(--glass);border:1px solid var(--bd);padding:8px 13px;border-radius:11px;backdrop-filter:blur(16px);}
+.langsw button.on{background:var(--blu);color:#fff;}
+.back-hub{position:fixed;top:16px;left:16px;z-index:5;font-size:12px;font-weight:600;color:var(--tx2);text-decoration:none;background:#fff;border:1px solid var(--bd);padding:8px 13px;border-radius:11px;box-shadow:var(--shadow);}
 .brand{font-family:var(--font-display);font-size:56px;letter-spacing:.02em;line-height:1;}
 .brand em{color:var(--orange);font-style:normal;}
 .login-sub{font-size:11px;letter-spacing:.3em;color:var(--tx3);text-transform:uppercase;margin:8px 0 30px;}
@@ -65,39 +62,38 @@ option{background:#141821;color:var(--tx);}
 .login-err{color:var(--red);font-size:12px;margin-top:10px;display:none;text-align:center;}
 .login-err.show{display:block;}
 
-/* app shell */
-.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:11px;padding:12px 16px;background:rgba(11,14,19,.72);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-bottom:1px solid var(--bd2);}
-.tb-back{flex-shrink:0;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--tx2);text-decoration:none;background:var(--glass);border:1px solid var(--bd);backdrop-filter:blur(12px);transition:color .15s;}
+.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:11px;padding:12px 16px;background:rgba(255,255,255,.8);backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);border-bottom:1px solid var(--bd2);}
+.tb-back{flex-shrink:0;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--tx2);text-decoration:none;background:#fff;border:1px solid var(--bd);}
 .tb-back:hover{color:var(--orange);}
 .tb-brand{font-family:var(--font-display);font-size:19px;letter-spacing:.03em;}
 .tb-brand em{color:var(--orange);font-style:normal;}
 .tb-role{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1px solid var(--bd);}
-.tb-role.admin{background:rgba(255,122,0,.14);color:var(--orange);}
-.tb-role.sponsor{background:rgba(59,130,246,.14);color:var(--blu);}
+.tb-role.admin{background:rgba(255,122,0,.12);color:#c85e00;}
+.tb-role.sponsor{background:rgba(47,116,230,.12);color:var(--blu);}
 .tb-sp{margin-left:auto;display:flex;gap:8px;align-items:center;}
 .sync{font-size:10px;color:var(--tx3);display:flex;align-items:center;gap:5px;}
 .sync .dot{width:7px;height:7px;border-radius:50%;background:var(--tx3);}
-.sync.live .dot{background:var(--grn);box-shadow:0 0 0 3px rgba(40,199,111,.2);}
+.sync.live .dot{background:var(--grn);box-shadow:0 0 0 3px rgba(31,170,85,.18);}
 .wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:18px 16px 70px;}
 .page-title{font-family:var(--font-display);font-size:28px;letter-spacing:.03em;margin:6px 0 16px;}
-.card{border-radius:20px;padding:18px;margin-bottom:15px;}
-.card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-.card-ttl{font-family:var(--font-display);font-size:15px;letter-spacing:.08em;color:var(--tx2);flex:1;}
+.card{border-radius:20px;padding:18px;margin-bottom:15px;background:var(--card);border:1px solid var(--bd2);box-shadow:var(--shadow);}
+.card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.card-ttl{font-family:var(--font-display);font-size:15px;letter-spacing:.07em;color:var(--tx2);flex:1;}
 
-.sp-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--bd2);border-radius:14px;margin-bottom:9px;cursor:pointer;transition:border-color .18s,background .18s,transform .15s;background:rgba(255,255,255,.02);}
-.sp-item:hover{border-color:rgba(59,130,246,.4);transform:translateX(2px);}
-.sp-item.on{border-color:var(--blu);background:rgba(59,130,246,.09);}
-.sp-logo{width:42px;height:42px;border-radius:13px;background:var(--glass);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.16);}
+.sp-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--bd2);border-radius:14px;margin-bottom:9px;cursor:pointer;transition:border-color .18s,background .18s;background:#fff;}
+.sp-item:hover{border-color:var(--blu);}
+.sp-item.on{border-color:var(--blu);background:rgba(47,116,230,.06);}
+.sp-logo{width:42px;height:42px;border-radius:13px;background:var(--inp);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;}
 .sp-name{font-weight:700;font-size:14px;}
 .sp-meta{font-size:11px;color:var(--tx3);}
 
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:15px;}
-.stat{border-radius:17px;padding:16px 12px;text-align:center;}
-.stat-num{font-family:var(--font-display);font-size:31px;line-height:1;letter-spacing:.02em;}
-.stat-lbl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:6px;}
+.stat{border-radius:17px;padding:16px 12px;text-align:center;background:var(--card);border:1px solid var(--bd2);box-shadow:var(--shadow);}
+.stat-num{font-family:var(--font-display);font-size:30px;line-height:1;letter-spacing:.02em;}
+.stat-lbl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-top:6px;font-weight:600;}
 
-.ct{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--glass);color:var(--tx2);border:1px solid var(--bd);}
-.pub{display:flex;align-items:center;gap:11px;padding:12px 4px;border-bottom:1px solid var(--bd2);}
+.ct{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--inp);color:var(--tx2);border:1px solid var(--bd);}
+.pub{display:flex;align-items:center;gap:11px;padding:12px 2px;border-bottom:1px solid var(--bd2);}
 .pub:last-child{border-bottom:none;}
 .pub-main{flex:1;min-width:0;}
 .pub-ttl{font-weight:600;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -105,32 +101,37 @@ option{background:#141821;color:var(--tx);}
 .pub-metric{font-variant-numeric:tabular-nums;font-weight:600;color:var(--tx2);}
 .pub-link{font-size:11px;font-weight:700;color:var(--blu);text-decoration:none;flex-shrink:0;}
 .pub-actions{display:flex;gap:6px;flex-shrink:0;}
-.wk-hdr{display:flex;align-items:center;justify-content:space-between;margin:16px 0 6px;padding-bottom:7px;border-bottom:1px solid var(--bd);}
-.wk-title{font-size:12px;font-weight:700;color:var(--tx2);}
-.wk-total{font-size:11px;color:var(--tx3);}
 
-/* month growth rows */
+/* cycle card */
+.cyc{border:1px solid var(--bd2);border-radius:16px;padding:15px;margin-bottom:13px;background:var(--card);box-shadow:0 4px 16px rgba(20,30,60,.06);}
+.cyc-hdr{display:flex;align-items:center;gap:9px;margin-bottom:12px;flex-wrap:wrap;}
+.cyc-mon{font-family:var(--font-display);font-size:19px;letter-spacing:.03em;flex:1;text-transform:capitalize;}
+.cyc-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px;}
+.cyc-tile{background:var(--inp);border:1px solid var(--bd2);border-radius:12px;padding:11px 8px;text-align:center;}
+.cyc-tile.reach{background:linear-gradient(160deg,rgba(124,92,255,.12),rgba(124,92,255,.04));border-color:rgba(124,92,255,.25);}
+.cyc-tnum{font-family:var(--font-display);font-size:22px;line-height:1;}
+.cyc-tlbl{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em;margin-top:4px;font-weight:600;}
+
 .mg-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd2);}
 .mg-row:last-child{border-bottom:none;}
-.mg-mon{width:80px;font-size:12px;font-weight:700;color:var(--tx2);flex-shrink:0;text-transform:capitalize;}
-.mg-track{flex:1;height:22px;background:rgba(255,255,255,.05);border-radius:7px;overflow:hidden;border:1px solid var(--bd2);}
-.mg-fill{height:100%;background:linear-gradient(90deg,var(--blu),var(--pur));border-radius:7px;box-shadow:inset 0 1px 0 rgba(255,255,255,.25);}
-.mg-val{width:70px;text-align:right;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0;}
-.mg-delta{width:66px;text-align:right;font-size:11px;font-weight:800;flex-shrink:0;font-variant-numeric:tabular-nums;}
+.mg-mon{width:84px;font-size:12px;font-weight:700;color:var(--tx2);flex-shrink:0;text-transform:capitalize;}
+.mg-track{flex:1;height:22px;background:var(--inp);border-radius:7px;overflow:hidden;border:1px solid var(--bd2);}
+.mg-fill{height:100%;background:linear-gradient(90deg,var(--blu),var(--pur));border-radius:7px;}
+.mg-val{width:72px;text-align:right;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0;}
+.mg-delta{width:64px;text-align:right;font-size:11px;font-weight:800;flex-shrink:0;font-variant-numeric:tabular-nums;}
 .mg-delta.up{color:var(--grn);}.mg-delta.down{color:var(--red);}.mg-delta.flat{color:var(--tx3);}
 
-/* modal */
-.mov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(6px);}
+.mov{position:fixed;inset:0;background:rgba(20,25,40,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(5px);}
 .mov.open{opacity:1;pointer-events:all;}
-.modal{border-radius:22px;padding:22px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;background:linear-gradient(155deg,rgba(28,32,42,.92),rgba(16,20,28,.94));backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);border:1px solid var(--bd);border-top-color:var(--bdt);box-shadow:0 30px 80px rgba(0,0,0,.6);}
+.modal{border-radius:22px;padding:22px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;background:#fff;border:1px solid var(--bd);box-shadow:0 30px 80px rgba(20,30,60,.28);}
 .mhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
 .mttl{font-family:var(--font-display);font-size:19px;letter-spacing:.04em;}
-.mclose{background:var(--glass);border:1px solid var(--bd);color:var(--tx2);width:31px;height:31px;border-radius:10px;font-size:15px;}
-.empty{text-align:center;padding:36px 10px;color:var(--tx3);font-size:13px;}
+.mclose{background:var(--inp);border:1px solid var(--bd);color:var(--tx2);width:31px;height:31px;border-radius:10px;font-size:15px;}
+.empty{text-align:center;padding:30px 10px;color:var(--tx3);font-size:13px;}
 .ctype-pills{display:flex;flex-wrap:wrap;gap:7px;}
-.ctype-pill{padding:8px 13px;border-radius:11px;background:var(--glass);border:1px solid var(--bd);color:var(--tx2);font-size:12px;font-weight:600;}
-.ctype-pill.on{background:linear-gradient(180deg,#4a90ff,#2f74e6);border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.35);}
-@media(max-width:520px){.stat-num{font-size:23px;}.mg-mon{width:62px;}}
+.ctype-pill{padding:8px 13px;border-radius:11px;background:var(--inp);border:1px solid var(--bd);color:var(--tx2);font-size:12px;font-weight:600;}
+.ctype-pill.on{background:var(--blu);border-color:transparent;color:#fff;}
+@media(max-width:520px){.stat-num{font-size:23px;}.mg-mon{width:66px;}}
 </style>
 </head>
 <body>
@@ -157,7 +158,7 @@ option{background:#141821;color:var(--tx);}
     <span class="tb-brand">FC<em>NOISE</em></span>
     <span class="tb-role" id="tb-role"></span>
     <div class="tb-sp">
-      <div class="langsw" style="position:static;"><button data-l="es" onclick="setLang('es')">ES</button><button data-l="en" onclick="setLang('en')">EN</button></div>
+      <div class="langsw" style="position:static;box-shadow:none;"><button data-l="es" onclick="setLang('es')">ES</button><button data-l="en" onclick="setLang('en')">EN</button></div>
       <span class="sync" id="sync"><span class="dot"></span><span id="sync-lbl"></span></span>
       <button class="btn btn-g btn-sm" id="logout-btn"></button>
     </div>
@@ -180,16 +181,27 @@ option{background:#141821;color:var(--tx);}
   </div>
 </div></div>
 
+<!-- MODAL CICLO -->
+<div class="mov" id="m-cycle"><div class="modal">
+  <div class="mhdr"><span class="mttl" id="cy-mttl"></span><button class="mclose" onclick="closeMod('m-cycle')">✕</button></div>
+  <input type="hidden" id="cy-id"><input type="hidden" id="cy-sponsor">
+  <div class="fi"><label id="lbl-month"></label><input type="month" id="cy-month"></div>
+  <div class="fi"><label id="lbl-reach"></label><input type="number" id="cy-reach" placeholder="0" min="0"></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+    <button class="btn btn-g btn-sm" onclick="closeMod('m-cycle')" id="cy-cancel"></button>
+    <button class="btn btn-p btn-sm" id="cy-save"></button>
+  </div>
+</div></div>
+
 <!-- MODAL POST -->
 <div class="mov" id="m-post"><div class="modal">
   <div class="mhdr"><span class="mttl" id="po-mttl"></span><button class="mclose" onclick="closeMod('m-post')">✕</button></div>
-  <input type="hidden" id="po-id"><input type="hidden" id="po-sponsor">
+  <input type="hidden" id="po-id"><input type="hidden" id="po-sponsor"><input type="hidden" id="po-month">
   <div class="fi"><label id="lbl-ctype"></label><div class="ctype-pills" id="po-types"></div><input type="hidden" id="po-type" value="carrusel"></div>
   <div class="fi"><label id="lbl-title"></label><input type="text" id="po-title"></div>
-  <div class="fi"><label id="lbl-date"></label><input type="date" id="po-date"></div>
   <div class="row">
     <div class="fi"><label id="lbl-views"></label><input type="number" id="po-views" placeholder="0" min="0"></div>
-    <div class="fi"><label id="lbl-reach"></label><input type="number" id="po-reach" placeholder="0" min="0"></div>
+    <div class="fi"><label id="lbl-likes"></label><input type="number" id="po-likes" placeholder="0" min="0"></div>
   </div>
   <div class="fi" id="po-link-wrap"><label id="lbl-link"></label><input type="text" id="po-link" placeholder="https://instagram.com/…"></div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
@@ -204,7 +216,7 @@ import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 const CFG={apiKey:"AIzaSyAMgsbJ2rOqLDofRMl6porBY7yczcJgZTA",authDomain:"fcnoise-proyectos.firebaseapp.com",databaseURL:"https://fcnoise-proyectos-default-rtdb.firebaseio.com",projectId:"fcnoise-proyectos",storageBucket:"fcnoise-proyectos.firebasestorage.app",messagingSenderId:"996777317756",appId:"1:996777317756:web:bdc555f3c288903b07c0f9"};
-const P_SP="fcn_sponsors", P_PO="fcn_sponsor_posts";
+const P_SP="fcn_sponsors", P_PO="fcn_sponsor_posts", P_CY="fcn_sponsor_cycles";
 const ADMIN_PASS="123456";
 let db=null;
 try{ const app=initializeApp(CFG,"fcnoise-sponsor"); db=getDatabase(app); try{ signInAnonymously(getAuth(app)).catch(()=>{}); }catch(e){} }catch(e){}
@@ -215,82 +227,82 @@ const CTYPES={
   reel:    {es:'Reel',en:'Reel',icon:'🎬',link:true},
   historia:{es:'Historia',en:'Story',icon:'📸',link:false},
 };
-const MONTHS={es:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],en:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']};
+const MONTHS={es:['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],en:['January','February','March','April','May','June','July','August','September','October','November','December']};
 const T={
   es:{base:'← Base',user:'Usuario',pass:'Contraseña',signin:'Entrar',bad:'Usuario o contraseña incorrectos',pick:'Selecciona…',
     admin:'Admin',sponsor:'Sponsor',signout:'Salir',live:'En vivo',conn:'Conectando…',
     sponsors:'Sponsors',createSp:'+ Crear sponsor',pubs:'publicaciones',noSp:'Sin sponsors. Crea el primero.',pickSp:'Selecciona un sponsor arriba para ver/editar sus métricas.',
-    addPub:'+ Publicación',from:'Desde',to:'Hasta',views:'Visualizaciones',reach:'Alcance',posts:'Publicaciones',
-    weekly:'Alcance y publicaciones · por semana',week:'Semana',noRange:'Sin publicaciones en este rango.',
-    growth:'Crecimiento mensual · Alcance',noData:'Sin datos.',vsPrev:'vs mes anterior',notitle:'(sin título)',
+    totalViews:'Visualizaciones totales',totalLikes:'Me gusta totales',totalPubs:'Publicaciones',
+    createCycle:'+ Crear ciclo',noCycles:'Sin ciclos. Crea el primero (un mes).',addPub:'+ Publicación',
+    reachTile:'Alcance de la cuenta',viewsTile:'Visualizaciones',likesTile:'Me gusta',noPubsCycle:'Sin publicaciones en este ciclo.',
+    growth:'Crecimiento mensual · Alcance de la cuenta',noData:'Sin datos.',notitle:'(sin título)',
     newSp:'Nuevo Sponsor',editSp:'Editar Sponsor',spName:'Nombre del sponsor',spPass:'Contraseña',cancel:'Cancelar',save:'Guardar',
-    newPo:'Nueva Publicación',editPo:'Editar Publicación',ctype:'Tipo de contenido',title:'Título',date:'Fecha',reachOpt:'Alcance (opcional)',link:'Link',
-    needName:'Escribe el nombre del sponsor.',needTitle:'Escribe un título.',delSp:'¿Borrar el sponsor y todas sus publicaciones?',delPo:'¿Borrar esta publicación?'},
+    newCy:'Nuevo Ciclo',editCy:'Editar Ciclo',month:'Mes',reachField:'Alcance de la cuenta (impacto a la marca)',
+    newPo:'Nueva Publicación',editPo:'Editar Publicación',ctype:'Tipo de contenido',title:'Título',views:'Visualizaciones',likes:'Me gusta',link:'Link',
+    needName:'Escribe el nombre del sponsor.',needTitle:'Escribe un título.',needMonth:'Elige un mes.',
+    delSp:'¿Borrar el sponsor y todo su contenido?',delCy:'¿Borrar este ciclo y sus publicaciones?',delPo:'¿Borrar esta publicación?',view:'Ver ↗'},
   en:{base:'← Home',user:'User',pass:'Password',signin:'Sign in',bad:'Wrong user or password',pick:'Select…',
     admin:'Admin',sponsor:'Sponsor',signout:'Sign out',live:'Live',conn:'Connecting…',
     sponsors:'Sponsors',createSp:'+ New sponsor',pubs:'posts',noSp:'No sponsors yet. Create the first one.',pickSp:'Select a sponsor above to view/edit its metrics.',
-    addPub:'+ New post',from:'From',to:'To',views:'Views',reach:'Reach',posts:'Posts',
-    weekly:'Reach & posts · by week',week:'Week',noRange:'No posts in this range.',
-    growth:'Monthly growth · Reach',noData:'No data.',vsPrev:'vs prev. month',notitle:'(untitled)',
+    totalViews:'Total views',totalLikes:'Total likes',totalPubs:'Posts',
+    createCycle:'+ New cycle',noCycles:'No cycles yet. Create the first one (a month).',addPub:'+ New post',
+    reachTile:'Account reach',viewsTile:'Views',likesTile:'Likes',noPubsCycle:'No posts in this cycle.',
+    growth:'Monthly growth · Account reach',noData:'No data.',notitle:'(untitled)',
     newSp:'New Sponsor',editSp:'Edit Sponsor',spName:'Sponsor name',spPass:'Password',cancel:'Cancel',save:'Save',
-    newPo:'New Post',editPo:'Edit Post',ctype:'Content type',title:'Title',date:'Date',reachOpt:'Reach (optional)',link:'Link',
-    needName:'Enter the sponsor name.',needTitle:'Enter a title.',delSp:'Delete this sponsor and all its posts?',delPo:'Delete this post?'}
+    newCy:'New Cycle',editCy:'Edit Cycle',month:'Month',reachField:'Account reach (brand impact)',
+    newPo:'New Post',editPo:'Edit Post',ctype:'Content type',title:'Title',views:'Views',likes:'Likes',link:'Link',
+    needName:'Enter the sponsor name.',needTitle:'Enter a title.',needMonth:'Pick a month.',
+    delSp:'Delete this sponsor and all its content?',delCy:'Delete this cycle and its posts?',delPo:'Delete this post?',view:'View ↗'}
 };
 
-let _sponsors={}, _posts={}, currentUser=null, selSponsor=null, _range={from:'',to:''}, lang='en';
+let _sponsors={}, _posts={}, _cycles={}, currentUser=null, selSponsor=null, lang='en';
 const t=k=>(T[lang]&&T[lang][k])||k;
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-const todayStr=()=>new Date().toISOString().slice(0,10);
+const thisMonth=()=>new Date().toISOString().slice(0,7);
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const nfmt=n=>Number(n||0).toLocaleString(lang==='en'?'en-US':'es');
 const ctLabel=ty=>CTYPES[ty]?CTYPES[ty][lang]:ty;
-function weekStart(d){ const x=new Date(d+'T00:00:00'); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x.toISOString().slice(0,10); }
-const fmtD=d=>{ if(!d) return ''; const p=d.split('-'); return `${p[2]}/${p[1]}`; };
 const normUrl=u=>{ u=(u||'').trim(); return u&&!/^https?:\/\//i.test(u)?'https://'+u:u; };
+const monthLabel=m=>{ if(!m) return ''; const [y,mm]=m.split('-'); return `${MONTHS[lang][+mm-1]} ${y}`; };
 const sponsorPosts=sid=>Object.values(_posts).filter(p=>p&&p.sponsorId===sid);
-const inRange=p=>{ const d=p.date||''; return !((_range.from&&d<_range.from)||(_range.to&&d>_range.to)); };
+const postMonth=p=>p.month || (p.date||'').slice(0,7); // compat: deriva mes de la fecha
+const sponsorCycles=sid=>Object.values(_cycles).filter(c=>c&&c.sponsorId===sid);
+function cycleForMonth(sid,m){ return sponsorCycles(sid).find(c=>c.month===m); }
+// meses del sponsor: ciclos explícitos + meses de publicaciones existentes
+function sponsorMonths(sid){
+  const s=new Set(sponsorCycles(sid).map(c=>c.month));
+  sponsorPosts(sid).forEach(p=>{ const m=postMonth(p); if(m) s.add(m); });
+  return [...s].sort((a,b)=>b.localeCompare(a));
+}
+const postsInMonth=(sid,m)=>sponsorPosts(sid).filter(p=>postMonth(p)===m);
 
 async function saveSponsor(s){ if(db) try{ await set(ref(db,`${P_SP}/${s.id}`),s); }catch(e){alert('Error');} }
 async function delSponsorFb(id){ if(db) try{ await remove(ref(db,`${P_SP}/${id}`)); }catch(e){} }
 async function savePost(p){ if(db) try{ await set(ref(db,`${P_PO}/${p.id}`),p); }catch(e){alert('Error');} }
 async function delPostFb(id){ if(db) try{ await remove(ref(db,`${P_PO}/${id}`)); }catch(e){} }
+async function saveCycle(c){ if(db) try{ await set(ref(db,`${P_CY}/${c.id}`),c); }catch(e){alert('Error');} }
+async function delCycleFb(id){ if(db) try{ await remove(ref(db,`${P_CY}/${id}`)); }catch(e){} }
 
 function startListening(){
   if(!db) return;
   onValue(ref(db,P_SP), s=>{ _sponsors=s.val()||{}; setSync(true); populateLoginUsers(); if(currentUser) render(); });
   onValue(ref(db,P_PO), s=>{ _posts=s.val()||{}; setSync(true); if(currentUser) render(); });
+  onValue(ref(db,P_CY), s=>{ _cycles=s.val()||{}; setSync(true); if(currentUser) render(); });
 }
 function setSync(live){ const s=document.getElementById('sync'); const l=document.getElementById('sync-lbl'); if(l)l.textContent=live?t('live'):t('conn'); if(s)s.classList.toggle('live',!!live); }
 
-/* i18n */
 function setLang(l){ lang=l; document.documentElement.lang=l; document.querySelectorAll('.langsw button').forEach(b=>b.classList.toggle('on',b.dataset.l===l)); applyStaticI18n(); populateLoginUsers(); if(currentUser) render(); }
 function applyStaticI18n(){
-  document.getElementById('back-lbl').textContent=t('base');
-  document.getElementById('lbl-user').textContent=t('user');
-  document.getElementById('lbl-pass').textContent=t('pass');
-  document.getElementById('l-btn').textContent=t('signin');
-  document.getElementById('l-err').textContent=t('bad');
-  document.getElementById('logout-btn').textContent=t('signout');
+  const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('back-lbl',t('base')); set('lbl-user',t('user')); set('lbl-pass',t('pass')); set('l-btn',t('signin')); set('l-err',t('bad')); set('logout-btn',t('signout'));
+  set('lbl-spname',t('spName')); set('lbl-sppass',t('spPass')); set('sp-cancel',t('cancel')); set('sp-save',t('save'));
+  set('lbl-month',t('month')); set('lbl-reach',t('reachField')); set('cy-cancel',t('cancel')); set('cy-save',t('save'));
+  set('lbl-ctype',t('ctype')); set('lbl-title',t('title')); set('lbl-views',t('views')); set('lbl-likes',t('likes')); set('lbl-link',t('link')); set('po-cancel',t('cancel')); set('po-save',t('save'));
   setSync(document.getElementById('sync').classList.contains('live'));
-  // modal sponsor
-  document.getElementById('lbl-spname').textContent=t('spName');
-  document.getElementById('lbl-sppass').textContent=t('spPass');
-  document.getElementById('sp-cancel').textContent=t('cancel');
-  document.getElementById('sp-save').textContent=t('save');
-  // modal post
-  document.getElementById('lbl-ctype').textContent=t('ctype');
-  document.getElementById('lbl-title').textContent=t('title');
-  document.getElementById('lbl-date').textContent=t('date');
-  document.getElementById('lbl-views').textContent=t('views');
-  document.getElementById('lbl-reach').textContent=t('reachOpt');
-  document.getElementById('lbl-link').textContent=t('link');
-  document.getElementById('po-cancel').textContent=t('cancel');
-  document.getElementById('po-save').textContent=t('save');
   if(currentUser){ const r=document.getElementById('tb-role'); r.textContent=currentUser.role==='admin'?t('admin'):t('sponsor'); }
   renderTypePills();
 }
 
-/* login */
 function populateLoginUsers(){
   const sel=document.getElementById('l-user'); if(!sel) return; const cur=sel.value;
   let h=`<option value="">${t('pick')}</option><option value="admin">ADMIN</option>`;
@@ -309,23 +321,19 @@ function enterApp(){
   document.getElementById('l-pass').value='';
   document.getElementById('screen-login').classList.add('hidden');
   document.getElementById('screen-app').classList.remove('hidden');
-  const r=document.getElementById('tb-role'); r.className='tb-role '+currentUser.role;
-  const to=new Date(), from=new Date(); from.setDate(from.getDate()-90);
-  _range={from:from.toISOString().slice(0,10),to:to.toISOString().slice(0,10)};
+  document.getElementById('tb-role').className='tb-role '+currentUser.role;
   setLang(lang);
 }
 function logout(){ currentUser=null; selSponsor=null; document.getElementById('screen-app').classList.add('hidden'); document.getElementById('screen-login').classList.remove('hidden'); }
 
-/* render */
 function render(){
   if(!currentUser) return;
-  const el=document.getElementById('app-body');
-  el.innerHTML=currentUser.role==='admin'?renderAdmin():renderDash(selSponsor,false);
+  document.getElementById('app-body').innerHTML=currentUser.role==='admin'?renderAdmin():renderDash(selSponsor,false);
 }
 function renderAdmin(){
   const sps=Object.values(_sponsors).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
   let h=`<div class="page-title">${t('sponsors')}</div>
-  <div class="card glass"><div class="card-hdr"><span class="card-ttl">${t('sponsors').toUpperCase()}</span><button class="btn btn-o btn-xs" onclick="openSponsor()">${t('createSp')}</button></div>
+  <div class="card"><div class="card-hdr"><span class="card-ttl">${t('sponsors').toUpperCase()}</span><button class="btn btn-o btn-xs" onclick="openSponsor()">${t('createSp')}</button></div>
   ${sps.length?sps.map(s=>`<div class="sp-item ${s.id===selSponsor?'on':''}" onclick="selectSponsor('${s.id}')">
     <div class="sp-logo">${esc(s.logo||'🏷️')}</div>
     <div style="flex:1;"><div class="sp-name">${esc(s.name)}</div><div class="sp-meta">${sponsorPosts(s.id).length} ${t('pubs')}</div></div>
@@ -339,55 +347,72 @@ function renderAdmin(){
 function renderDash(sid,admin){
   const s=_sponsors[sid];
   if(!s) return `<div class="empty">${admin?t('pickSp'):''}</div>`;
-  const all=sponsorPosts(sid).filter(inRange).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  const totV=all.reduce((a,p)=>a+Number(p.views||0),0), totR=all.reduce((a,p)=>a+Number(p.reach||0),0);
-  let h=`<div class="card glass"><div class="card-hdr">
+  const allPosts=sponsorPosts(sid);
+  const totV=allPosts.reduce((a,p)=>a+Number(p.views||0),0);
+  const totL=allPosts.reduce((a,p)=>a+Number(p.likes||0),0);
+  // header
+  let h=`<div class="card"><div class="card-hdr">
     <div class="sp-logo">${esc(s.logo||'🏷️')}</div>
     <div style="flex:1;"><div class="page-title" style="margin:0;">${esc(s.name)}</div></div>
-    ${admin?`<button class="btn btn-o btn-xs" onclick="openPost('${sid}')">${t('addPub')}</button>`:''}
+    ${admin?`<button class="btn btn-o btn-xs" onclick="openCycle('${sid}')">${t('createCycle')}</button>`:''}
   </div>
-  <div class="row">
-    <div class="fi" style="margin:0;"><label>${t('from')}</label><input type="date" value="${_range.from}" onchange="setRange('from',this.value)"></div>
-    <div class="fi" style="margin:0;"><label>${t('to')}</label><input type="date" value="${_range.to}" onchange="setRange('to',this.value)"></div>
-  </div></div>
-  <div class="stats">
-    <div class="stat glass"><div class="stat-num" style="color:var(--blu);">${nfmt(totV)}</div><div class="stat-lbl">${t('views')}</div></div>
-    <div class="stat glass"><div class="stat-num" style="color:var(--pur);">${nfmt(totR)}</div><div class="stat-lbl">${t('reach')}</div></div>
-    <div class="stat glass"><div class="stat-num" style="color:var(--orange);">${all.length}</div><div class="stat-lbl">${t('posts')}</div></div>
-  </div>`;
-  // weekly
-  const weeks={}; all.forEach(p=>{ const w=weekStart(p.date||todayStr()); (weeks[w]=weeks[w]||[]).push(p); });
-  const wk=Object.keys(weeks).sort((a,b)=>b.localeCompare(a));
-  h+=`<div class="card glass"><div class="card-hdr"><span class="card-ttl">${t('weekly').toUpperCase()}</span></div>`;
-  if(!wk.length) h+=`<div class="empty">${t('noRange')}</div>`;
-  else wk.forEach(w=>{ const it=weeks[w].sort((a,b)=>(b.date||'').localeCompare(a.date||'')); const wv=it.reduce((a,p)=>a+Number(p.views||0),0); const we=new Date(w+'T00:00:00'); we.setDate(we.getDate()+6);
-    h+=`<div class="wk-hdr"><span class="wk-title">${t('week')} ${fmtD(w)} – ${fmtD(we.toISOString().slice(0,10))}</span><span class="wk-total">👁 ${nfmt(wv)} · ${it.length}</span></div>`+it.map(p=>pubHTML(p,admin)).join(''); });
-  h+=`</div>`;
-  // monthly growth (reach)
-  const mo={}; all.forEach(p=>{ const mk=(p.date||'').slice(0,7); if(mk) mo[mk]=(mo[mk]||0)+Number(p.reach||0); });
-  const mk=Object.keys(mo).sort(); const maxM=Math.max(1,...Object.values(mo));
-  h+=`<div class="card glass"><div class="card-hdr"><span class="card-ttl">${t('growth').toUpperCase()}</span></div>`;
-  if(!mk.length) h+=`<div class="empty">${t('noData')}</div>`;
-  else h+=mk.map((k,i)=>{ const val=mo[k]; const prev=i>0?mo[mk[i-1]]:null; const [y,m]=k.split('-');
+  <div class="stats" style="margin-bottom:0;">
+    <div class="stat" style="box-shadow:none;border:none;background:var(--inp);"><div class="stat-num" style="color:var(--blu);">${nfmt(totV)}</div><div class="stat-lbl">${t('totalViews')}</div></div>
+    <div class="stat" style="box-shadow:none;border:none;background:var(--inp);"><div class="stat-num" style="color:var(--red);">${nfmt(totL)}</div><div class="stat-lbl">${t('totalLikes')}</div></div>
+    <div class="stat" style="box-shadow:none;border:none;background:var(--inp);"><div class="stat-num" style="color:var(--orange);">${allPosts.length}</div><div class="stat-lbl">${t('totalPubs')}</div></div>
+  </div></div>`;
+
+  // Crecimiento mensual (alcance de la cuenta)
+  const months=sponsorMonths(sid);
+  const reachByMonth={}; months.forEach(m=>{ const c=cycleForMonth(sid,m); reachByMonth[m]=c?Number(c.accountReach||0):0; });
+  const asc=[...months].sort(); const maxR=Math.max(1,...Object.values(reachByMonth));
+  h+=`<div class="card"><div class="card-hdr"><span class="card-ttl">${t('growth').toUpperCase()}</span></div>`;
+  if(!asc.length || asc.every(m=>!reachByMonth[m])) h+=`<div class="empty">${t('noData')}</div>`;
+  else h+=asc.map((m,i)=>{ const val=reachByMonth[m]; const prev=i>0?reachByMonth[asc[i-1]]:null;
     let dh='<span class="mg-delta flat">—</span>';
     if(prev!=null&&prev>0){ const d=(val-prev)/prev*100; const up=d>=0; dh=`<span class="mg-delta ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(d).toFixed(0)}%</span>`; }
-    else if(prev===0&&val>0){ dh='<span class="mg-delta up">▲ new</span>'; }
-    return `<div class="mg-row"><div class="mg-mon">${MONTHS[lang][+m-1]} ${y.slice(2)}</div><div class="mg-track"><div class="mg-fill" style="width:${Math.round(val/maxM*100)}%;"></div></div><div class="mg-val">${nfmt(val)}</div>${dh}</div>`;
+    else if(prev===0&&val>0){ dh='<span class="mg-delta up">▲</span>'; }
+    return `<div class="mg-row"><div class="mg-mon">${monthLabel(m)}</div><div class="mg-track"><div class="mg-fill" style="width:${Math.round(val/maxR*100)}%;"></div></div><div class="mg-val">${nfmt(val)}</div>${dh}</div>`;
   }).join('');
   h+=`</div>`;
+
+  // Ciclos (meses)
+  h+=`<div class="page-title" style="font-size:20px;">${lang==='en'?'Cycles':'Ciclos'}</div>`;
+  if(!months.length) h+=`<div class="card"><div class="empty">${t('noCycles')}</div></div>`;
+  else h+=months.map(m=>renderCycle(sid,m,admin)).join('');
   return h;
+}
+function renderCycle(sid,m,admin){
+  const c=cycleForMonth(sid,m);
+  const posts=postsInMonth(sid,m).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  const v=posts.reduce((a,p)=>a+Number(p.views||0),0);
+  const l=posts.reduce((a,p)=>a+Number(p.likes||0),0);
+  const reach=c?Number(c.accountReach||0):0;
+  return `<div class="cyc">
+    <div class="cyc-hdr">
+      <span class="cyc-mon">${monthLabel(m)}</span>
+      ${admin?`<button class="btn btn-p btn-xs" onclick="openPost('${sid}','${m}')">${t('addPub')}</button>
+        <button class="icobtn" title="${t('editCy')}" onclick="openCycle('${sid}','${c?c.id:''}','${m}')">✎</button>
+        ${c?`<button class="btn-del" onclick="deleteCycle('${c.id}')">✕</button>`:''}`:''}
+    </div>
+    <div class="cyc-tiles">
+      <div class="cyc-tile reach"><div class="cyc-tnum" style="color:var(--pur);">${nfmt(reach)}</div><div class="cyc-tlbl">${t('reachTile')}</div></div>
+      <div class="cyc-tile"><div class="cyc-tnum" style="color:var(--blu);">${nfmt(v)}</div><div class="cyc-tlbl">${t('viewsTile')}</div></div>
+      <div class="cyc-tile"><div class="cyc-tnum" style="color:var(--red);">${nfmt(l)}</div><div class="cyc-tlbl">${t('likesTile')}</div></div>
+    </div>
+    ${posts.length?posts.map(p=>pubHTML(p,admin)).join(''):`<div class="empty" style="padding:14px;">${t('noPubsCycle')}</div>`}
+  </div>`;
 }
 function pubHTML(p,admin){
   const c=CTYPES[p.type]||CTYPES.carrusel;
-  const link=(c.link&&p.link)?`<a class="pub-link" href="${esc(normUrl(p.link))}" target="_blank" rel="noopener">${lang==='en'?'View ↗':'Ver ↗'}</a>`:'';
+  const link=(c.link&&p.link)?`<a class="pub-link" href="${esc(normUrl(p.link))}" target="_blank" rel="noopener">${t('view')}</a>`:'';
   return `<div class="pub"><div class="pub-main">
     <div class="pub-ttl">${esc(p.title||t('notitle'))}</div>
-    <div class="pub-sub"><span class="ct">${c.icon} ${esc(ctLabel(p.type))}</span><span>${fmtD(p.date)}</span><span class="pub-metric">👁 ${nfmt(p.views)}</span>${p.reach?`<span class="pub-metric">📣 ${nfmt(p.reach)}</span>`:''}</div>
-  </div>${link}${admin?`<div class="pub-actions"><button class="icobtn" onclick="openPost('${p.sponsorId}','${p.id}')">✎</button><button class="btn-del" onclick="deletePost('${p.id}')">✕</button></div>`:''}</div>`;
+    <div class="pub-sub"><span class="ct">${c.icon} ${esc(ctLabel(p.type))}</span><span class="pub-metric">👁 ${nfmt(p.views)}</span><span class="pub-metric">❤ ${nfmt(p.likes)}</span></div>
+  </div>${link}${admin?`<div class="pub-actions"><button class="icobtn" onclick="openPost('${p.sponsorId}','${postMonth(p)}','${p.id}')">✎</button><button class="btn-del" onclick="deletePost('${p.id}')">✕</button></div>`:''}</div>`;
 }
 
 /* actions */
-function setRange(k,v){ _range[k]=v; render(); }
 function selectSponsor(id){ selSponsor=id; render(); }
 function openSponsor(id){
   document.getElementById('sp-id').value=id||''; const s=id?_sponsors[id]:null;
@@ -402,23 +427,46 @@ async function saveSponsorForm(){
   await saveSponsor({id,name,pass,logo,createdAt:_sponsors[id]?.createdAt||Date.now()});
   selSponsor=id; closeMod('m-sponsor');
 }
-async function deleteSponsor(id){ const s=_sponsors[id]; if(!s) return; if(!confirm(t('delSp'))) return; for(const p of sponsorPosts(id)) await delPostFb(p.id); await delSponsorFb(id); if(selSponsor===id) selSponsor=null; }
-function openPost(sid,pid){
-  document.getElementById('po-sponsor').value=sid; document.getElementById('po-id').value=pid||''; const p=pid?_posts[pid]:null;
+async function deleteSponsor(id){ const s=_sponsors[id]; if(!s) return; if(!confirm(t('delSp'))) return; for(const p of sponsorPosts(id)) await delPostFb(p.id); for(const c of sponsorCycles(id)) await delCycleFb(c.id); await delSponsorFb(id); if(selSponsor===id) selSponsor=null; }
+
+function openCycle(sid,cid,month){
+  document.getElementById('cy-sponsor').value=sid; document.getElementById('cy-id').value=cid||'';
+  const c=cid?_cycles[cid]:null;
+  document.getElementById('cy-mttl').textContent=cid?t('editCy'):t('newCy');
+  document.getElementById('cy-month').value=c?c.month:(month||thisMonth());
+  document.getElementById('cy-reach').value=c?(c.accountReach??''):'';
+  openMod('m-cycle');
+}
+async function saveCycleForm(){
+  const sid=document.getElementById('cy-sponsor').value, month=document.getElementById('cy-month').value;
+  if(!month){ alert(t('needMonth')); return; }
+  let id=document.getElementById('cy-id').value;
+  const existingByMonth=cycleForMonth(sid,month);
+  if(!id && existingByMonth) id=existingByMonth.id; // no duplicar el mes
+  if(!id) id=uid();
+  const reach=Number(document.getElementById('cy-reach').value||0);
+  await saveCycle({id,sponsorId:sid,month,accountReach:reach,createdAt:_cycles[id]?.createdAt||Date.now()});
+  closeMod('m-cycle');
+}
+async function deleteCycle(id){ const c=_cycles[id]; if(!c) return; if(!confirm(t('delCy'))) return; for(const p of postsInMonth(c.sponsorId,c.month)) await delPostFb(p.id); await delCycleFb(id); }
+
+function openPost(sid,month,pid){
+  document.getElementById('po-sponsor').value=sid; document.getElementById('po-month').value=month||thisMonth(); document.getElementById('po-id').value=pid||'';
+  const p=pid?_posts[pid]:null;
   document.getElementById('po-mttl').textContent=pid?t('editPo'):t('newPo');
-  document.getElementById('po-title').value=p?.title||''; document.getElementById('po-date').value=p?.date||todayStr();
-  document.getElementById('po-views').value=p?.views??''; document.getElementById('po-reach').value=p?.reach??''; document.getElementById('po-link').value=p?.link||'';
+  document.getElementById('po-title').value=p?.title||'';
+  document.getElementById('po-views').value=p?.views??''; document.getElementById('po-likes').value=p?.likes??''; document.getElementById('po-link').value=p?.link||'';
   selectPostType(p?.type||'carrusel'); openMod('m-post');
 }
 function renderTypePills(){ const c=document.getElementById('po-types'); if(!c) return; const cur=document.getElementById('po-type').value; c.innerHTML=Object.entries(CTYPES).map(([id,x])=>`<button type="button" class="ctype-pill ${id===cur?'on':''}" data-t="${id}" onclick="selectPostType('${id}')">${x.icon} ${esc(x[lang])}</button>`).join(''); }
 function selectPostType(ty){ document.getElementById('po-type').value=ty; document.querySelectorAll('#po-types .ctype-pill').forEach(b=>b.classList.toggle('on',b.dataset.t===ty)); document.getElementById('po-link-wrap').style.display=CTYPES[ty]?.link?'block':'none'; }
 async function savePostForm(){
-  const sid=document.getElementById('po-sponsor').value, id=document.getElementById('po-id').value||uid(), type=document.getElementById('po-type').value;
+  const sid=document.getElementById('po-sponsor').value, month=document.getElementById('po-month').value, id=document.getElementById('po-id').value||uid(), type=document.getElementById('po-type').value;
   const title=document.getElementById('po-title').value.trim(); if(!title){ alert(t('needTitle')); return; }
-  const date=document.getElementById('po-date').value||todayStr(), views=Number(document.getElementById('po-views').value||0);
-  const rr=document.getElementById('po-reach').value, reach=rr===''?null:Number(rr);
+  const views=Number(document.getElementById('po-views').value||0), likes=Number(document.getElementById('po-likes').value||0);
   const link=CTYPES[type]?.link?(normUrl(document.getElementById('po-link').value)||null):null;
-  await savePost({id,sponsorId:sid,type,title,date,views,reach,link,createdAt:_posts[id]?.createdAt||Date.now()});
+  const ex=_posts[id];
+  await savePost({id,sponsorId:sid,month,type,title,views,likes,link,date:ex?.date||null,createdAt:ex?.createdAt||Date.now()});
   closeMod('m-post');
 }
 async function deletePost(id){ if(!confirm(t('delPo'))) return; await delPostFb(id); }
@@ -429,9 +477,10 @@ document.getElementById('l-btn').onclick=doLogin;
 document.getElementById('l-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
 document.getElementById('logout-btn').onclick=logout;
 document.getElementById('sp-save').onclick=saveSponsorForm;
+document.getElementById('cy-save').onclick=saveCycleForm;
 document.getElementById('po-save').onclick=savePostForm;
 document.querySelectorAll('.mov').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
-Object.assign(window,{ closeMod,openSponsor,selectSponsor,deleteSponsor,openPost,deletePost,selectPostType,setRange,setLang });
+Object.assign(window,{ closeMod,openSponsor,selectSponsor,deleteSponsor,openCycle,deleteCycle,openPost,deletePost,selectPostType,setLang });
 
 startListening(); setLang('en');
 </script>
