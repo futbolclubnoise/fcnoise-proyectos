@@ -42,6 +42,10 @@ a{color:var(--blu);}
 .btn-xs{padding:6px 10px;font-size:10.5px;border-radius:9px;}
 .btn:hover{opacity:.94;}
 .btn-del{background:#fff;border:1px solid rgba(229,72,77,.3);color:var(--red);width:28px;height:28px;padding:0;border-radius:9px;font-size:12px;display:inline-flex;align-items:center;justify-content:center;}
+.lico{width:1em;height:1em;display:inline-block;vertical-align:-.14em;flex-shrink:0;}
+.pub-metric .lico,.ct .lico{width:13px;height:13px;vertical-align:-2px;margin-right:3px;}
+.icobtn .lico{width:15px;height:15px;}
+.pub-link .lico{width:12px;height:12px;vertical-align:-1px;margin-left:3px;}
 .icobtn{background:#fff;border:1px solid var(--bd);color:var(--tx3);width:29px;height:29px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;}
 label{display:block;font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:700;}
 .fi{margin-bottom:15px;}
@@ -179,7 +183,7 @@ option{background:#fff;color:var(--tx);}
   <div class="fi"><label id="lbl-spname"></label><input type="text" id="sp-fname" placeholder="Peroni"></div>
   <div class="row">
     <div class="fi"><label id="lbl-sppass"></label><input type="text" id="sp-fpass" placeholder="123456"></div>
-    <div class="fi" style="flex:0 0 92px;"><label>Emoji</label><input type="text" id="sp-flogo" placeholder="🏷️" maxlength="4" style="text-align:center;"></div>
+    <div class="fi" style="flex:0 0 92px;"><label>Emoji</label><input type="text" id="sp-flogo" placeholder="" maxlength="4" style="text-align:center;"></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
     <button class="btn btn-g btn-sm" onclick="closeMod('m-sponsor')" id="sp-cancel"></button>
@@ -227,11 +231,24 @@ const ADMIN_PASS="123456";
 let db=null;
 try{ const app=initializeApp(CFG,"fcnoise-sponsor"); db=getDatabase(app); try{ signInAnonymously(getAuth(app)).catch(()=>{}); }catch(e){} }catch(e){}
 
+// Iconos de línea sutiles (sin emoji)
+const _sv=(p)=>`<svg class="lico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const ICO={
+  carousel:_sv('<rect x="7" y="5" width="10" height="14" rx="2"/><path d="M4 8v8M20 8v8"/>'),
+  image:   _sv('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m4 17 5-5 4 4 3-3 4 4"/>'),
+  video:   _sv('<rect x="3" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3z"/>'),
+  story:   _sv('<circle cx="12" cy="12" r="8" stroke-dasharray="3 2.4"/><circle cx="12" cy="12" r="3"/>'),
+  tag:     _sv('<path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/>'),
+  eye:     _sv('<path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/>'),
+  heart:   _sv('<path d="M12 20s-7-4.4-9.3-8.4C1 8.5 2.6 5 6 5c2 0 3.2 1.2 4 2.3C10.8 6.2 12 5 14 5c3.4 0 5 3.5 3.3 6.6C19 15.6 12 20 12 20z"/>'),
+  pencil:  _sv('<path d="M4 20h4L19 9a2 2 0 0 0-3-3L5 17z"/><path d="M14 7l3 3"/>'),
+  external:_sv('<path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/>'),
+};
 const CTYPES={
-  carrusel:{es:'Carrusel',en:'Carousel',icon:'🎠',link:true},
-  post:    {es:'Post',en:'Post',icon:'🖼️',link:true},
-  reel:    {es:'Reel',en:'Reel',icon:'🎬',link:true},
-  historia:{es:'Historia',en:'Story',icon:'📸',link:false},
+  carrusel:{es:'Carrusel',en:'Carousel',icon:ICO.carousel,link:true},
+  post:    {es:'Post',en:'Post',icon:ICO.image,link:true},
+  reel:    {es:'Reel',en:'Reel',icon:ICO.video,link:true},
+  historia:{es:'Historia',en:'Story',icon:ICO.story,link:false},
 };
 const MONTHS={es:['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],en:['January','February','March','April','May','June','July','August','September','October','November','December']};
 const T={
@@ -246,7 +263,7 @@ const T={
     newCy:'Nuevo Ciclo',editCy:'Editar Ciclo',month:'Mes',reachField:'Alcance de la cuenta (impacto a la marca)',
     newPo:'Nueva Publicación',editPo:'Editar Publicación',ctype:'Tipo de contenido',title:'Título',views:'Visualizaciones',likes:'Me gusta',link:'Link',
     needName:'Escribe el nombre del sponsor.',needTitle:'Escribe un título.',needMonth:'Elige un mes.',
-    delSp:'¿Borrar el sponsor y todo su contenido?',delCy:'¿Borrar este ciclo y sus publicaciones?',delPo:'¿Borrar esta publicación?',view:'Ver ↗'},
+    delSp:'¿Borrar el sponsor y todo su contenido?',delCy:'¿Borrar este ciclo y sus publicaciones?',delPo:'¿Borrar esta publicación?',view:'Ver'},
   en:{base:'← Home',user:'User',pass:'Password',signin:'Sign in',bad:'Wrong user or password',pick:'Select…',
     admin:'Admin',sponsor:'Sponsor',signout:'Sign out',live:'Live',conn:'Connecting…',
     sponsors:'Sponsors',createSp:'+ New sponsor',pubs:'posts',noSp:'No sponsors yet. Create the first one.',pickSp:'Select a sponsor above to view/edit its metrics.',
@@ -258,7 +275,7 @@ const T={
     newCy:'New Cycle',editCy:'Edit Cycle',month:'Month',reachField:'Account reach (brand impact)',
     newPo:'New Post',editPo:'Edit Post',ctype:'Content type',title:'Title',views:'Views',likes:'Likes',link:'Link',
     needName:'Enter the sponsor name.',needTitle:'Enter a title.',needMonth:'Pick a month.',
-    delSp:'Delete this sponsor and all its content?',delCy:'Delete this cycle and its posts?',delPo:'Delete this post?',view:'View ↗'}
+    delSp:'Delete this sponsor and all its content?',delCy:'Delete this cycle and its posts?',delPo:'Delete this post?',view:'View'}
 };
 
 let _sponsors={}, _posts={}, _cycles={}, currentUser=null, selSponsor=null, lang='en', _cmpMetric='reach';
@@ -337,9 +354,9 @@ function renderAdmin(){
   let h=`<div class="page-title">${t('sponsors')}</div>
   <div class="card"><div class="card-hdr"><span class="card-ttl">${t('sponsors').toUpperCase()}</span><button class="btn btn-o btn-xs" onclick="openSponsor()">${t('createSp')}</button></div>
   ${sps.length?sps.map(s=>`<div class="sp-item ${s.id===selSponsor?'on':''}" onclick="selectSponsor('${s.id}')">
-    <div class="sp-logo">${esc(s.logo||'🏷️')}</div>
+    <div class="sp-logo">${(s.logo&&s.logo!=='🏷️')?esc(s.logo):ICO.tag}</div>
     <div style="flex:1;"><div class="sp-name">${esc(s.name)}</div><div class="sp-meta">${sponsorPosts(s.id).length} ${t('pubs')}</div></div>
-    <button class="icobtn" onclick="event.stopPropagation();openSponsor('${s.id}')">✎</button>
+    <button class="icobtn" onclick="event.stopPropagation();openSponsor('${s.id}')">${ICO.pencil}</button>
     <button class="btn-del" onclick="event.stopPropagation();deleteSponsor('${s.id}')">✕</button>
   </div>`).join(''):`<div class="empty">${t('noSp')}</div>`}
   </div>`;
@@ -354,7 +371,7 @@ function renderDash(sid,admin){
   const totL=allPosts.reduce((a,p)=>a+Number(p.likes||0),0);
   // header
   let h=`<div class="card"><div class="card-hdr">
-    <div class="sp-logo">${esc(s.logo||'🏷️')}</div>
+    <div class="sp-logo">${(s.logo&&s.logo!=='🏷️')?esc(s.logo):ICO.tag}</div>
     <div style="flex:1;"><div class="page-title" style="margin:0;">${esc(s.name)}</div></div>
     ${admin?`<button class="btn btn-o btn-xs" onclick="openCycle('${sid}')">${t('createCycle')}</button>`:''}
   </div>
@@ -404,7 +421,7 @@ function renderCycle(sid,m,admin){
     <div class="cyc-hdr">
       <span class="cyc-mon">${monthLabel(m)}</span>
       ${admin?`<button class="btn btn-p btn-xs" onclick="openPost('${sid}','${m}')">${t('addPub')}</button>
-        <button class="icobtn" title="${t('editCy')}" onclick="openCycle('${sid}','${c?c.id:''}','${m}')">✎</button>
+        <button class="icobtn" title="${t('editCy')}" onclick="openCycle('${sid}','${c?c.id:''}','${m}')">${ICO.pencil}</button>
         ${c?`<button class="btn-del" onclick="deleteCycle('${c.id}')">✕</button>`:''}`:''}
     </div>
     <div class="cyc-tiles">
@@ -417,11 +434,11 @@ function renderCycle(sid,m,admin){
 }
 function pubHTML(p,admin){
   const c=CTYPES[p.type]||CTYPES.carrusel;
-  const link=(c.link&&p.link)?`<a class="pub-link" href="${esc(normUrl(p.link))}" target="_blank" rel="noopener">${t('view')}</a>`:'';
+  const link=(c.link&&p.link)?`<a class="pub-link" href="${esc(normUrl(p.link))}" target="_blank" rel="noopener">${t('view')}${ICO.external}</a>`:'';
   return `<div class="pub"><div class="pub-main">
     <div class="pub-ttl">${esc(p.title||t('notitle'))}</div>
-    <div class="pub-sub"><span class="ct">${c.icon} ${esc(ctLabel(p.type))}</span><span class="pub-metric">👁 ${nfmt(p.views)}</span><span class="pub-metric">❤ ${nfmt(p.likes)}</span></div>
-  </div>${link}${admin?`<div class="pub-actions"><button class="icobtn" onclick="openPost('${p.sponsorId}','${postMonth(p)}','${p.id}')">✎</button><button class="btn-del" onclick="deletePost('${p.id}')">✕</button></div>`:''}</div>`;
+    <div class="pub-sub"><span class="ct">${c.icon} ${esc(ctLabel(p.type))}</span><span class="pub-metric">${ICO.eye}${nfmt(p.views)}</span><span class="pub-metric">${ICO.heart}${nfmt(p.likes)}</span></div>
+  </div>${link}${admin?`<div class="pub-actions"><button class="icobtn" onclick="openPost('${p.sponsorId}','${postMonth(p)}','${p.id}')">${ICO.pencil}</button><button class="btn-del" onclick="deletePost('${p.id}')">✕</button></div>`:''}</div>`;
 }
 
 /* actions */
@@ -436,7 +453,7 @@ function openSponsor(id){
 async function saveSponsorForm(){
   const id=document.getElementById('sp-id').value||uid();
   const name=document.getElementById('sp-fname').value.trim(); if(!name){ alert(t('needName')); return; }
-  const pass=document.getElementById('sp-fpass').value.trim()||'123456', logo=document.getElementById('sp-flogo').value.trim()||'🏷️';
+  const pass=document.getElementById('sp-fpass').value.trim()||'123456', logo=document.getElementById('sp-flogo').value.trim()||'';
   await saveSponsor({id,name,pass,logo,createdAt:_sponsors[id]?.createdAt||Date.now()});
   selSponsor=id; closeMod('m-sponsor');
 }

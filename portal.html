@@ -1197,7 +1197,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <!-- ── REPOSITORIOS ── -->
     <div id="view-repos" class="hidden">
       <div class="page-hdr">
-        <div class="page-title">🔗 Repositorios</div>
+        <div class="page-title"><svg class="lico" style="margin-right:8px;vertical-align:-3px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15 15 9"/><path d="M11 6l1-1a4 4 0 0 1 6 6l-1 1"/><path d="M13 18l-1 1a4 4 0 0 1-6-6l1-1"/></svg>Repositorios</div>
       </div>
       <div id="view-repos-body"></div>
     </div>
@@ -1646,7 +1646,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="fi">
       <label>Fotos</label>
       <div id="tf-photos-list" class="ph-grid"></div>
-      <label class="btn btn-g btn-sm ph-add"><span>📷 Adjuntar foto</span><input type="file" accept="image/*" multiple style="display:none;" onchange="tfAddPhotos(this)"></label>
+      <label class="btn btn-g btn-sm ph-add"><span><svg class="lico" style="margin-right:7px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a2 2 0 0 1 2-2h2l1.2-1.6a1 1 0 0 1 .8-.4h6a1 1 0 0 1 .8.4L19 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.2"/></svg>Adjuntar foto</span><input type="file" accept="image/*" multiple style="display:none;" onchange="tfAddPhotos(this)"></label>
     </div>
 
     <!-- Dates — labels change by type -->
@@ -1755,9 +1755,9 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
       <div style="height:1px;background:var(--bd);margin:16px 0 12px;"></div>
       <div class="tdp-slbl">Administración</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
-        <button class="btn btn-g w-full" onclick="openMod('m-admin-pass')">🔑 Editar contraseñas</button>
-        <button class="btn btn-g w-full" onclick="openMod('m-admin-user')">👤 Agregar persona</button>
-        <button class="btn btn-g w-full" onclick="openMod('m-admin-area')">📂 Crear / gestionar áreas</button>
+        <button class="btn btn-g w-full" onclick="openMod('m-admin-pass')"><svg class="lico" style="margin-right:7px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.2"/><path d="M10.3 12.7 20 3"/><path d="M16 7l3 3M14 9l2 2"/></svg>Editar contraseñas</button>
+        <button class="btn btn-g w-full" onclick="openMod('m-admin-user')"><svg class="lico" style="margin-right:7px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>Agregar persona</button>
+        <button class="btn btn-g w-full" onclick="openMod('m-admin-area')"><svg class="lico" style="margin-right:7px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Crear / gestionar áreas</button>
       </div>
       <div style="height:1px;background:var(--bd);margin:14px 0 10px;"></div>
       <div class="tdp-slbl">Respaldo de datos</div>
@@ -1982,6 +1982,9 @@ const LINE_ICONS={
   calendar:_svg('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>'),
   link:    _svg('<path d="M10 13a4 4 0 0 0 6 .5l2-2a4 4 0 0 0-6-6l-1 1"/><path d="M14 11a4 4 0 0 0-6-.5l-2 2a4 4 0 0 0 6 6l1-1"/>'),
   note:    _svg('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/>'),
+  inbox:   _svg('<path d="M4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><path d="M4 13h4l1.5 2.5h5L16 13h4"/><path d="M12 3v7m0 0-2.5-2.5M12 10l2.5-2.5"/>'),
+  chat:    _svg('<path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/>'),
+  target:  _svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>'),
 };
 // Icono de línea por área (fallback: folder)
 const AREA_ICON={marketing:'megaphone',estrategia:'chart',operaciones:'bolt',diseno:'palette',admin:'files',ventas:'goat',edicion:'scissors',eventos:'ticket',lig:'ball',general:'briefcase'};
@@ -2480,7 +2483,7 @@ function applyCustomAreas(data){
   localStorage.setItem(LS.careas, JSON.stringify(_customAreas));
   Object.values(_customAreas).forEach(a=>{
     if(!a||!a.id) return;
-    AREAS[a.id]={ label:a.label||a.id, icon:a.icon||'📂', cls:a.cls||'bw', color:a.color||'var(--tx3)' };
+    AREAS[a.id]={ label:a.label||a.id, icon:a.icon||'', svg:a.svg||'folder', cls:a.cls||'bw', color:a.color||'var(--tx3)' };
   });
 }
 
@@ -3071,12 +3074,12 @@ function refreshDetailPopup(){
   const datesEl=document.getElementById('tdp-dates');
   if(s||e){
     if(isContentT){
-      datesEl.innerHTML=(s?`<div class="dd" title="Fecha de entrega">📥 Entrega: ${s}</div>`:'')+
-        (e?`<div class="dd" title="Fecha de publicación">🚀 Publica: ${e}</div>`:'');
+      datesEl.innerHTML=(s?`<div class="dd" title="Fecha de entrega">${lico('inbox')} Entrega: ${s}</div>`:'')+
+        (e?`<div class="dd" title="Fecha de publicación">${lico('rocket')} Publica: ${e}</div>`:'');
     } else {
-      datesEl.innerHTML=(s?`<div class="dd">🟢 ${s}</div>`:'')+
+      datesEl.innerHTML=(s?`<div class="dd">${lico('calendar')} ${s}</div>`:'')+
         (s&&e?`<span style="color:var(--tx3);">→</span>`:'') +
-        (e?`<div class="dd">🔴 ${e}</div>`:'');
+        (e?`<div class="dd">${lico('calendar')} ${e}</div>`:'');
     }
   } else { datesEl.innerHTML='<span style="color:var(--tx3);font-size:11px;">Sin fechas asignadas</span>'; }
 
@@ -3450,7 +3453,7 @@ function renderProjGrid(){
   const el=document.getElementById('proj-grid');
   const projs=visibleProjects();
   if(!projs.length){
-    el.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-ico">📂</div><p>Sin proyectos todavía</p></div>'; return;
+    el.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-ico">'+lico('folder')+'</div><p>Sin proyectos todavía</p></div>'; return;
   }
 
   // ── Modo BÚSQUEDA: grilla plana filtrada (sin secciones ni arrastre) ──
@@ -3459,7 +3462,7 @@ function renderProjGrid(){
     const found=projs.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.desc||'').toLowerCase().includes(q)).sort(byProjOrder);
     el.innerHTML = found.length
       ? `<div class="proj-grid-inner">${found.map(p=>projCardHTML(p,admin,false)).join('')}</div>`
-      : '<div class="empty" style="grid-column:1/-1"><div class="empty-ico">🔍</div><p>Sin coincidencias</p></div>';
+      : '<div class="empty" style="grid-column:1/-1"><div class="empty-ico">'+lico('search')+'</div><p>Sin coincidencias</p></div>';
     return;
   }
 
@@ -3600,7 +3603,7 @@ function renderMethContent(id, meth){
 /* ── Lista ── */
 function renderListaHTML(projId){
   const tasks=_tasks.filter(t=>t.projectId===projId);
-  if(!tasks.length) return '<div class="empty"><div class="empty-ico">📋</div><p>Sin tareas en este proyecto</p></div>';
+  if(!tasks.length) return '<div class="empty"><div class="empty-ico">'+lico('clip')+'</div><p>Sin tareas en este proyecto</p></div>';
   const pend=tasks.filter(t=>t.status!=='done');
   const done=tasks.filter(t=>t.status==='done');
   let h='';
@@ -3628,7 +3631,7 @@ function renderKanbanHTML(projId){
       const pm=PRIOS[t.priority]||PRIOS.media;
       const done=t.status==='done';
       const s=tStart(t), e=tEnd(t);
-      const dateStr=e?`📅 ${e}`:s?`🟢 ${s}`:'';
+      const dateStr=e?`${lico('calendar')} ${e}`:s?`${lico('calendar')} ${s}`:'';
       const dots=(t.assignedUsers||[]).map(uid_=>{
         const u=USERS[uid_]; if(!u) return '';
         const rm=ROLES[u.role];
@@ -3739,8 +3742,8 @@ function renderCalHTML(projId){
       <button class="btn btn-g btn-sm" onclick="calNav(1,'${projId}')">→</button>
     </div>
     <div class="cal-legend">
-      <span><span class="c-ico">📥</span> Fecha de entrega</span>
-      <span><span class="c-ico">🚀</span> Fecha de publicación</span>
+      <span><span class="c-ico">${lico('inbox')}</span> Fecha de entrega</span>
+      <span><span class="c-ico">${lico('rocket')}</span> Fecha de publicación</span>
     </div>
     <div class="cal-grid">
     ${DAYS_SHORT.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('')}`;
@@ -3775,16 +3778,16 @@ function renderCalHTML(projId){
         const solidStyle=`background:${color};color:#fff;border:1px solid ${color};`;
         const hasBoth = sD && eD && sD!==eD;
         if(hasBoth && dStr===sD){
-          return `<div class="cal-chip c-entrega ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${softStyle}" ${open} title="Entrega — ${title}"><span class="c-ico">📥</span>${title}</div>`;
+          return `<div class="cal-chip c-entrega ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${softStyle}" ${open} title="Entrega — ${title}"><span class="c-ico">${lico('inbox')}</span>${title}</div>`;
         }
         if(hasBoth && dStr===eD){
-          return `<div class="cal-chip c-publica ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${solidStyle}" ${open} title="Publicación — ${title}"><span class="c-ico">🚀</span>${title}</div>`;
+          return `<div class="cal-chip c-publica ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${solidStyle}" ${open} title="Publicación — ${title}"><span class="c-ico">${lico('rocket')}</span>${title}</div>`;
         }
         if(hasBoth){ return ''; } // días intermedios: sin ruido visual
         // Una sola fecha (o entrega y publicación el mismo día)
         const sameDay = sD && eD && sD===eD;
         const isPub = eD && dStr===eD;
-        const ico = sameDay?'📥🚀':(isPub?'🚀':'📥');
+        const ico = sameDay?(lico('inbox')+lico('rocket')):(isPub?lico('rocket'):lico('inbox'));
         const lbl = sameDay?'Entrega y publicación':(isPub?'Publicación':'Entrega');
         return `<div class="cal-chip c-publica ${doneCls}" id="cchip-${t.id}-${dStr}" ${dragAttrs} style="${solidStyle}" ${open} title="${lbl} — ${title}"><span class="c-ico">${ico}</span>${title}</div>`;
       }
@@ -3821,10 +3824,10 @@ function renderCalHTML(projId){
       // Contenido: muestra ENTREGA 📥 y PUBLICACIÓN 🚀 por separado
       let datesHtml='';
       if(sD&&eD&&sD!==eD){
-        datesHtml=`<span class="cal-card-date" title="Entrega">📥 ${fmt(sD)}</span><span class="cal-card-date" title="Publicación">🚀 ${fmt(eD)}</span>`;
+        datesHtml=`<span class="cal-card-date" title="Entrega">${lico('inbox')} ${fmt(sD)}</span><span class="cal-card-date" title="Publicación">${lico('rocket')} ${fmt(eD)}</span>`;
       } else {
         const only=eD||sD;
-        const ico=eD?'🚀':'📥';
+        const ico=eD?lico('rocket'):lico('inbox');
         if(only) datesHtml=`<span class="cal-card-date" title="${eD?'Publicación':'Entrega'}">${ico} ${fmt(only)}</span>`;
       }
       const avs=(t.assignedUsers||[]).slice(0,3).map(uid_=>{
@@ -4031,8 +4034,8 @@ function openOpsProjModal(projId){
   document.getElementById('opsp-meta').innerHTML=`
     <span class="bdg ${am.cls}">${cico(am)} ${am.label}</span>
     <span class="${prioCls[p.priority||'media']}">${prioLbl[p.priority||'media']}</span>
-    ${p.startDate?`<span style="font-size:9px;color:var(--tx3);">🟢 ${p.startDate}</span>`:''}
-    ${p.endDate  ?`<span style="font-size:9px;color:var(--tx3);">🔴 ${p.endDate}</span>`  :''}`;
+    ${p.startDate?`<span style="font-size:9px;color:var(--tx3);">${lico('calendar')} ${p.startDate}</span>`:''}
+    ${p.endDate  ?`<span style="font-size:9px;color:var(--tx3);">${lico('calendar')} ${p.endDate}</span>`  :''}`;
   // mini stats
   document.getElementById('opsp-total').textContent  =pt.length;
   document.getElementById('opsp-pending').textContent=pend.length;
@@ -4054,7 +4057,7 @@ function openOpsProjModal(projId){
     section('Alta prioridad','var(--red)',alta)+
     section('Media prioridad','var(--yel)',media)+
     section('Baja prioridad','var(--grn)',baja)+
-    (doneTks.length?`<div class="ops-prio-lbl" style="color:var(--grn);">✅ Completadas (${doneTks.length})</div>
+    (doneTks.length?`<div class="ops-prio-lbl" style="color:var(--grn);">${lico('check')} Completadas (${doneTks.length})</div>
       ${doneTks.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;opacity:.55;">${taskRowHTML(t)}</div>`).join('')}`:'');
   document.getElementById('opsp-body').innerHTML=body||'<div class="empty"><p>Sin tareas en este proyecto.</p></div>';
   openMod('m-ops-proj');
@@ -4139,7 +4142,7 @@ function renderRevision(){
       const pd=pt.filter(t=>t.status==='done').length;
       const pp=pt.length?Math.round(pd/pt.length*100):0;
       const am=AREAS[p.area]||AREAS.general;
-      const methIcon={lista:'📋',kanban:'🗂',calendario:'📅'}[p.meth||'lista']||'📋';
+      const methIcon={lista:lico('clip'),kanban:lico('files'),calendario:lico('calendar')}[p.meth||'lista']||lico('clip');
       return `<tr onclick="navigate('proj-detail','${p.id}')" style="cursor:pointer;">
         <td>${lico('folder')} ${esc(p.name)}</td>
         <td><span class="bdg ${am.cls}">${cico(am)} ${am.label}</span></td>
@@ -4524,7 +4527,7 @@ function renderEventos(){
 
   let h='';
   if(!_events.length){
-    h='<div class="empty"><div class="empty-ico">📅</div><p>Sin eventos todavía</p></div>';
+    h='<div class="empty"><div class="empty-ico">'+lico('calendar')+'</div><p>Sin eventos todavía</p></div>';
   } else {
     if(upcoming.length){
       h+=`<div class="sec-lbl">Próximos</div>${upcoming.map(e=>eventRowHTML(e,true)).join('')}`;
@@ -4772,7 +4775,7 @@ function renderAdminAreaList(){
 }
 async function adminAddArea(){
   const name=document.getElementById('adm-a-name').value.trim();
-  const icon=document.getElementById('adm-a-icon').value.trim()||'📂';
+  const icon=document.getElementById('adm-a-icon').value.trim()||'';
   const color=document.getElementById('adm-a-color').value;
   if(!name){ alert('Nombre del área requerido.'); return; }
   const id=name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'')||('a'+Date.now().toString(36));
@@ -4826,7 +4829,7 @@ async function importData(input){
       if(isConnected()) for(const item of arr){ if(item&&item.id){ await saveFn(item); total++; } }
     }
     input.value='';
-    alert('✅ Restaurado: '+total+' elementos subidos. La app ya muestra los datos.');
+    alert('Restaurado: '+total+' elementos subidos. La app ya muestra los datos.');
     onDataChange(); renderNav();
   }catch(e){
     alert('No se pudo leer el archivo: '+e.message);
@@ -5398,7 +5401,7 @@ function renderAreaDash(area){
             </div>
             <span class="pw-ids-title ${it.done?'done':''}">${esc(it.title)}</span>
             ${(()=>{ const pr=it.projectId?_projects.find(p=>p.id===it.projectId):null; return pr?`<span class="ids-proj-chip" onclick="event.stopPropagation();navigate('proj-detail','${pr.id}')" title="Proyecto responsable: ${esc(pr.name)}">${lico('folder')} ${esc(pr.name)}</span>`:''; })()}
-            <span class="pw-ids-cnt">${(it.comments||[]).length} 💬</span>
+            <span class="pw-ids-cnt">${(it.comments||[]).length} ${lico('chat')}</span>
             ${admin?`<button class="btn-icon btn-del" style="flex-shrink:0;" onclick="event.stopPropagation();delIdsItem('${area}','${it.id}')">✕</button>`:''}
           </div>
           <div class="pw-ids-body" style="display:none;">
@@ -5415,11 +5418,11 @@ function renderAreaDash(area){
     <!-- Metas ancladas arriba -->
     <div class="pw-goals-row">
       <div class="pw-goal-card q">
-        <div class="pw-goal-hdr"><span class="pw-goal-ttl">🎯 METAS DEL Q</span>${admin?`<button class="btn-icon" onclick="editAreaGoals('${area}','q')" title="Editar"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}</div>
+        <div class="pw-goal-hdr"><span class="pw-goal-ttl">${lico('target')} METAS DEL Q</span>${admin?`<button class="btn-icon" onclick="editAreaGoals('${area}','q')" title="Editar"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}</div>
         <div class="pw-goal-list">${goalsHTML(pulse.quarterGoals||[],'q')}</div>
       </div>
       <div class="pw-goal-card year">
-        <div class="pw-goal-hdr"><span class="pw-goal-ttl">📅 METAS DEL AÑO</span>${admin?`<button class="btn-icon" onclick="editAreaGoals('${area}','year')" title="Editar"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}</div>
+        <div class="pw-goal-hdr"><span class="pw-goal-ttl">${lico('calendar')} METAS DEL AÑO</span>${admin?`<button class="btn-icon" onclick="editAreaGoals('${area}','year')" title="Editar"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}</div>
         <div class="pw-goal-list">${goalsHTML(pulse.yearGoals||[],'year')}</div>
       </div>
     </div>
@@ -5451,7 +5454,7 @@ function editAreaGoals(area, kind){
   _goalsDraft=normalizeGoals(cur); // copia normalizada (compat con metas viejas de texto)
   document.getElementById('goals-area').value=area;
   document.getElementById('goals-kind').value=kind;
-  document.getElementById('goals-ttl').textContent=kind==='q'?'🎯 Metas del Trimestre':'📅 Metas del Año';
+  document.getElementById('goals-ttl').textContent=kind==='q'?'Metas del Trimestre':'Metas del Año';
   document.getElementById('goals-add-input').value='';
   renderGoalsDraft();
   openMod('m-goals');
@@ -5532,7 +5535,7 @@ function repoLinkHTML(areaId, l, i, total, admin){
     <button class="sub-move" ${i===total-1?'disabled':''} onclick="moveRepoLink('${areaId}','${l.id}',1)" title="Bajar">▼</button>
   </div>`:'';
   return `<div class="repo-item">
-    <div class="repo-main" onclick="openRepoLink('${areaId}','${l.id}')" title="${esc(l.url)}"><span class="repo-ico">🔗</span><span class="repo-name">${esc(l.name)}</span><span class="repo-open">↗</span></div>
+    <div class="repo-main" onclick="openRepoLink('${areaId}','${l.id}')" title="${esc(l.url)}"><span class="repo-ico">${lico('link')}</span><span class="repo-name">${esc(l.name)}</span><span class="repo-open">↗</span></div>
     ${moves}
     ${admin?`<button class="btn-icon" title="Editar link" onclick="editRepoLink('${areaId}','${l.id}')">${_repoEditSvg}</button><button class="btn-icon btn-del" onclick="delRepoLink('${areaId}','${l.id}')">✕</button>`:''}
   </div>`;
@@ -5769,7 +5772,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-17-4';
+const APP_BUILD='2026-09-18-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
