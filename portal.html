@@ -511,6 +511,20 @@ body.light .rte-sw{border-color:rgba(0,0,0,.18);}
 .plat-chip .plat-ico{width:18px;height:18px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;}
 .plat-chip.on{color:#fff;}
 .plat-badge{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;font-size:8px;font-weight:800;color:#fff;letter-spacing:.02em;}
+/* Desplegable multi-selección (plataformas) */
+.tf-dd{position:relative;}
+.tf-dd summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 13px;border-radius:12px;border:1px solid var(--bd2);background:var(--inp);color:var(--tx);font-size:13px;font-weight:500;cursor:pointer;user-select:none;}
+.tf-dd summary::-webkit-details-marker{display:none;}
+.tf-dd summary::after{content:'⌄';color:var(--tx3);font-size:15px;line-height:1;margin-top:-4px;}
+.tf-dd[open] summary::after{transform:rotate(180deg);margin-top:2px;}
+.tf-dd summary.empty{color:var(--tx3);}
+.tf-dd-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;background:var(--bg3);border:1px solid var(--bd2);border-radius:12px;padding:5px;box-shadow:0 16px 44px rgba(0,0,0,.5);max-height:240px;overflow-y:auto;}
+.tf-dd-row{display:flex;align-items:center;gap:9px;padding:8px 8px;border-radius:9px;cursor:pointer;transition:background .12s;}
+.tf-dd-row:hover{background:var(--bg5);}
+.tf-dd-row.on{background:var(--ac2);}
+.tf-dd-row input{width:15px;height:15px;accent-color:var(--orange);flex-shrink:0;cursor:pointer;}
+.tf-dd-row .plat-ico{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;}
+.tf-dd-name{font-size:13px;font-weight:600;color:var(--tx);}
 .plat-badges{display:inline-flex;gap:3px;align-items:center;}
 /* Tipo de contenido: badge en tarjeta + conteo por tipo */
 .ctype-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;letter-spacing:.02em;padding:2px 8px;border-radius:20px;background:var(--bg4);color:var(--tx2);border:1px solid var(--bd2);margin-bottom:8px;}
@@ -1598,7 +1612,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
       <div class="rte"><div class="rte-tb" data-for="tf-desc"></div><div class="rte-body" id="tf-desc" contenteditable="true" data-ph="Detalles, notas…"></div></div>
     </div>
 
-    <div class="form-row">
+    <div class="form-row" id="tf-proj-area-row">
       <div class="fi" id="tf-proj-fi">
         <label>Proyecto</label>
         <select id="tf-proj" onchange="updateTaskFormStates(this.value);syncTaskAreaToProj(this.value)"></select>
@@ -1647,19 +1661,16 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
 
     <!-- Contenido-only fields -->
     <div id="tf-contenido-fields" style="display:none;">
-      <div class="fi">
-        <label>Formato</label>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-ctype"></div>
-        <input type="hidden" id="tf-content-type" value="reel">
+      <div class="form-row">
+        <div class="fi"><label>Formato</label><select id="tf-content-type"></select></div>
+        <div class="fi"><label>Estado</label><select id="tf-calstatus"></select></div>
       </div>
       <div class="fi">
         <label>Plataforma <span style="color:var(--tx3);font-weight:400;">(elige 1, 2 o todas)</span></label>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-platforms"></div>
-      </div>
-      <div class="fi">
-        <label>Estado</label>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-cal-pills"></div>
-        <input type="hidden" id="tf-calstatus" value="idea">
+        <details class="tf-dd" id="tf-plat-dd">
+          <summary id="tf-plat-sum">Selecciona…</summary>
+          <div class="tf-dd-menu" id="tf-platforms"></div>
+        </details>
       </div>
       <div class="fi">
         <label>Contenido</label>
@@ -4489,15 +4500,11 @@ function openNewTaskForProjTyped(projId, forceType){
 
 /* ── Contenido state pills ── */
 function populateCalPills(selectedId){
-  const container=document.getElementById('tf-cal-pills');
-  const hidden=document.getElementById('tf-calstatus');
-  if(!container) return;
-  const sel=selectedId||'idea';
-  container.innerHTML=CAL_COLS.map(c=>
-    `<button type="button" class="tdp-state ${c.id===sel?'on':''}"
-      onclick="selectCalPill(this,'${c.id}')">${cico(c)} ${c.label}</button>`
-  ).join('');
-  if(hidden) hidden.value=sel;
+  const selEl=document.getElementById('tf-calstatus');
+  if(!selEl) return;
+  const sel=CAL_COLS.find(c=>c.id===selectedId)?selectedId:'idea';
+  selEl.innerHTML=CAL_COLS.map(c=>`<option value="${c.id}" ${c.id===sel?'selected':''}>${c.label}</option>`).join('');
+  selEl.value=sel;
 }
 function selectCalPill(btn, id){
   document.querySelectorAll('#tf-cal-pills .tdp-state').forEach(b=>b.classList.remove('on'));
@@ -4506,12 +4513,10 @@ function selectCalPill(btn, id){
 }
 // ── Tipo de contenido (Carrusel / Post / Reel / Historia) ──
 function populateContentTypePills(selectedId){
-  const c=document.getElementById('tf-ctype'); if(!c) return;
-  const sel=CONTENT_TYPES[selectedId]?selectedId:'carrusel';
-  c.innerHTML=Object.entries(CONTENT_TYPES).map(([id,t])=>
-    `<button type="button" class="tdp-state ${id===sel?'on':''}" onclick="selectCTypePill(this,'${id}')">${cico(t)} ${t.label}</button>`
-  ).join('');
-  document.getElementById('tf-content-type').value=sel;
+  const selEl=document.getElementById('tf-content-type'); if(!selEl) return;
+  const sel=CONTENT_TYPES[selectedId]?selectedId:'reel';
+  selEl.innerHTML=Object.entries(CONTENT_TYPES).map(([id,t])=>`<option value="${id}" ${id===sel?'selected':''}>${t.label}</option>`).join('');
+  selEl.value=sel;
 }
 function selectCTypePill(btn, id){
   document.querySelectorAll('#tf-ctype .tdp-state').forEach(b=>b.classList.remove('on'));
@@ -4524,11 +4529,23 @@ function populatePlatformChips(selected){
   const sel=Array.isArray(selected)?selected:[];
   c.innerHTML=Object.entries(PLATFORMS).map(([id,p])=>{
     const on=sel.includes(id);
-    const style=on?`background:${p.color};border-color:${p.color};`:'';
-    const icoBg=on?'rgba(255,255,255,.28)':p.color;
-    return `<div class="plat-chip ${on?'on':''}" data-value="${id}" style="${style}" onclick="togglePlatform(this)">
-      <span class="plat-ico" style="background:${icoBg};">${p.short}</span>${p.label}</div>`;
+    return `<label class="tf-dd-row ${on?'on':''}">
+      <input type="checkbox" value="${id}" ${on?'checked':''} onchange="updatePlatformSummary()">
+      <span class="plat-ico" style="background:${p.color};">${p.short}</span>
+      <span class="tf-dd-name">${p.label}</span>
+    </label>`;
   }).join('');
+  updatePlatformSummary();
+}
+function updatePlatformSummary(){
+  const sum=document.getElementById('tf-plat-sum'); if(!sum) return;
+  const sel=selectedPlatforms();
+  document.querySelectorAll('#tf-platforms .tf-dd-row').forEach(r=>{
+    const cb=r.querySelector('input'); r.classList.toggle('on', cb&&cb.checked);
+  });
+  const names=sel.map(id=>PLATFORMS[id]?.label).filter(Boolean);
+  sum.textContent=names.length?(names.length<=2?names.join(', '):names.length+' plataformas'):'Selecciona…';
+  sum.classList.toggle('empty', names.length===0);
 }
 function togglePlatform(el){
   const on=el.classList.toggle('on');
@@ -4538,7 +4555,7 @@ function togglePlatform(el){
   if(ico) ico.style.background = on?'rgba(255,255,255,.28)':p.color;
 }
 function selectedPlatforms(){
-  return [...document.querySelectorAll('#tf-platforms .plat-chip.on')].map(c=>c.dataset.value);
+  return [...document.querySelectorAll('#tf-platforms input[type=checkbox]:checked')].map(c=>c.value);
 }
 // Badges de plataforma para tarjetas y detalle
 function platBadgesHTML(platforms){
@@ -4555,6 +4572,11 @@ function switchTaskType(type){
   document.getElementById('ttt-tarea').classList.toggle('on', type==='tarea');
   document.getElementById('ttt-contenido').classList.toggle('on', type==='contenido');
   const isContent=type==='contenido';
+  // Contenido nuevo va por defecto a Marketing (proyecto + área)
+  if(isContent && !document.getElementById('tf-id').value){
+    const mp=marketingProjId();
+    if(mp){ const sel=document.getElementById('tf-proj'); if(sel){ sel.value=mp; syncTaskAreaToProj(mp); } }
+  }
   // Show/hide methodology-specific fields
   document.getElementById('tf-tarea-fields').style.display=isContent?'none':'block';
   document.getElementById('tf-contenido-fields').style.display=isContent?'block':'none';
@@ -5199,6 +5221,7 @@ function setTaskFormMode(simple){
   const isContenido=taskType==='contenido';
   show('tf-type-toggle',   !simple||isCalProj);
   show('tf-desc-wrap',     !isContenido); // descripción visible también en modo rápido (contenido usa su propio campo)
+  show('tf-proj-area-row', !simple&&!isContenido); // contenido va por defecto a Marketing → sin proyecto/área
   show('tf-proj-fi',       !simple);
   show('tf-area-fi',       !simple);
   show('tf-state-wrap',    !simple&&!isContenido); // estado hidden for contenido in simple mode
@@ -5955,7 +5978,7 @@ function renderWeekAnalysis(){ /* no-op */ }
 ═══════════════════════════════════════ */
 Object.assign(window,{
   rteCmd, rteSet, rteGet, initRTEs,
-  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView,
+  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView, updatePlatformSummary,
   login, logout, navigate, goBack, toggleTheme, setTheme, openAlerts,
   selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, editAreaGoodNews, delAreaGoodNews,
   createRepoArea, editRepoArea, saveRepoArea, delRepoArea, moveRepoArea,
@@ -5999,7 +6022,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-18-5';
+const APP_BUILD='2026-09-18-6';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
