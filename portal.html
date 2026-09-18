@@ -348,6 +348,25 @@ body.light select{color:#1a1a1a;}
 .tdp-user.on{border-color:var(--bd3);}
 .tdp-state{padding:6px 13px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--bd2);background:var(--bg4);color:var(--tx3);cursor:pointer;transition:all .18s;font-family:var(--font-body);}
 .tdp-state.on{border-color:var(--orange);background:var(--ac2);color:var(--orange);}
+/* Campos compactos (responsables + estado) en fila */
+.tdp-fields{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+.tdp-field{flex:1;min-width:150px;}
+.tdp-select{width:100%;padding:9px 11px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg4);color:var(--tx);font-size:12.5px;font-weight:600;font-family:var(--font-body);cursor:pointer;outline:none;transition:border-color .15s;}
+.tdp-select:focus{border-color:var(--orange);}
+/* Desplegable de responsables */
+.tdp-dd{position:relative;}
+.tdp-dd summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg4);color:var(--tx);font-size:12.5px;font-weight:600;cursor:pointer;user-select:none;}
+.tdp-dd summary::-webkit-details-marker{display:none;}
+.tdp-dd summary::after{content:'⌄';color:var(--tx3);font-size:14px;line-height:1;margin-top:-4px;}
+.tdp-dd[open] summary::after{transform:rotate(180deg);margin-top:2px;}
+.tdp-dd summary.empty{color:var(--tx3);font-weight:500;}
+.tdp-dd-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20;background:var(--bg3);border:1px solid var(--bd2);border-radius:11px;padding:5px;box-shadow:0 14px 40px rgba(0,0,0,.5);max-height:230px;overflow-y:auto;}
+.tdp-urow{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .12s;}
+.tdp-urow:hover{background:var(--bg5);}
+.tdp-urow.on{background:var(--ac2);}
+.tdp-urow-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+.tdp-urow-name{flex:1;font-size:12.5px;font-weight:600;color:var(--tx);}
+.tdp-urow-chk{color:var(--orange);font-weight:800;font-size:13px;width:14px;text-align:center;}
 .tdp-divider{height:1px;background:var(--bd);margin:14px 0;}
 /* Subtareas */
 .sub-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
@@ -805,6 +824,22 @@ body.light .qa-btn{background:#fff!important;border:1px solid rgba(0,0,0,.09)!im
 /* Grilla uniforme del dashboard: tarjetas alineadas que se acomodan solas */
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:12px;align-items:start;}
 @media(max-width:560px){.dash-grid{grid-template-columns:1fr;}}
+/* Completadas por ciclo (mes) — tarjetas desplegables + evolución */
+.cbm-wrap{display:flex;flex-direction:column;gap:8px;}
+.cbm-card{background:linear-gradient(170deg,rgba(28,32,40,0.7),rgba(20,24,31,0.55));border:1px solid var(--glass-bd);border-radius:14px;overflow:hidden;}
+.cbm-sum{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;user-select:none;}
+.cbm-sum::-webkit-details-marker{display:none;}
+.cbm-sum::before{content:'⌄';color:var(--tx3);font-size:15px;line-height:1;transition:transform .2s;width:12px;flex-shrink:0;}
+.cbm-card[open] .cbm-sum::before{transform:rotate(180deg);}
+.cbm-mon{font-family:var(--font-display);font-size:14px;letter-spacing:.04em;color:var(--tx);min-width:118px;text-transform:uppercase;}
+.cbm-bar{flex:1;height:6px;background:var(--bg5);border-radius:6px;overflow:hidden;min-width:60px;}
+.cbm-fill{height:100%;background:var(--grn);border-radius:6px;}
+.cbm-cnt{font-family:var(--font-display);font-size:16px;color:var(--grn);min-width:30px;text-align:right;}
+.cbm-delta{font-size:10px;font-weight:700;min-width:52px;text-align:right;}
+.cbm-delta.up{color:var(--grn);}.cbm-delta.down{color:var(--red);}.cbm-delta.flat{color:var(--tx3);}
+.cbm-body{padding:2px 10px 10px;border-top:1px solid var(--bd2);}
+body.light .cbm-card{background:#fff;}
+@media(max-width:520px){.cbm-mon{min-width:0;font-size:12px;}.cbm-delta{min-width:0;}}
 .hcard-more{display:block;text-align:center;font-size:10px;font-weight:600;color:var(--tx3);padding:8px 0 2px;cursor:pointer;letter-spacing:.04em;border-top:1px solid var(--bd);margin-top:4px;transition:color .15s;}
 .hcard-more:hover{color:var(--orange);}
 @media(max-width:660px){.home-grid{grid-template-columns:1fr;}}
@@ -1613,14 +1648,22 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div id="tdp-photos-wrap" style="margin-bottom:14px;">
       <div class="tdp-slbl">Fotos</div>
       <div id="tdp-photos-list" class="ph-grid"></div>
-      <label class="btn btn-g btn-sm ph-add" id="tdp-photo-add"><span>📷 Adjuntar</span><input type="file" accept="image/*" multiple style="display:none;" onchange="tdpAddPhotos(this)"></label>
+      <label class="btn btn-g btn-sm ph-add" id="tdp-photo-add"><span>Adjuntar</span><input type="file" accept="image/*" multiple style="display:none;" onchange="tdpAddPhotos(this)"></label>
     </div>
 
-    <div class="tdp-slbl">Asignados</div>
-    <div class="tdp-chips" id="tdp-users"></div>
-
-    <div class="tdp-slbl" id="tdp-states-lbl">Estado</div>
-    <div class="tdp-chips" id="tdp-states"></div>
+    <div class="tdp-fields">
+      <div class="tdp-field">
+        <div class="tdp-slbl">Responsables</div>
+        <details class="tdp-dd" id="tdp-users-dd">
+          <summary id="tdp-users-sum">Asignar…</summary>
+          <div class="tdp-dd-menu" id="tdp-users"></div>
+        </details>
+      </div>
+      <div class="tdp-field" id="tdp-states-field">
+        <div class="tdp-slbl" id="tdp-states-lbl">Estado</div>
+        <select class="tdp-select" id="tdp-states" onchange="tdpSetStateSel(this.value)"></select>
+      </div>
+    </div>
 
     <!-- Subtareas (solo tareas, no contenido) -->
     <div id="tdp-subs-wrap" style="display:none;">
@@ -2023,6 +2066,7 @@ let _projects= [], _tasks= [], _events= [], _fbOn= false;
 let _presence= {}; // {userId: {online: bool, lastSeen: ...}}
 let dragId         = null;
 let _tdpId         = null; // task currently open in detail popup
+let _tdpStateType  = 'tarea'; // tipo de estado activo en el popup (tarea|contenido)
 let _taskFromProjId= null; // when opening task form from inside a project, lock to that project
 let _tfSubs        = []; // subtareas en construcción dentro del formulario de tarea
 let _tfPhotos      = []; // fotos (dataURI) en construcción dentro del formulario de tarea
@@ -2740,6 +2784,9 @@ function renderDashboard(){
     </div>`:''}
   </div>`;
 
+  // Completadas por ciclo (mes) — tarjetas desplegables con evolución
+  h+=completedByMonthHTML(done);
+
   document.getElementById('home-content').innerHTML=h;
   renderTimeline();
 }
@@ -2794,6 +2841,47 @@ function renderTeamHTML(){
       <span style="font-size:10px;color:var(--tx3);margin-left:4px;">${online?'En línea':'Desconectado'}</span>
     </div>`;
   }).join('');
+}
+
+// Etiqueta de mes a partir de 'YYYY-MM'
+function monthKeyLabel(key){
+  if(key==='nofecha') return 'Sin fecha';
+  const [y,m]=key.split('-'); return `${MONTHS[(+m)-1]||''} ${y}`;
+}
+// Tareas completadas agrupadas por mes → tarjetas desplegables + barra de evolución
+function completedByMonthHTML(done){
+  if(!done.length) return '';
+  const groups={};
+  done.forEach(t=>{ const d=tEnd(t)||t.startDate||''; const k=d?d.slice(0,7):'nofecha'; (groups[k]=groups[k]||[]).push(t); });
+  const dated=Object.keys(groups).filter(k=>k!=='nofecha').sort(); // asc (evolución)
+  const keys=dated.slice();
+  const maxV=Math.max(1,...Object.keys(groups).map(k=>groups[k].length));
+  const desc=[...dated].reverse();               // meses recientes primero
+  if(groups['nofecha']) desc.push('nofecha');    // "Sin fecha" siempre al final
+  const CAPM=12;
+  const cards=desc.map((k,idx)=>{
+    const arr=groups[k].sort((a,b)=>(tEnd(b)||'').localeCompare(tEnd(a)||''));
+    const cnt=arr.length;
+    const ascIdx=keys.indexOf(k);
+    const prev=ascIdx>0?groups[keys[ascIdx-1]].length:null;
+    let delta='';
+    if(prev!=null){ const d=cnt-prev; const pct=prev?Math.round(d/prev*100):(cnt?100:0);
+      const cls=d>0?'up':d<0?'down':'flat'; const arrw=d>0?'▲':d<0?'▼':'—';
+      delta=`<span class="cbm-delta ${cls}">${arrw} ${Math.abs(pct)}%</span>`; }
+    const shown=arr.slice(0,CAPM);
+    const more=arr.length>CAPM?`<div class="hcard-more">+${arr.length-CAPM} más</div>`:'';
+    return `<details class="cbm-card"${idx===0?' open':''}>
+      <summary class="cbm-sum">
+        <span class="cbm-mon">${monthKeyLabel(k)}</span>
+        <span class="cbm-bar"><span class="cbm-fill" style="width:${Math.round(cnt/maxV*100)}%;"></span></span>
+        <span class="cbm-cnt">${cnt}</span>
+        ${delta}
+      </summary>
+      <div class="cbm-body">${shown.map(t=>taskTicketHTML(t)).join('')}${more}</div>
+    </details>`;
+  }).join('');
+  return `<div class="section-title">COMPLETADAS · POR CICLO <span class="bscnt">${done.length}</span></div>
+    <div class="cbm-wrap">${cards}</div>`;
 }
 
 function boardSection(label, cls, tasks){
@@ -2917,35 +3005,33 @@ function refreshDetailPopup(){
   if(phList) phList.innerHTML=photoThumbsHTML(t.photos||[], canEdit?'tdpDelPhoto':null);
   const phAdd=document.getElementById('tdp-photo-add'); if(phAdd) phAdd.style.display=canEdit?'':'none';
 
-  // assignees (toggleable)
+  // assignees — desplegable (details) que NO ocupa espacio si está cerrado
+  const assigned=(t.assignedUsers||[]);
   document.getElementById('tdp-users').innerHTML=Object.values(USERS).map(u=>{
     const rm=ROLES[u.role];
-    const isAssigned=(t.assignedUsers||[]).includes(u.id);
-    const style=isAssigned?`border-color:${rm.brd};background:${rm.bg};color:${rm.color};`:'';
-    return `<div class="tdp-user ${isAssigned?'on':''}" style="${style}" onclick="tdpToggleUser('${u.id}')">
-      <span>${u.name}</span>
-      ${isAssigned?'<span style="font-size:11px;">✓</span>':''}
-    </div>`;
+    const isAssigned=assigned.includes(u.id);
+    return `<label class="tdp-urow ${isAssigned?'on':''}" onclick="event.preventDefault();tdpToggleUser('${u.id}')">
+      <span class="tdp-urow-av" style="background:${rm.bg};color:${rm.color};">${initials(u.name)}</span>
+      <span class="tdp-urow-name">${esc(u.name)}</span>
+      <span class="tdp-urow-chk">${isAssigned?'✓':''}</span>
+    </label>`;
   }).join('');
+  const sum=document.getElementById('tdp-users-sum');
+  const asgNames=assigned.map(id=>USERS[id]?.name).filter(Boolean);
+  sum.textContent=asgNames.length?(asgNames.length<=2?asgNames.join(', '):asgNames.length+' responsables'):'Asignar…';
+  sum.classList.toggle('empty', asgNames.length===0);
 
-  // states — depend on task type
+  // states — desplegable nativo <select>
   const meth=proj?.meth||'lista';
   const tdpType=t.taskType||(meth==='calendario'?'contenido':'tarea');
   const statesEl=document.getElementById('tdp-states');
-  const statesLbl=document.getElementById('tdp-states-lbl');
+  _tdpStateType=tdpType;
   if(tdpType==='contenido'){
-    statesLbl.style.display='block';
-    statesEl.innerHTML=CAL_COLS.map(col=>{
-      const isOn=(t.calStatus||'idea')===col.id;
-      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','contenido')">${cico(col)} ${col.label}</button>`;
-    }).join('');
+    const cur=t.calStatus||'idea';
+    statesEl.innerHTML=CAL_COLS.map(col=>`<option value="${col.id}" ${cur===col.id?'selected':''}>${col.label}</option>`).join('');
   } else {
-    // tarea — always show TASK_STATES
-    statesLbl.style.display='block';
-    statesEl.innerHTML=TASK_STATES.map(col=>{
-      const isOn=(t.taskStatus||'pendiente')===col.id;
-      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','tarea')">${cico(col)} ${col.label}</button>`;
-    }).join('');
+    const cur=t.taskStatus||'pendiente';
+    statesEl.innerHTML=TASK_STATES.map(col=>`<option value="${col.id}" ${cur===col.id?'selected':''}>${col.label}</option>`).join('');
   }
 
   // subtareas (solo tareas, no contenido)
@@ -3150,6 +3236,7 @@ function applyDoneState(t, done){
     }
   }
 }
+function tdpSetStateSel(colId){ tdpSetState(colId, _tdpStateType||'tarea'); }
 async function tdpSetState(colId, type){
   const t=_tasks.find(x=>x.id===_tdpId); if(!t) return;
   let done=t.status==='done';
@@ -5548,7 +5635,7 @@ Object.assign(window,{
   openNewProj, openNewProjForArea, openEditProj, saveProject, deleteProject,
   createTask, openNewTask, openTaskForm, saveTaskForm, toggleTask, selectHomeFilter,
   openNewTaskForProj, openNewTaskForProjTyped, calPickOpen, renderGTaskList, populateGestionFilters, renderOpsView, openOpsProjModal, openAreaModal, renderPulseTaskSections, pwTaskHTML, formatResources, togglePwSection,
-  openTaskDetail, tdpToggleUser, tdpSetState, tdpToggleDone, tdpEdit, tdpDelete,
+  openTaskDetail, tdpToggleUser, tdpSetState, tdpSetStateSel, tdpToggleDone, tdpEdit, tdpDelete,
   tdpAddSubtask, tdpToggleSubtask, tdpDelSubtask, tdpEditSubtask, tdpMoveSubtask,
   tfAddSubtask, tfToggleSubtask, tfDelSubtask, tfEditSubtask, tfMoveSubtask,
   tfAddPhotos, tfRemovePhoto, tdpAddPhotos, tdpDelPhoto, openLightbox,
@@ -5578,7 +5665,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-17-1';
+const APP_BUILD='2026-09-17-2';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
