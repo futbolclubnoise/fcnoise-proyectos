@@ -556,6 +556,21 @@ body.light .rte{border-color:rgba(0,0,0,.12);}
 body.light .cal-card{background:#fff!important;border:1px solid rgba(0,0,0,.08)!important;box-shadow:var(--card-shadow)!important;}
 body.light .cal-card-avs .udot{border-color:#fff;}
 @media(max-width:600px){.cal-cards-grid{grid-template-columns:1fr 1fr;}}
+/* Tarjeta de contenido optimizada (calendario global) */
+.cal-card.cc{border-left:3px solid var(--c);cursor:pointer;}
+.cc-body{padding:9px 11px 10px;}
+.cc-top{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.cc-type{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--tx2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cc-type .lico{width:12px;height:12px;flex-shrink:0;color:var(--c);}
+.cc-status{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--c);white-space:nowrap;flex-shrink:0;}
+.cc-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--c);flex-shrink:0;}
+.cc-title{font-size:12.5px;font-weight:600;line-height:1.32;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px;}
+.cc-foot{display:flex;align-items:center;flex-wrap:wrap;gap:4px 7px;font-size:9.5px;color:var(--tx3);}
+.cc-dates{display:inline-flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums;font-weight:500;}
+.cc-dates .lico{width:11px;height:11px;vertical-align:-2px;}
+.cc-plats{display:inline-flex;gap:3px;}
+.cc-foot .cal-card-avs{margin-left:auto;}
+body.light .cal-card.cc{background:#fff!important;}
 /* drag-over en celdas del calendario */
 .cal-cell.cal-drop{border-color:var(--orange)!important;background:var(--ac2)!important;box-shadow:inset 0 0 0 2px var(--orange);}
 .cal-chip[draggable]{cursor:grab;}
@@ -3925,8 +3940,13 @@ function calViewNav(dir){
   if(calMonth<0){calMonth=11;calYear--;}
   renderCalendarView();
 }
-function calAddContent(preDate){ openTaskForm(null,null,preDate||'','contenido',_calFilter); }
-function calAddTask(preDate){ openTaskForm(null,null,preDate||'','tarea',_calFilter); }
+// Proyecto de marketing por defecto para el contenido del calendario
+function marketingProjId(){
+  const ps=visibleProjects().filter(x=>(x.area||'')==='marketing');
+  return (ps.find(x=>/marketing/i.test(x.name||''))||ps[0])?.id||'';
+}
+function calAddContent(preDate){ openTaskForm(null, marketingProjId()||null, preDate||'','contenido',_calFilter); }
+function calAddTask(preDate){ openTaskForm(null, marketingProjId()||null, preDate||'','tarea',_calFilter); }
 
 function renderCalendarView(){
   const rm=ROLES[currentUser.role];
@@ -3942,8 +3962,8 @@ function renderCalendarView(){
   const inCal=t=>taskCalType(t)===_calFilter && mine(t);
 
   const cfg={
-    fcnoise:{label:'FCnoise', accent:'var(--orange)'},
-    cfl:    {label:'CFL',     accent:'var(--blu)'},
+    fcnoise:{label:'FCN', accent:'var(--orange)'},
+    cfl:    {label:'CFL', accent:'var(--blu)'},
   }[_calFilter];
 
   let h=`<div class="page-hdr">
@@ -3951,7 +3971,7 @@ function renderCalendarView(){
     </div>
     <div class="cal-switch">
       <div class="cal-seg">
-        <button class="cal-seg-btn ${_calFilter==='fcnoise'?'on':''}" onclick="setCalFilter('fcnoise')">FCnoise</button>
+        <button class="cal-seg-btn ${_calFilter==='fcnoise'?'on':''}" onclick="setCalFilter('fcnoise')">FCN</button>
         <button class="cal-seg-btn ${_calFilter==='cfl'?'on':''}" onclick="setCalFilter('cfl')">CFL</button>
       </div>
       ${isCeo?`<div class="cal-switch-actions">
@@ -4036,15 +4056,18 @@ function renderCalendarView(){
       else { const only=eD||sD; if(only) datesHtml=`<span class="cal-card-date">${eD?lico('rocket'):lico('inbox')} ${fmt(only)}</span>`; }
       const avs=(t.assignedUsers||[]).slice(0,3).map(uid_=>{const u=USERS[uid_]; if(!u) return ''; const r=ROLES[u.role]; return `<div class="udot" style="background:${r.bg};color:${r.color};" title="${u.name}">${initials(u.name).charAt(0)}</div>`;}).join('');
       const isTask=t.taskType==='tarea';
-      return `<div class="cal-card ${done?'done':''}" style="--c:${calCol.color};" onclick="openTaskDetail('${t.id}')">
-        <span style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${calCol.color};"></span>
-        <div class="cal-card-body">
-          <div class="cal-card-status" style="color:${calCol.color};display:flex;width:100%;align-items:center;gap:6px;">
-            <span>${calCol.label}</span><span style="margin-left:auto;">${platBadgesHTML(t.platforms)}</span>
+      return `<div class="cal-card cc ${done?'done':''}" style="--c:${calCol.color};" onclick="openTaskDetail('${t.id}')">
+        <div class="cc-body">
+          <div class="cc-top">
+            <span class="cc-type">${isTask?lico('note'):cico(ct)}${isTask?'Tarea':ct.label}</span>
+            <span class="cc-status">${calCol.label}</span>
           </div>
-          <div class="cal-card-title">${esc(t.name)}</div>
-          <div class="ctype-badge">${isTask?lico('note'):cico(ct)} ${isTask?'Tarea':ct.label}</div>
-          <div class="cal-card-foot">${datesHtml}<div class="cal-card-avs">${avs}</div></div>
+          <div class="cc-title">${esc(t.name)}</div>
+          <div class="cc-foot">
+            <span class="cc-dates">${datesHtml||''}</span>
+            ${platBadgesHTML(t.platforms)?`<span class="cc-plats">${platBadgesHTML(t.platforms)}</span>`:''}
+            <span class="cal-card-avs">${avs}</span>
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -5954,7 +5977,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-18-3';
+const APP_BUILD='2026-09-18-4';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});

@@ -129,6 +129,17 @@ option{background:#fff;color:var(--tx);}
 .cmp-pills{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
 .cmp-pill{padding:7px 13px;border-radius:20px;background:var(--inp);border:1px solid var(--bd);color:var(--tx2);font-size:12px;font-weight:700;}
 .cmp-pill.on{background:var(--tx);border-color:var(--tx);color:#fff;}
+/* Gráfico comparativo semana a semana (small multiples) */
+.wc-metric{margin-bottom:18px;}
+.wc-metric:last-child{margin-bottom:0;}
+.wc-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:10px;letter-spacing:.02em;}
+.wc-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+.wc-bars{display:flex;align-items:flex-end;gap:8px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+.wc-col{flex:1 0 34px;min-width:34px;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.wc-cap{font-size:10px;font-weight:700;color:var(--tx2);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.wc-bwrap{width:100%;height:90px;display:flex;align-items:flex-end;justify-content:center;}
+.wc-bar{width:70%;max-width:26px;border-radius:6px 6px 3px 3px;min-height:2px;transition:height .3s cubic-bezier(.2,.7,.2,1);}
+.wc-wk{font-size:9.5px;color:var(--tx3);font-weight:600;white-space:nowrap;}
 
 .mov{position:fixed;inset:0;background:rgba(20,25,40,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(5px);}
 .mov.open{opacity:1;pointer-events:all;}
@@ -141,6 +152,18 @@ option{background:#fff;color:var(--tx);}
 .ctype-pill{padding:8px 13px;border-radius:11px;background:var(--inp);border:1px solid var(--bd);color:var(--tx2);font-size:12px;font-weight:600;}
 .ctype-pill.on{background:var(--blu);border-color:transparent;color:#fff;}
 @media(max-width:520px){.stat-num{font-size:23px;}.mg-mon{width:66px;}}
+/* Impresión / Descarga PDF */
+@media print{
+  @page{margin:12mm;}
+  html,body{background:#fff!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .bgfx,.langsw,.back-hub,.tb-back,.sync,.tb-role,.no-print,.btn-o,.btn-p,.icobtn,.btn-del,.pub-actions,.pub-link,.card-hdr .btn,.cyc-hdr .btn{display:none!important;}
+  .topbar{position:static!important;background:#fff!important;border-bottom:1px solid var(--bd)!important;padding:6px 0!important;}
+  .wrap{max-width:100%!important;padding:0!important;}
+  .card,.cyc,.pub,.wc-metric,.stats{break-inside:avoid;}
+  .wc-bars{overflow:visible!important;flex-wrap:wrap;}
+  .sp-item{display:none!important;} /* la lista de selección del admin no se imprime */
+}
 </style>
 </head>
 <body>
@@ -170,7 +193,8 @@ option{background:#fff;color:var(--tx);}
     <div class="tb-sp">
       <div class="langsw" style="position:static;box-shadow:none;"><button data-l="es" onclick="setLang('es')">ES</button><button data-l="en" onclick="setLang('en')">EN</button></div>
       <span class="sync" id="sync"><span class="dot"></span><span id="sync-lbl"></span></span>
-      <button class="btn btn-g btn-sm" id="logout-btn"></button>
+      <button class="btn btn-g btn-sm no-print" id="pdf-btn" onclick="downloadPDF()"></button>
+      <button class="btn btn-g btn-sm no-print" id="logout-btn"></button>
     </div>
   </div>
   <div class="wrap" id="app-body"></div>
@@ -212,6 +236,7 @@ option{background:#fff;color:var(--tx);}
   <div class="row">
     <div class="fi"><label id="lbl-views"></label><input type="number" id="po-views" placeholder="0" min="0"></div>
     <div class="fi"><label id="lbl-likes"></label><input type="number" id="po-likes" placeholder="0" min="0"></div>
+    <div class="fi"><label id="lbl-podate"></label><input type="date" id="po-date"></div>
   </div>
   <div class="fi" id="po-link-wrap"><label id="lbl-link"></label><input type="text" id="po-link" placeholder="https://instagram.com/…"></div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
@@ -257,8 +282,8 @@ const T={
     sponsors:'Sponsors',createSp:'+ Crear sponsor',pubs:'publicaciones',noSp:'Sin sponsors. Crea el primero.',pickSp:'Selecciona un sponsor arriba para ver/editar sus métricas.',
     totalViews:'Visualizaciones totales',totalLikes:'Me gusta totales',totalPubs:'Publicaciones',
     createCycle:'+ Crear ciclo',noCycles:'Sin ciclos. Crea el primero (un mes).',addPub:'+ Publicación',
-    reachTile:'Alcance de la cuenta',viewsTile:'Visualizaciones',likesTile:'Me gusta',noPubsCycle:'Sin publicaciones en este ciclo.',
-    growth:'Crecimiento mensual · Alcance de la cuenta',report:'Reporte comparativo por ciclo',noData:'Sin datos.',notitle:'(sin título)',
+    reachTile:'Alcance de la cuenta',viewsTile:'Visualizaciones',likesTile:'Me gusta',creativesTile:'Creativos',noPubsCycle:'Sin publicaciones en este ciclo.',
+    growth:'Crecimiento mensual · Alcance de la cuenta',report:'Reporte comparativo por ciclo',weekReport:'Comparativo semana a semana',week:'Semana',podate:'Fecha',pdf:'Descargar PDF',noData:'Sin datos.',notitle:'(sin título)',
     newSp:'Nuevo Sponsor',editSp:'Editar Sponsor',spName:'Nombre del sponsor',spPass:'Contraseña',cancel:'Cancelar',save:'Guardar',
     newCy:'Nuevo Ciclo',editCy:'Editar Ciclo',month:'Mes',reachField:'Alcance de la cuenta (impacto a la marca)',
     newPo:'Nueva Publicación',editPo:'Editar Publicación',ctype:'Tipo de contenido',title:'Título',views:'Visualizaciones',likes:'Me gusta',link:'Link',
@@ -269,8 +294,8 @@ const T={
     sponsors:'Sponsors',createSp:'+ New sponsor',pubs:'posts',noSp:'No sponsors yet. Create the first one.',pickSp:'Select a sponsor above to view/edit its metrics.',
     totalViews:'Total views',totalLikes:'Total likes',totalPubs:'Posts',
     createCycle:'+ New cycle',noCycles:'No cycles yet. Create the first one (a month).',addPub:'+ New post',
-    reachTile:'Account reach',viewsTile:'Views',likesTile:'Likes',noPubsCycle:'No posts in this cycle.',
-    growth:'Monthly growth · Account reach',report:'Comparative report · by cycle',noData:'No data.',notitle:'(untitled)',
+    reachTile:'Account reach',viewsTile:'Views',likesTile:'Likes',creativesTile:'Creatives',noPubsCycle:'No posts in this cycle.',
+    growth:'Monthly growth · Account reach',report:'Comparative report · by cycle',weekReport:'Week-by-week comparison',week:'Week',podate:'Date',pdf:'Download PDF',noData:'No data.',notitle:'(untitled)',
     newSp:'New Sponsor',editSp:'Edit Sponsor',spName:'Sponsor name',spPass:'Password',cancel:'Cancel',save:'Save',
     newCy:'New Cycle',editCy:'Edit Cycle',month:'Month',reachField:'Account reach (brand impact)',
     newPo:'New Post',editPo:'Edit Post',ctype:'Content type',title:'Title',views:'Views',likes:'Likes',link:'Link',
@@ -287,6 +312,8 @@ const nfmt=n=>Number(n||0).toLocaleString(lang==='en'?'en-US':'es');
 const ctLabel=ty=>CTYPES[ty]?CTYPES[ty][lang]:ty;
 const normUrl=u=>{ u=(u||'').trim(); return u&&!/^https?:\/\//i.test(u)?'https://'+u:u; };
 const monthLabel=m=>{ if(!m) return ''; const [y,mm]=m.split('-'); return `${MONTHS[lang][+mm-1]} ${y}`; };
+// Lunes de la semana de una fecha 'YYYY-MM-DD' → 'YYYY-MM-DD'
+function weekStart(dateStr){ if(!dateStr) return ''; const d=new Date(dateStr+'T00:00:00'); if(isNaN(d)) return ''; const off=(d.getDay()+6)%7; d.setDate(d.getDate()-off); return d.toISOString().slice(0,10); }
 const sponsorPosts=sid=>Object.values(_posts).filter(p=>p&&p.sponsorId===sid);
 const postMonth=p=>p.month || (p.date||'').slice(0,7); // compat: deriva mes de la fecha
 const sponsorCycles=sid=>Object.values(_cycles).filter(c=>c&&c.sponsorId===sid);
@@ -320,8 +347,9 @@ function applyStaticI18n(){
   set('back-lbl',t('base')); set('lbl-user',t('user')); set('lbl-pass',t('pass')); set('l-btn',t('signin')); set('l-err',t('bad')); set('logout-btn',t('signout'));
   set('lbl-spname',t('spName')); set('lbl-sppass',t('spPass')); set('sp-cancel',t('cancel')); set('sp-save',t('save'));
   set('lbl-month',t('month')); set('lbl-reach',t('reachField')); set('cy-cancel',t('cancel')); set('cy-save',t('save'));
-  set('lbl-ctype',t('ctype')); set('lbl-title',t('title')); set('lbl-views',t('views')); set('lbl-likes',t('likes')); set('lbl-link',t('link')); set('po-cancel',t('cancel')); set('po-save',t('save'));
+  set('lbl-ctype',t('ctype')); set('lbl-title',t('title')); set('lbl-views',t('views')); set('lbl-likes',t('likes')); set('lbl-podate',t('podate')); set('lbl-link',t('link')); set('po-cancel',t('cancel')); set('po-save',t('save'));
   setSync(document.getElementById('sync').classList.contains('live'));
+  set('pdf-btn',t('pdf'));
   if(currentUser){ const r=document.getElementById('tb-role'); r.textContent=currentUser.role==='admin'?t('admin'):t('sponsor'); }
   renderTypePills();
 }
@@ -383,26 +411,36 @@ function renderDash(sid,admin){
 
   // Reporte comparativo por ciclo (métrica seleccionable: alcance / visualizaciones / me gusta)
   const months=sponsorMonths(sid);
-  const metricVal={
-    reach:m=>{ const c=cycleForMonth(sid,m); return c?Number(c.accountReach||0):0; },
-    views:m=>postsInMonth(sid,m).reduce((a,p)=>a+Number(p.views||0),0),
-    likes:m=>postsInMonth(sid,m).reduce((a,p)=>a+Number(p.likes||0),0),
-  };
-  const metricMeta={reach:{lbl:t('reachTile'),color:'var(--pur)'},views:{lbl:t('viewsTile'),color:'var(--blu)'},likes:{lbl:t('likesTile'),color:'var(--red)'}};
-  if(!metricVal[_cmpMetric]) _cmpMetric='reach';
-  const byMonth={}; months.forEach(m=>byMonth[m]=metricVal[_cmpMetric](m));
-  const asc=[...months].sort(); const maxV=Math.max(1,...Object.values(byMonth));
-  const meta=metricMeta[_cmpMetric];
-  const pills=['reach','views','likes'].map(k=>`<button type="button" class="cmp-pill ${k===_cmpMetric?'on':''}" onclick="setCmpMetric('${k}')">${metricMeta[k].lbl}</button>`).join('');
-  h+=`<div class="card"><div class="card-hdr"><span class="card-ttl">${t('report').toUpperCase()}</span></div>
-    <div class="cmp-pills">${pills}</div>`;
-  if(!asc.length || asc.every(m=>!byMonth[m])) h+=`<div class="empty">${t('noData')}</div>`;
-  else h+=asc.map((m,i)=>{ const val=byMonth[m]; const prev=i>0?byMonth[asc[i-1]]:null;
-    let dh='<span class="mg-delta flat">—</span>';
-    if(prev!=null&&prev>0){ const d=(val-prev)/prev*100; const up=d>=0; dh=`<span class="mg-delta ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(d).toFixed(0)}%</span>`; }
-    else if(prev===0&&val>0){ dh='<span class="mg-delta up">▲</span>'; }
-    return `<div class="mg-row"><div class="mg-mon">${monthLabel(m)}</div><div class="mg-track"><div class="mg-fill" style="width:${Math.round(val/maxV*100)}%;background:${meta.color};"></div></div><div class="mg-val">${nfmt(val)}</div>${dh}</div>`;
-  }).join('');
+  // Comparativo SEMANA A SEMANA — visualizaciones, me gusta y creativos (nº de piezas)
+  const wk={};
+  allPosts.forEach(p=>{ const d=p.date||((postMonth(p)||thisMonth())+'-01'); const w=weekStart(d); if(!w) return; (wk[w]=wk[w]||{v:0,l:0,c:0}); wk[w].v+=Number(p.views||0); wk[w].l+=Number(p.likes||0); wk[w].c+=1; });
+  const weeks=Object.keys(wk).sort();
+  h+=`<div class="card"><div class="card-hdr"><span class="card-ttl">${t('weekReport').toUpperCase()}</span></div>`;
+  if(!weeks.length){ h+=`<div class="empty">${t('noData')}</div>`; }
+  else {
+    const series=[
+      {key:'v',lbl:t('viewsTile'),color:'var(--blu)'},
+      {key:'l',lbl:t('likesTile'),color:'var(--red)'},
+      {key:'c',lbl:t('creativesTile'),color:'var(--orange)'},
+    ];
+    h+=series.map(s=>{
+      const vals=weeks.map(w=>wk[w][s.key]);
+      const max=Math.max(1,...vals);
+      const bars=weeks.map((w,i)=>{
+        const val=vals[i]; const hp=Math.max(val>0?6:0,Math.round(val/max*100));
+        const [yy,mm,dd]=w.split('-');
+        return `<div class="wc-col" title="${t('week')} ${dd}/${mm}: ${nfmt(val)}">
+          <div class="wc-cap">${nfmt(val)}</div>
+          <div class="wc-bwrap"><div class="wc-bar" style="height:${hp}%;background:${s.color};"></div></div>
+          <div class="wc-wk">${dd}/${mm}</div>
+        </div>`;
+      }).join('');
+      return `<div class="wc-metric">
+        <div class="wc-title"><span class="wc-dot" style="background:${s.color};"></span>${s.lbl}</div>
+        <div class="wc-bars">${bars}</div>
+      </div>`;
+    }).join('');
+  }
   h+=`</div>`;
 
   // Ciclos (meses)
@@ -486,6 +524,7 @@ function openPost(sid,month,pid){
   document.getElementById('po-mttl').textContent=pid?t('editPo'):t('newPo');
   document.getElementById('po-title').value=p?.title||'';
   document.getElementById('po-views').value=p?.views??''; document.getElementById('po-likes').value=p?.likes??''; document.getElementById('po-link').value=p?.link||'';
+  document.getElementById('po-date').value=p?.date||((month||thisMonth())+'-01');
   selectPostType(p?.type||'carrusel'); openMod('m-post');
 }
 function renderTypePills(){ const c=document.getElementById('po-types'); if(!c) return; const cur=document.getElementById('po-type').value; c.innerHTML=Object.entries(CTYPES).map(([id,x])=>`<button type="button" class="ctype-pill ${id===cur?'on':''}" data-t="${id}" onclick="selectPostType('${id}')">${x.icon} ${esc(x[lang])}</button>`).join(''); }
@@ -496,7 +535,8 @@ async function savePostForm(){
   const views=Number(document.getElementById('po-views').value||0), likes=Number(document.getElementById('po-likes').value||0);
   const link=CTYPES[type]?.link?(normUrl(document.getElementById('po-link').value)||null):null;
   const ex=_posts[id];
-  await savePost({id,sponsorId:sid,month,type,title,views,likes,link,date:ex?.date||null,createdAt:ex?.createdAt||Date.now()});
+  const date=document.getElementById('po-date').value||ex?.date||(month+'-01');
+  await savePost({id,sponsorId:sid,month,type,title,views,likes,link,date,createdAt:ex?.createdAt||Date.now()});
   closeMod('m-post');
 }
 async function deletePost(id){ if(!confirm(t('delPo'))) return; await delPostFb(id); }
@@ -510,7 +550,8 @@ document.getElementById('sp-save').onclick=saveSponsorForm;
 document.getElementById('cy-save').onclick=saveCycleForm;
 document.getElementById('po-save').onclick=savePostForm;
 document.querySelectorAll('.mov').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
-Object.assign(window,{ closeMod,openSponsor,selectSponsor,setCmpMetric,deleteSponsor,openCycle,deleteCycle,openPost,deletePost,selectPostType,setLang });
+function downloadPDF(){ document.body.classList.add('printing'); setTimeout(()=>{ window.print(); document.body.classList.remove('printing'); }, 60); }
+Object.assign(window,{ closeMod,openSponsor,selectSponsor,setCmpMetric,deleteSponsor,openCycle,deleteCycle,openPost,deletePost,selectPostType,setLang,downloadPDF });
 
 startListening(); setLang('en');
 </script>
