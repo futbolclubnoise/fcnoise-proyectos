@@ -254,6 +254,15 @@ body.light .rte{border-color:rgba(0,0,0,.12);}
 .rte-body{min-height:74px;max-height:240px;overflow-y:auto;padding:10px 13px;color:var(--tx);font-family:var(--font-body);font-size:13px;line-height:1.6;outline:none;}
 .rte-body:empty::before{content:attr(data-ph);color:var(--tx3);pointer-events:none;}
 .rte-body *{max-width:100%;}
+.rte-body ul,.rte-body ol{margin:5px 0;padding-left:22px;}
+.rte-body li{margin:2px 0;}
+/* Paleta de colores (cuadritos) */
+.rte-swatches{display:inline-flex;align-items:center;gap:3px;flex-wrap:wrap;}
+.rte-sw{width:17px;height:17px;border-radius:5px;border:1px solid rgba(255,255,255,.22);cursor:pointer;padding:0;flex-shrink:0;transition:transform .1s;position:relative;}
+.rte-sw:hover{transform:scale(1.15);}
+body.light .rte-sw{border-color:rgba(0,0,0,.18);}
+.rte-sw-custom{display:inline-flex;align-items:center;justify-content:center;overflow:hidden;background:conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);}
+.rte-sw-custom input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none;}
 .login-err{font-size:11px;color:var(--red);background:var(--red2);border:1px solid var(--red3);padding:8px 12px;border-radius:8px;margin-bottom:12px;display:none;}
 .login-err.show{display:block;}
 
@@ -1639,8 +1648,13 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <!-- Contenido-only fields -->
     <div id="tf-contenido-fields" style="display:none;">
       <div class="fi">
-        <label>Descripción del contenido</label>
-        <div class="rte"><div class="rte-tb" data-for="tf-content-desc"></div><div class="rte-body" id="tf-content-desc" contenteditable="true" data-ph="¿De qué trata este contenido? Contexto, objetivo, formato…"></div></div>
+        <label>Formato</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-ctype"></div>
+        <input type="hidden" id="tf-content-type" value="reel">
+      </div>
+      <div class="fi">
+        <label>Plataforma <span style="color:var(--tx3);font-weight:400;">(elige 1, 2 o todas)</span></label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-platforms"></div>
       </div>
       <div class="fi">
         <label>Estado</label>
@@ -1648,17 +1662,12 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
         <input type="hidden" id="tf-calstatus" value="idea">
       </div>
       <div class="fi">
-        <label>Tipo de contenido</label>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-ctype"></div>
-        <input type="hidden" id="tf-content-type" value="carrusel">
+        <label>Contenido</label>
+        <div class="rte"><div class="rte-tb" data-for="tf-content-desc"></div><div class="rte-body" id="tf-content-desc" contenteditable="true" data-ph="Escribe el guion, copy o notas del contenido…"></div></div>
       </div>
       <div class="fi">
-        <label>Plataforma <span style="color:var(--tx3);font-weight:400;">(elige 1, 2 o todas)</span></label>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="tf-platforms"></div>
-      </div>
-      <div class="fi">
-        <label>Recursos / Links</label>
-        <textarea id="tf-resources" placeholder="Pega links de carpetas, Google Drive, referencias…" style="min-height:52px;font-size:12px;"></textarea>
+        <label>Referentes / Links</label>
+        <textarea id="tf-resources" placeholder="Pega links de referencias, carpetas, Google Drive…" style="min-height:52px;font-size:12px;"></textarea>
         <div style="font-size:9px;color:var(--tx3);margin-top:4px;">Un link por línea</div>
       </div>
     </div>
@@ -2014,6 +2023,9 @@ const LINE_ICONS={
   note:    _svg('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/>'),
   inbox:   _svg('<path d="M4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><path d="M4 13h4l1.5 2.5h5L16 13h4"/><path d="M12 3v7m0 0-2.5-2.5M12 10l2.5-2.5"/>'),
   chat:    _svg('<path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/>'),
+  mail:    _svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/>'),
+  article: _svg('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'),
+  globe:   _svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 2.5 15.4 0 18M12 3c-2.5 2.6-2.5 15.4 0 18"/>'),
   target:  _svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>'),
 };
 // Icono de línea por área (fallback: folder)
@@ -2026,7 +2038,9 @@ function cico(item){ return (item&&item.svg&&LINE_ICONS[item.svg])?LINE_ICONS[it
 function folderSvg(){ return LINE_ICONS.folder; }
 
 /* ═══ EDITOR DE TEXTO ENRIQUECIDO (negrita, subrayado, color, tamaño, alineación) ═══ */
+const RTE_SWATCHES=['#ff7a00','#e8a017','#e5484d','#e93d82','#7c5cff','#2f74e6','#14b8a6','#1faa55','#f4f4f7','#111827'];
 function rteToolbar(id){
+  const sw=RTE_SWATCHES.map(c=>`<button type="button" class="rte-sw" style="background:${c};" title="${c}" onclick="rteCmd('foreColor','${id}','${c}')"></button>`).join('');
   return `<button type="button" class="rte-b" title="Negrita" style="font-weight:800;" onclick="rteCmd('bold','${id}')">B</button>
     <button type="button" class="rte-b" title="Cursiva" style="font-style:italic;" onclick="rteCmd('italic','${id}')">I</button>
     <button type="button" class="rte-b" title="Subrayar" style="text-decoration:underline;" onclick="rteCmd('underline','${id}')">U</button>
@@ -2034,13 +2048,15 @@ function rteToolbar(id){
     <select class="rte-size" title="Tamaño de texto" onchange="rteCmd('fontSize','${id}',this.value);this.selectedIndex=0;">
       <option value="">Tamaño</option><option value="2">Pequeño</option><option value="3">Normal</option><option value="5">Grande</option><option value="6">Título</option>
     </select>
-    <label class="rte-color" title="Color del texto"><span>A</span><input type="color" value="#ff7a00" onchange="rteCmd('foreColor','${id}',this.value)"></label>
     <span class="rte-sep"></span>
     <button type="button" class="rte-b" title="Alinear izquierda" onclick="rteCmd('justifyLeft','${id}')">⇤</button>
     <button type="button" class="rte-b" title="Centrar" onclick="rteCmd('justifyCenter','${id}')">≡</button>
     <button type="button" class="rte-b" title="Alinear derecha" onclick="rteCmd('justifyRight','${id}')">⇥</button>
     <span class="rte-sep"></span>
-    <button type="button" class="rte-b" title="Lista" onclick="rteCmd('insertUnorderedList','${id}')">•</button>
+    <button type="button" class="rte-b" title="Lista con viñetas" onclick="rteCmd('insertUnorderedList','${id}')">•</button>
+    <button type="button" class="rte-b" title="Lista numerada" onclick="rteCmd('insertOrderedList','${id}')" style="font-size:10px;font-weight:800;">1.</button>
+    <span class="rte-sep"></span>
+    <span class="rte-swatches">${sw}<label class="rte-sw rte-sw-custom" title="Color personalizado"><input type="color" value="#ff7a00" onchange="rteCmd('foreColor','${id}',this.value)"></label></span>
     <button type="button" class="rte-b" title="Quitar formato" onclick="rteCmd('removeFormat','${id}')">⨯</button>`;
 }
 function initRTEs(){
@@ -2123,16 +2139,20 @@ const TASK_STATES = [
 ];
 // Plataformas de publicación de CONTENIDO (multi-selección)
 const PLATFORMS = {
-  linkedin:  {label:'LinkedIn',  color:'#0a66c2', short:'in'},
   instagram: {label:'Instagram', color:'#8b5cf6', short:'IG'},
+  linkedin:  {label:'LinkedIn',  color:'#0a66c2', short:'in'},
   tiktok:    {label:'TikTok',    color:'#111827', short:'TT'},
+  web:       {label:'Web',       color:'#1faa55', short:'W'},
+  newsletter:{label:'Newsletter',color:'#ff7a00', short:'NL'},
 };
 // Tipos de contenido (para el conteo del planner)
 const CONTENT_TYPES = {
-  carrusel: {label:'Carrusel', icon:'🎠', svg:'carousel'},
-  post:     {label:'Post',     icon:'🖼️', svg:'image'},
-  reel:     {label:'Reel',     icon:'🎬', svg:'video'},
-  historia: {label:'Historia', icon:'📸', svg:'story'},
+  reel:      {label:'Reel',      icon:'🎬', svg:'video'},
+  carrusel:  {label:'Carrusel',  icon:'🎠', svg:'carousel'},
+  post:      {label:'Post',      icon:'🖼️', svg:'image'},
+  historia:  {label:'Historia',  icon:'📸', svg:'story'},
+  newsletter:{label:'Newsletter',icon:'✉️',  svg:'mail'},
+  blog:      {label:'Blog',      icon:'📝', svg:'article'},
 };
 // Estados de una meta/objetivo del Pulse
 const GOAL_STATUS = {
@@ -4539,8 +4559,8 @@ function switchTaskType(type){
   document.getElementById('tf-tarea-fields').style.display=isContent?'none':'block';
   document.getElementById('tf-contenido-fields').style.display=isContent?'block':'none';
   // Date labels
-  document.getElementById('tf-start-lbl').textContent=isContent?'Fecha de entrega':'Fecha inicio';
-  document.getElementById('tf-end-lbl').textContent  =isContent?'Fecha de publicación':'Fecha fin';
+  document.getElementById('tf-start-lbl').textContent=isContent?'Entrega':'Fecha inicio';
+  document.getElementById('tf-end-lbl').textContent  =isContent?'Publicación':'Fecha fin';
   // Populate states
   if(isContent){
     populateCalPills(document.getElementById('tf-calstatus').value||'idea');
@@ -4628,7 +4648,7 @@ function openTaskForm(taskId, projId, preDate, forceType, calType){
     document.getElementById('tf-ttl').textContent=defaultType==='contenido'?'Nuevo Contenido':'Nueva Tarea';
     switchTaskType(defaultType);
     if(defaultType==='tarea') updateTaskFormStates(useProjId);
-    if(defaultType==='contenido'){ populateCalPills('idea'); populatePlatformChips([]); populateContentTypePills('carrusel'); }
+    if(defaultType==='contenido'){ populateCalPills('idea'); populatePlatformChips([]); populateContentTypePills('reel'); }
   }
   // Handle project selector lock/unlock
   const lockEl=document.getElementById('tf-proj-locked');
@@ -5197,9 +5217,11 @@ function setTaskFormMode(simple){
     }
   }
 
-  // Relabel end date
+  // Relabel dates (contenido usa Entrega / Publicación)
+  const startLbl=document.getElementById('tf-start-lbl');
+  if(startLbl) startLbl.textContent=isContenido?'Entrega':'Fecha inicio';
   const endLbl=document.getElementById('tf-end-lbl');
-  if(endLbl) endLbl.textContent=simple?'Fecha límite':'Fecha fin';
+  if(endLbl) endLbl.textContent=isContenido?'Publicación':(simple?'Fecha límite':'Fecha fin');
 
   // Modal title
   const ttl=document.getElementById('tf-ttl');
@@ -5977,7 +5999,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-18-4';
+const APP_BUILD='2026-09-18-5';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
