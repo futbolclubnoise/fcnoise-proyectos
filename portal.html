@@ -238,8 +238,10 @@ body.light select option{background:#ffffff;color:#1a1a1a;}
 body.light select{color:#1a1a1a;}
 .fi textarea{resize:vertical;min-height:64px;}
 /* Editor de texto enriquecido */
-.rte{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:var(--inp);overflow:hidden;}
+.rte{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:var(--inp);}
 .rte:focus-within{border-color:var(--orange);box-shadow:0 0 0 4px var(--ac2);}
+.rte-tb{border-radius:12px 12px 0 0;}
+.rte-body{border-radius:0 0 12px 12px;}
 body.light .rte{border-color:rgba(0,0,0,.12);}
 .rte-tb{display:flex;flex-wrap:wrap;align-items:center;gap:2px;padding:5px 6px;border-bottom:1px solid var(--bd2);background:var(--bg3);}
 .rte-b{width:26px;height:26px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--tx2);font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--font-body);transition:background .12s,color .12s;}
@@ -262,7 +264,12 @@ body.light .rte{border-color:rgba(0,0,0,.12);}
 .rte-sw:hover{transform:scale(1.15);}
 body.light .rte-sw{border-color:rgba(0,0,0,.18);}
 .rte-sw-custom{display:inline-flex;align-items:center;justify-content:center;overflow:hidden;background:conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);}
-.rte-sw-custom input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none;}
+.rte-colorbox{position:relative;display:inline-flex;}
+.rte-colorpop{position:absolute;top:calc(100% + 6px);right:0;z-index:60;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:8px;box-shadow:0 14px 40px rgba(0,0,0,.5);display:flex;align-items:center;gap:6px;}
+.rte-cp-native{width:32px;height:32px;padding:0;border:1px solid var(--bd2);border-radius:8px;background:none;cursor:pointer;flex-shrink:0;}
+.rte-cp-hex{width:92px;padding:7px 9px;border:1px solid var(--bd2);border-radius:8px;background:var(--inp);color:var(--tx);font-size:12px;font-family:var(--font-body);outline:none;text-transform:uppercase;}
+.rte-cp-hex:focus{border-color:var(--orange);}
+.rte-cp-save{padding:7px 13px;border:none;border-radius:8px;background:var(--orange);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);white-space:nowrap;}
 .login-err{font-size:11px;color:var(--red);background:var(--red2);border:1px solid var(--red3);padding:8px 12px;border-radius:8px;margin-bottom:12px;display:none;}
 .login-err.show{display:block;}
 
@@ -524,7 +531,12 @@ body.light .rte-sw{border-color:rgba(0,0,0,.18);}
 .tf-dd-row.on{background:var(--ac2);}
 .tf-dd-row input{width:15px;height:15px;accent-color:var(--orange);flex-shrink:0;cursor:pointer;}
 .tf-dd-row .plat-ico{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;}
-.tf-dd-name{font-size:13px;font-weight:600;color:var(--tx);}
+.tf-dd-name{font-size:13px;font-weight:600;color:var(--tx);flex:1;}
+.tf-dd-cur{display:inline-flex;align-items:center;gap:8px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tf-dd-ico{display:inline-flex;align-items:center;color:var(--tx2);flex-shrink:0;}
+.tf-dd-ico .lico{width:16px;height:16px;}
+.tf-dd-row .tf-dd-ico .lico{width:16px;height:16px;}
+.tf-dd-chk{margin-left:auto;color:var(--orange);font-weight:800;font-size:13px;flex-shrink:0;}
 .plat-badges{display:inline-flex;gap:3px;align-items:center;}
 /* Tipo de contenido: badge en tarjeta + conteo por tipo */
 .ctype-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;letter-spacing:.02em;padding:2px 8px;border-radius:20px;background:var(--bg4);color:var(--tx2);border:1px solid var(--bd2);margin-bottom:8px;}
@@ -1662,8 +1674,14 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <!-- Contenido-only fields -->
     <div id="tf-contenido-fields" style="display:none;">
       <div class="form-row">
-        <div class="fi"><label>Formato</label><select id="tf-content-type"></select></div>
-        <div class="fi"><label>Estado</label><select id="tf-calstatus"></select></div>
+        <div class="fi"><label>Formato</label>
+          <details class="tf-dd" id="tf-fmt-dd"><summary id="tf-fmt-sum"></summary><div class="tf-dd-menu" id="tf-fmt-menu"></div></details>
+          <input type="hidden" id="tf-content-type" value="reel">
+        </div>
+        <div class="fi"><label>Estado</label>
+          <details class="tf-dd" id="tf-st-dd"><summary id="tf-st-sum"></summary><div class="tf-dd-menu" id="tf-st-menu"></div></details>
+          <input type="hidden" id="tf-calstatus" value="idea">
+        </div>
       </div>
       <div class="fi">
         <label>Plataforma <span style="color:var(--tx3);font-weight:400;">(elige 1, 2 o todas)</span></label>
@@ -2067,7 +2085,14 @@ function rteToolbar(id){
     <button type="button" class="rte-b" title="Lista con viñetas" onclick="rteCmd('insertUnorderedList','${id}')">•</button>
     <button type="button" class="rte-b" title="Lista numerada" onclick="rteCmd('insertOrderedList','${id}')" style="font-size:10px;font-weight:800;">1.</button>
     <span class="rte-sep"></span>
-    <span class="rte-swatches">${sw}<label class="rte-sw rte-sw-custom" title="Color personalizado"><input type="color" value="#ff7a00" onchange="rteCmd('foreColor','${id}',this.value)"></label></span>
+    <span class="rte-swatches">${sw}<span class="rte-colorbox">
+      <button type="button" class="rte-sw rte-sw-custom" title="Color personalizado (HEX)" onclick="rteToggleColorPop('${id}',this)"></button>
+      <div class="rte-colorpop" hidden>
+        <input type="color" class="rte-cp-native" value="#ff7a00" oninput="this.parentNode.querySelector('.rte-cp-hex').value=this.value;">
+        <input type="text" class="rte-cp-hex" value="#ff7a00" maxlength="7" placeholder="#RRGGBB" onkeydown="if(event.key==='Enter'){event.preventDefault();rteApplyHex('${id}',this);}">
+        <button type="button" class="rte-cp-save" onclick="rteApplyHex('${id}',this)">Guardar</button>
+      </div>
+    </span></span>
     <button type="button" class="rte-b" title="Quitar formato" onclick="rteCmd('removeFormat','${id}')">⨯</button>`;
 }
 function initRTEs(){
@@ -2083,6 +2108,30 @@ function rteCmd(cmd, id, val){
   ed.focus();
   try{ document.execCommand('styleWithCSS', false, true); }catch(e){}
   try{ document.execCommand(cmd, false, val||null); }catch(e){}
+}
+// ── Color por código HEX (popover con Guardar) ──
+let _rteRange=null,_rteRangeId=null;
+function rteSaveSel(id){
+  const s=window.getSelection(); if(!s||!s.rangeCount) return;
+  const r=s.getRangeAt(0); const ed=document.getElementById(id);
+  if(ed&&ed.contains(r.commonAncestorContainer)){ _rteRange=r.cloneRange(); _rteRangeId=id; }
+}
+function rteToggleColorPop(id, btn){
+  rteSaveSel(id); // la selección aún es válida (mousedown de la barra la conserva)
+  const pop=btn.parentNode.querySelector('.rte-colorpop');
+  document.querySelectorAll('.rte-colorpop').forEach(p=>{ if(p!==pop) p.hidden=true; });
+  pop.hidden=!pop.hidden;
+  if(!pop.hidden){ const hex=pop.querySelector('.rte-cp-hex'); setTimeout(()=>{hex.focus();hex.select();},0); }
+}
+function rteApplyHex(id, el){
+  const pop=el.closest('.rte-colorpop');
+  let hex=(pop.querySelector('.rte-cp-hex').value||'').trim();
+  if(!/^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hex)){ alert('Código HEX inválido. Ejemplo: #FF7A00'); return; }
+  if(hex[0]!=='#') hex='#'+hex;
+  const ed=document.getElementById(id); ed.focus();
+  if(_rteRange&&_rteRangeId===id){ const s=window.getSelection(); s.removeAllRanges(); s.addRange(_rteRange); }
+  try{ document.execCommand('styleWithCSS',false,true); document.execCommand('foreColor',false,hex); }catch(e){}
+  pop.hidden=true;
 }
 function rteSet(id, html){
   const ed=document.getElementById(id); if(!ed) return;
@@ -4500,12 +4549,16 @@ function openNewTaskForProjTyped(projId, forceType){
 
 /* ── Contenido state pills ── */
 function populateCalPills(selectedId){
-  const selEl=document.getElementById('tf-calstatus');
-  if(!selEl) return;
-  const sel=CAL_COLS.find(c=>c.id===selectedId)?selectedId:'idea';
-  selEl.innerHTML=CAL_COLS.map(c=>`<option value="${c.id}" ${c.id===sel?'selected':''}>${c.label}</option>`).join('');
-  selEl.value=sel;
+  const hid=document.getElementById('tf-calstatus'); if(!hid) return;
+  const cur=CAL_COLS.find(c=>c.id===selectedId)?selectedId:'idea';
+  hid.value=cur;
+  const menu=document.getElementById('tf-st-menu');
+  if(menu) menu.innerHTML=CAL_COLS.map(c=>`<div class="tf-dd-row ${c.id===cur?'on':''}" onclick="selectSt('${c.id}')"><span class="tf-dd-ico" style="color:${c.color};">${cico(c)}</span><span class="tf-dd-name">${c.label}</span>${c.id===cur?'<span class="tf-dd-chk">✓</span>':''}</div>`).join('');
+  const cc=CAL_COLS.find(c=>c.id===cur)||CAL_COLS[0];
+  const sum=document.getElementById('tf-st-sum');
+  if(sum) sum.innerHTML=`<span class="tf-dd-cur"><span class="tf-dd-ico" style="color:${cc.color};">${cico(cc)}</span>${cc.label}</span>`;
 }
+function selectSt(id){ document.getElementById('tf-calstatus').value=id; populateCalPills(id); const dd=document.getElementById('tf-st-dd'); if(dd) dd.open=false; }
 function selectCalPill(btn, id){
   document.querySelectorAll('#tf-cal-pills .tdp-state').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
@@ -4513,11 +4566,16 @@ function selectCalPill(btn, id){
 }
 // ── Tipo de contenido (Carrusel / Post / Reel / Historia) ──
 function populateContentTypePills(selectedId){
-  const selEl=document.getElementById('tf-content-type'); if(!selEl) return;
-  const sel=CONTENT_TYPES[selectedId]?selectedId:'reel';
-  selEl.innerHTML=Object.entries(CONTENT_TYPES).map(([id,t])=>`<option value="${id}" ${id===sel?'selected':''}>${t.label}</option>`).join('');
-  selEl.value=sel;
+  const hid=document.getElementById('tf-content-type'); if(!hid) return;
+  const cur=CONTENT_TYPES[selectedId]?selectedId:'reel';
+  hid.value=cur;
+  const menu=document.getElementById('tf-fmt-menu');
+  if(menu) menu.innerHTML=Object.entries(CONTENT_TYPES).map(([id,t])=>`<div class="tf-dd-row ${id===cur?'on':''}" onclick="selectFmt('${id}')"><span class="tf-dd-ico">${cico(t)}</span><span class="tf-dd-name">${t.label}</span>${id===cur?'<span class="tf-dd-chk">✓</span>':''}</div>`).join('');
+  const t=CONTENT_TYPES[cur]||CONTENT_TYPES.reel;
+  const sum=document.getElementById('tf-fmt-sum');
+  if(sum) sum.innerHTML=`<span class="tf-dd-cur"><span class="tf-dd-ico">${cico(t)}</span>${t.label}</span>`;
 }
+function selectFmt(id){ document.getElementById('tf-content-type').value=id; populateContentTypePills(id); const dd=document.getElementById('tf-fmt-dd'); if(dd) dd.open=false; }
 function selectCTypePill(btn, id){
   document.querySelectorAll('#tf-ctype .tdp-state').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
@@ -5977,8 +6035,8 @@ function renderWeekAnalysis(){ /* no-op */ }
    WINDOW EXPORTS
 ═══════════════════════════════════════ */
 Object.assign(window,{
-  rteCmd, rteSet, rteGet, initRTEs,
-  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView, updatePlatformSummary,
+  rteCmd, rteSet, rteGet, initRTEs, rteToggleColorPop, rteApplyHex,
+  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView, updatePlatformSummary, selectFmt, selectSt,
   login, logout, navigate, goBack, toggleTheme, setTheme, openAlerts,
   selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, editAreaGoodNews, delAreaGoodNews,
   createRepoArea, editRepoArea, saveRepoArea, delRepoArea, moveRepoArea,
@@ -6022,7 +6080,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-18-6';
+const APP_BUILD='2026-09-18-7';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
