@@ -169,21 +169,28 @@ body.light .section-sep{background:rgba(0,0,0,.08)!important;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font-body);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;transition:background .25s,color .25s;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,122,0,.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
-#screen-app,#screen-login{position:relative;z-index:1;}
+#screen-login{position:relative;z-index:1;}
+#screen-app{position:relative;z-index:1;display:flex;align-items:flex-start;}
 
-/* ── NAV ── */
-.nav{height:50px;background:rgba(8,10,16,0.92);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;padding:0 20px;gap:6px;position:sticky;top:0;z-index:100;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);}
-.nav-back{flex-shrink:0;width:30px;height:30px;margin-right:8px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--tx2);text-decoration:none;background:var(--bg3);border:1px solid var(--bd2);transition:background .15s,color .15s;}
+/* ── NAV (panel lateral izquierdo) ── */
+.nav{width:214px;flex-shrink:0;min-height:100dvh;height:100dvh;background:rgba(8,10,16,0.92);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:stretch;padding:16px 12px;gap:6px;position:sticky;top:0;z-index:100;overflow-y:auto;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);}
+.nav-back{flex-shrink:0;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--tx2);text-decoration:none;background:var(--bg3);border:1px solid var(--bd2);transition:background .15s,color .15s;}
 .nav-back:hover{background:var(--bg4);color:var(--accent);}
-.nav-brand{font-family:var(--font-display);font-size:21px;letter-spacing:.06em;flex-shrink:0;margin-right:12px;line-height:1;}
+.nav-brand{font-family:var(--font-display);font-size:23px;letter-spacing:.06em;flex-shrink:0;line-height:1;padding:2px 6px 10px;}
 .nav-brand em{color:var(--accent);font-style:normal;}
-.nav-links{display:flex;gap:0;flex:1;}
-.nav-link{padding:6px 12px;border-radius:0;font-size:11px;font-weight:500;color:rgba(255,255,255,.38);cursor:pointer;transition:color .18s;border:none;background:transparent;font-family:var(--font-body);white-space:nowrap;letter-spacing:.03em;position:relative;}
-.nav-link::after{content:'';position:absolute;bottom:-1px;left:12px;right:12px;height:1.5px;background:var(--orange);transform:scaleX(0);transition:transform .2s;border-radius:2px;}
-.nav-link:hover{color:rgba(255,255,255,.7);}
-.nav-link.on{color:var(--tx);}
-.nav-link.on::after{transform:scaleX(1);}
-.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.nav-top{display:flex;align-items:center;gap:8px;}
+.nav-links{display:flex;flex-direction:column;gap:2px;margin-top:6px;}
+.nav-link{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 11px;border-radius:10px;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;transition:color .15s,background .15s;border:none;background:transparent;font-family:var(--font-body);white-space:nowrap;letter-spacing:.01em;}
+.nav-link svg{width:16px;height:16px;flex-shrink:0;stroke-width:1.7;opacity:.8;}
+.nav-link:hover{color:rgba(255,255,255,.85);background:var(--bg3);}
+.nav-link.on{color:var(--tx);background:var(--ac2);}
+.nav-link.on svg{opacity:1;color:var(--accent);}
+.nav-right{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid var(--bd2);}
+.nav-right .sync-status{padding:2px 6px;}
+body.light .nav{background:rgba(242,242,247,.94)!important;border-right:1px solid rgba(0,0,0,.1)!important;border-bottom:none!important;}
+body.light .nav-link{color:rgba(0,0,0,.5)!important;}
+body.light .nav-link:hover{color:rgba(0,0,0,.8)!important;}
+body.light .nav-link.on{color:var(--tx)!important;}
 .theme-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
 .theme-btn:hover{background:var(--bg4);}
 .sync-dot{font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--tx3);border:1px solid var(--bd2);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;transition:opacity .18s;}
@@ -243,7 +250,7 @@ body.light select{color:#1a1a1a;}
 .w-full{width:100%;}
 
 /* ── APP BODY ── */
-.app-body{padding:20px;max-width:1140px;margin:0 auto;}
+.app-body{flex:1;min-width:0;padding:22px 26px;max-width:1180px;margin:0 auto;}
 
 /* ── PAGE HEADER ── */
 .page-hdr{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
@@ -700,20 +707,23 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
 .proj-dates span{display:flex;align-items:center;gap:3px;}
 
 /* ── MOBILE RESPONSIVE ── */
-@media(max-width:640px){
-  /* Nav: make links scroll horizontally, shrink right side */
-  .nav{padding:0 12px;gap:4px;height:48px;}
-  .nav-brand{font-size:18px;margin-right:4px;}
-  .nav-links{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:1px;}
+@media(max-width:820px){
+  /* En móvil/tablet el panel lateral vuelve a barra superior horizontal */
+  #screen-app{display:block;}
+  .nav{width:auto;min-height:0;height:48px;flex-direction:row;align-items:center;padding:0 12px;gap:4px;border-right:none;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;overflow-y:hidden;}
+  body.light .nav{border-right:none!important;border-bottom:1px solid rgba(0,0,0,.1)!important;}
+  .nav-brand{font-size:18px;padding:0;margin-right:4px;}
+  .nav-links{flex-direction:row;margin-top:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:1px;flex:1;}
   .nav-links::-webkit-scrollbar{display:none;}
-  .nav-link{padding:4px 9px;font-size:10px;white-space:nowrap;}
-  .nav-right{gap:4px;}
+  .nav-link{width:auto;padding:5px 10px;font-size:11px;border-radius:8px;white-space:nowrap;}
+  .nav-link svg{width:14px;height:14px;}
+  .nav-right{flex-direction:row;align-items:center;gap:6px;margin-top:0;margin-left:auto;padding-top:0;border-top:none;}
   .sync-dot{font-size:8px;padding:3px 7px;}
   .nav-logout{display:none;} /* hidden on mobile — logout via settings */
   .user-av{width:28px;height:28px;}
 
   /* App body padding */
-  .app-body{padding:10px;}
+  .app-body{padding:12px;}
 
   /* Page headers */
   .page-hdr{margin-bottom:12px;}
@@ -822,7 +832,13 @@ body.light .qa-btn{background:#fff!important;border:1px solid rgba(0,0,0,.09)!im
 .ppr-row{display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:9px;background:var(--card);border:1px solid var(--bd2);margin-bottom:5px;cursor:pointer;transition:all .15s;}
 .ppr-row:hover{border-color:var(--orange);}
 .ppr-row:last-child{margin-bottom:0;}
-.ppr-icon{font-size:20px;flex-shrink:0;line-height:1;}
+.ppr-icon{font-size:20px;flex-shrink:0;line-height:1;display:flex;align-items:center;justify-content:center;}
+/* Iconos de línea reutilizables */
+.lico{width:1em;height:1em;display:inline-block;vertical-align:-.14em;flex-shrink:0;}
+.bdg .lico{width:12px;height:12px;vertical-align:-2px;margin-right:1px;}
+.ppr-icon .lico,.pc-icon .lico,.pdh-icon .lico{width:56%;height:56%;}
+.tdp-state .lico,.ctype-badge .lico,.ctype-ico .lico{width:14px;height:14px;vertical-align:-2px;}
+.itag .lico{width:11px;height:11px;vertical-align:-1.5px;}
 .ppr-info{flex:1;min-width:0;}
 .ppr-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ppr-bar{height:4px;background:var(--bg5);border-radius:4px;margin-top:5px;overflow:hidden;}
@@ -1029,8 +1045,10 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
 <!-- ═══ APP ═══ -->
 <div id="screen-app" class="hidden">
   <nav class="nav">
-    <a href="./index.html" class="nav-back" title="Volver a la base">←</a>
-    <div class="nav-brand">FC<em>NOISE.</em></div>
+    <div class="nav-top">
+      <a href="./index.html" class="nav-back" title="Volver a la base">←</a>
+      <div class="nav-brand">FC<em>NOISE.</em></div>
+    </div>
     <div class="nav-links" id="nav-links"></div>
     <div class="nav-right">
       <div class="sync-status" id="sync-status" title="Estado de sincronización">
@@ -1310,7 +1328,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     </div>
     <div class="fi">
       <label>¿A qué proyecto pertenece? (opcional)</label>
-      <select id="ids-proj"><option value="">— Sin proyecto —</option></select>
+      <select id="ids-proj"><option value="">Sin proyecto —</option></select>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
       <button class="btn btn-g btn-sm" onclick="closeMod('m-ids')">Cancelar</button>
@@ -1328,7 +1346,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     </div>
     <input type="hidden" id="repoarea-id">
     <div class="fi"><label>Nombre del área</label><input type="text" id="repoarea-name" placeholder="Ej. Diseño, Contenido, Legal…"></div>
-    <div class="fi"><label>Emoji (opcional)</label><input type="text" id="repoarea-icon" placeholder="📁" maxlength="4" style="width:80px;text-align:center;"></div>
+    <div class="fi"><label>Emoji (opcional)</label><input type="text" id="repoarea-icon" placeholder="" maxlength="4" style="width:80px;text-align:center;"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
       <button class="btn btn-g btn-sm" onclick="closeMod('m-repo-area')">Cancelar</button>
       <button class="btn btn-p btn-sm" onclick="saveRepoArea()">Guardar</button>
@@ -1357,7 +1375,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
 <!-- ═══ MODAL ALERT ═══ -->
 <div class="mov" id="m-alert">
   <div class="modal" style="border-top:3px solid var(--org);display:flex;flex-direction:column;max-height:88vh;">
-    <div class="mhdr"><span class="mttl">⚠️ Tareas Vencidas <span id="m-alert-count" style="color:var(--tx3);font-weight:400;"></span></span><button class="mclose" onclick="closeMod('m-alert')">✕</button></div>
+    <div class="mhdr"><span class="mttl"><svg class="lico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 9v5M12 17h.01"/></svg> Tareas Vencidas <span id="m-alert-count" style="color:var(--tx3);font-weight:400;"></span></span><button class="mclose" onclick="closeMod('m-alert')">✕</button></div>
     <div id="m-alert-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;"></div>
     <div style="margin-top:14px;flex-shrink:0;"><button class="btn btn-p w-full" onclick="closeMod('m-alert')">Entendido</button></div>
   </div>
@@ -1378,7 +1396,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="form-row">
       <div class="fi"><label>Trimestre (Q)</label>
         <select id="mp-quarter">
-          <option value="">— Sin Q —</option>
+          <option value="">Sin Q —</option>
           <option value="Q1">Q1 (Ene–Mar)</option>
           <option value="Q2">Q2 (Abr–Jun)</option>
           <option value="Q3">Q3 (Jul–Sep)</option>
@@ -1394,31 +1412,31 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="form-row">
       <div class="fi"><label>Área</label>
         <select id="mp-area">
-          <option value="marketing">📣 Marketing</option>
-          <option value="estrategia">📊 Estrategia</option>
-          <option value="operaciones">⚡ Operaciones</option>
-          <option value="diseno">🎨 Diseño</option>
-          <option value="admin">🗂 Admin</option>
-          <option value="ventas">🐐 FCnoise</option>
-          <option value="edicion">✂️ Edición</option>
-          <option value="eventos">🎟 Eventos</option>
-          <option value="lig">⚽ LIG</option>
-          <option value="general">💼 General</option>
+          <option value="marketing">Marketing</option>
+          <option value="estrategia">Estrategia</option>
+          <option value="operaciones">Operaciones</option>
+          <option value="diseno">Diseño</option>
+          <option value="admin">Admin</option>
+          <option value="ventas">FCnoise</option>
+          <option value="edicion">Edición</option>
+          <option value="eventos">Eventos</option>
+          <option value="lig">LIG</option>
+          <option value="general">General</option>
         </select>
       </div>
       <div class="fi"><label>Metodología</label>
         <select id="mp-meth">
-          <option value="lista">📋 Lista</option>
-          <option value="kanban">🗂 Kanban</option>
-          <option value="calendario">📅 Calendario</option>
+          <option value="lista">Lista</option>
+          <option value="kanban">Kanban</option>
+          <option value="calendario">Calendario</option>
         </select>
       </div>
     </div>
     <div class="form-row">
       <div class="fi"><label>Tipo</label>
         <select id="mp-type" onchange="document.getElementById('mp-cycle-w').style.display=this.value==='cyclic'?'block':'none'">
-          <option value="once">📌 Único</option>
-          <option value="cyclic">🔄 Cíclico</option>
+          <option value="once">Único</option>
+          <option value="cyclic">Cíclico</option>
         </select>
       </div>
       <div class="fi" id="mp-cycle-w" style="display:none;"><label>Frecuencia</label>
@@ -1432,12 +1450,12 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="form-row">
       <div class="fi"><label>Prioridad</label>
         <select id="mp-prio">
-          <option value="alta">🔴 Alta</option>
-          <option value="media">🟡 Media</option>
-          <option value="baja">🟢 Baja</option>
+          <option value="alta">Alta</option>
+          <option value="media">Media</option>
+          <option value="baja">Baja</option>
         </select>
       </div>
-      <div class="fi"><label>Emoji</label><input type="text" id="mp-icon" placeholder="📁" maxlength="2" style="width:70px;"></div>
+      <div class="fi"><label>Emoji</label><input type="text" id="mp-icon" placeholder="" maxlength="2" style="width:70px;"></div>
     </div>
     <div class="form-row">
       <div class="fi"><label>Fecha inicio</label><input type="date" id="mp-start"></div>
@@ -1484,16 +1502,16 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
       </div>
       <div class="fi" id="tf-area-fi"><label>Área</label>
         <select id="tf-area">
-          <option value="marketing">📣 Marketing</option>
-          <option value="estrategia">📊 Estrategia</option>
-          <option value="operaciones">⚡ Operaciones</option>
-          <option value="diseno">🎨 Diseño</option>
-          <option value="admin">🗂 Admin</option>
-          <option value="ventas">🐐 FCnoise</option>
-          <option value="edicion">✂️ Edición</option>
-          <option value="eventos">🎟 Eventos</option>
-          <option value="lig">⚽ LIG</option>
-          <option value="general">💼 General</option>
+          <option value="marketing">Marketing</option>
+          <option value="estrategia">Estrategia</option>
+          <option value="operaciones">Operaciones</option>
+          <option value="diseno">Diseño</option>
+          <option value="admin">Admin</option>
+          <option value="ventas">FCnoise</option>
+          <option value="edicion">Edición</option>
+          <option value="eventos">Eventos</option>
+          <option value="lig">LIG</option>
+          <option value="general">General</option>
         </select>
       </div>
     </div>
@@ -1503,9 +1521,9 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
       <div class="form-row">
         <div class="fi"><label>Prioridad</label>
           <select id="tf-prio">
-            <option value="alta">🔴 Alta</option>
-            <option value="media">🟡 Media</option>
-            <option value="baja">🟢 Baja</option>
+            <option value="alta">Alta</option>
+            <option value="media">Media</option>
+            <option value="baja">Baja</option>
           </select>
         </div>
         <div class="fi" id="tf-state-wrap"><label id="tf-state-lbl">Estado</label>
@@ -1648,8 +1666,8 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="fi">
       <label>Apariencia</label>
       <div class="theme-pair">
-        <button id="smod-dark" class="btn btn-g" onclick="setTheme('dark')">🌙 Oscuro</button>
-        <button id="smod-light" class="btn btn-g" onclick="setTheme('light')">☀️ Claro</button>
+        <button id="smod-dark" class="btn btn-g" onclick="setTheme('dark')">Oscuro</button>
+        <button id="smod-light" class="btn btn-g" onclick="setTheme('light')">Claro</button>
       </div>
     </div>
 
@@ -1716,7 +1734,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="mhdr"><span class="mttl">Áreas</span><button class="mclose" onclick="closeMod('m-admin-area')">✕</button></div>
     <div class="form-row">
       <div class="fi"><label>Nombre del área</label><input type="text" id="adm-a-name" placeholder="Ej. Comunidad"></div>
-      <div class="fi"><label>Emoji</label><input type="text" id="adm-a-icon" placeholder="📂" maxlength="2" style="width:70px;"></div>
+      <div class="fi"><label>Emoji</label><input type="text" id="adm-a-icon" placeholder="" maxlength="2" style="width:70px;"></div>
     </div>
     <div class="fi"><label>Color</label>
       <select id="adm-a-color">
@@ -1749,11 +1767,11 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div class="form-row">
       <div class="fi"><label>Tipo</label>
         <select id="mev-type">
-          <option value="partido">⚽ Partido</option>
-          <option value="entrenamiento">🏃 Entrenamiento</option>
-          <option value="reunion">📋 Reunión</option>
-          <option value="lanzamiento">🚀 Lanzamiento</option>
-          <option value="otro">📅 Otro</option>
+          <option value="partido">Partido</option>
+          <option value="entrenamiento">Entrenamiento</option>
+          <option value="reunion">Reunión</option>
+          <option value="lanzamiento">Lanzamiento</option>
+          <option value="otro">Otro</option>
         </select>
       </div>
       <div class="fi"><label>Lugar</label><input type="text" id="mev-loc" placeholder="Estadio / dirección"></div>
@@ -1842,42 +1860,89 @@ const ROLES = {
   colaborador: {label:'Colaborador',   color:'var(--blu)',   bg:'var(--blu2)',brd:'var(--blu3)'},
 };
 const AREAS = {
-  marketing:  {label:'Marketing',   icon:'📣', cls:'bo', color:'var(--org)'},
-  estrategia: {label:'Estrategia',  icon:'📊', cls:'bb', color:'var(--blu)'},
-  operaciones:{label:'Operaciones', icon:'⚡', cls:'bg', color:'var(--grn)'},
-  diseno:     {label:'Diseño',      icon:'🎨', cls:'bp', color:'var(--pur)'},
-  admin:      {label:'Admin',       icon:'🗂',  cls:'bw', color:'var(--tx3)'},
-  ventas:     {label:'FCnoise',     icon:'🐐', cls:'by', color:'var(--yel)'},
-  edicion:    {label:'Edición',     icon:'✂️',  cls:'br', color:'var(--red)'},
-  eventos:    {label:'Eventos',     icon:'🎟', cls:'bp', color:'var(--pur)'},
-  lig:        {label:'LIG',         icon:'⚽', cls:'bg', color:'var(--grn)'},
-  general:    {label:'General',     icon:'💼', cls:'bw', color:'var(--tx3)'},
+  marketing:  {label:'Marketing',   icon:'📣', svg:'megaphone', cls:'bo', color:'var(--org)'},
+  estrategia: {label:'Estrategia',  icon:'📊', svg:'chart',     cls:'bb', color:'var(--blu)'},
+  operaciones:{label:'Operaciones', icon:'⚡', svg:'bolt',      cls:'bg', color:'var(--grn)'},
+  diseno:     {label:'Diseño',      icon:'🎨', svg:'palette',   cls:'bp', color:'var(--pur)'},
+  admin:      {label:'Admin',       icon:'🗂',  svg:'files',     cls:'bw', color:'var(--tx3)'},
+  ventas:     {label:'FCnoise',     icon:'🐐', svg:'goat',      cls:'by', color:'var(--yel)'},
+  edicion:    {label:'Edición',     icon:'✂️',  svg:'scissors',  cls:'br', color:'var(--red)'},
+  eventos:    {label:'Eventos',     icon:'🎟', svg:'ticket',    cls:'bp', color:'var(--pur)'},
+  lig:        {label:'LIG',         icon:'⚽', svg:'ball',      cls:'bg', color:'var(--grn)'},
+  general:    {label:'General',     icon:'💼', svg:'briefcase', cls:'bw', color:'var(--tx3)'},
 };
+/* ═══ ICONOS DE LÍNEA (sutiles, sin emoji) ═══
+   Un solo <svg> reutilizable; se colorea con currentColor. */
+const _svg=(p,vb='0 0 24 24')=>`<svg class="lico" viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const LINE_ICONS={
+  folder:  _svg('<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'),
+  megaphone:_svg('<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M16 8a5 5 0 0 1 0 8"/><path d="M19 5a9 9 0 0 1 0 14"/>'),
+  chart:   _svg('<path d="M4 20V4"/><path d="M4 20h16"/><rect x="7" y="11" width="3" height="6" rx=".5"/><rect x="12" y="7" width="3" height="10" rx=".5"/><rect x="17" y="13" width="3" height="4" rx=".5"/>'),
+  bolt:    _svg('<path d="M13 3 5 13h5l-1 8 8-10h-5z"/>'),
+  palette: _svg('<path d="M12 3a9 9 0 1 0 0 18c1 0 1.6-.8 1.6-1.6 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7.4-9-7.4z"/><circle cx="7.5" cy="12" r="1"/><circle cx="10" cy="8" r="1"/><circle cx="15" cy="8" r="1"/>'),
+  files:   _svg('<rect x="4" y="4" width="12" height="14" rx="2"/><path d="M8 20h10a2 2 0 0 0 2-2V8"/>'),
+  goat:    _svg('<circle cx="12" cy="13" r="6"/><path d="M8 8 6 4M16 8l2-4"/><path d="M10 13h.01M14 13h.01"/>'),
+  scissors:_svg('<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 8l12 10M8 16 20 6"/>'),
+  ticket:  _svg('<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="1 2"/>'),
+  ball:    _svg('<circle cx="12" cy="12" r="9"/><path d="m12 7 4 3-1.5 5h-5L8 10z"/>'),
+  briefcase:_svg('<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/>'),
+  // Contenido
+  carousel:_svg('<rect x="7" y="5" width="10" height="14" rx="2"/><path d="M4 8v8M20 8v8"/>'),
+  image:   _svg('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m4 17 5-5 4 4 3-3 4 4"/>'),
+  video:   _svg('<rect x="3" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3z"/>'),
+  story:   _svg('<circle cx="12" cy="12" r="8" stroke-dasharray="3 2.4"/><circle cx="12" cy="12" r="3"/>'),
+  // Estados / calendario
+  search:  _svg('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/>'),
+  bulb:    _svg('<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 1 4 10.5c-.6.6-1 1.3-1 2.1H9c0-.8-.4-1.5-1-2.1A6 6 0 0 1 12 3z"/>'),
+  clip:    _svg('<path d="M9 4h6l1 3H8z"/><rect x="6" y="7" width="12" height="13" rx="2"/><path d="M9 11h6M9 15h4"/>'),
+  camera:  _svg('<rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8 7l1.5-2h5L16 7"/>'),
+  wrench:  _svg('<path d="M14 7a3.5 3.5 0 0 1-4.6 4.6L5 16v3h3l4.4-4.4A3.5 3.5 0 0 1 17 10l-2-1z"/>'),
+  thumb:   _svg('<path d="M7 11v9H4v-9z"/><path d="M7 11l4-7c1.3 0 2 .9 2 2v3h5a2 2 0 0 1 2 2.3l-1 6a2 2 0 0 1-2 1.7H7"/>'),
+  rocket:  _svg('<path d="M5 15c-1 1-1 4-1 4s3 0 4-1M9 15l6-6a6 6 0 0 0 4-6 6 6 0 0 0-6 4l-6 6z"/><circle cx="14.5" cy="9.5" r="1"/><path d="M9 15l-2-2"/>'),
+  square:  _svg('<rect x="4" y="4" width="16" height="16" rx="3"/>'),
+  circle:  _svg('<circle cx="12" cy="12" r="8"/>'),
+  circleHalf:_svg('<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/>'),
+  check:   _svg('<circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.4 2.4L16 9"/>'),
+  // Eventos / otros
+  people:  _svg('<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.3"/><path d="M15.5 14.2A5 5 0 0 1 21 19"/>'),
+  run:     _svg('<circle cx="14" cy="5" r="2"/><path d="M12 22l2-6-3-2 1-5 4 2 2 1M9 12l-3 1-2 4"/>'),
+  calendar:_svg('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>'),
+  link:    _svg('<path d="M10 13a4 4 0 0 0 6 .5l2-2a4 4 0 0 0-6-6l-1 1"/><path d="M14 11a4 4 0 0 0-6-.5l-2 2a4 4 0 0 0 6 6l1-1"/>'),
+  note:    _svg('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/>'),
+};
+// Icono de línea por área (fallback: folder)
+const AREA_ICON={marketing:'megaphone',estrategia:'chart',operaciones:'bolt',diseno:'palette',admin:'files',ventas:'goat',edicion:'scissors',eventos:'ticket',lig:'ball',general:'briefcase'};
+function areaSvg(areaId){ return LINE_ICONS[AREA_ICON[areaId]]||LINE_ICONS.folder; }
+function lico(name){ return LINE_ICONS[name]||''; }
+// Icono de un item de config (estado/tipo/evento): SVG de línea si existe, si no su emoji.
+function cico(item){ return (item&&item.svg&&LINE_ICONS[item.svg])?LINE_ICONS[item.svg]:(item?.icon||''); }
+// Icono de carpeta (proyectos/áreas/repos). Toma color del área si se pasa.
+function folderSvg(){ return LINE_ICONS.folder; }
 const PRIOS = {
   alta: {label:'Alta', cls:'br'},
   media:{label:'Media',cls:'by'},
   baja: {label:'Baja', cls:'bg'},
 };
 const KB_COLS = [
-  {id:'investigacion', label:'Investigación', icon:'🔍', cls:'bb', color:'var(--blu)'},
-  {id:'ideacion',      label:'Ideación',      icon:'💡', cls:'by', color:'var(--yel)'},
-  {id:'planeacion',    label:'Planeación',    icon:'📋', cls:'bo', color:'var(--org)'},
-  {id:'ejecucion',     label:'Ejecución',     icon:'⚡', cls:'br', color:'var(--red)'},
-  {id:'cierre',        label:'Cierre',        icon:'✅', cls:'bg', color:'var(--grn)'},
+  {id:'investigacion', label:'Investigación', icon:'🔍', svg:'search', cls:'bb', color:'var(--blu)'},
+  {id:'ideacion',      label:'Ideación',      icon:'💡', svg:'bulb',   cls:'by', color:'var(--yel)'},
+  {id:'planeacion',    label:'Planeación',    icon:'📋', svg:'clip',   cls:'bo', color:'var(--org)'},
+  {id:'ejecucion',     label:'Ejecución',     icon:'⚡', svg:'bolt',   cls:'br', color:'var(--red)'},
+  {id:'cierre',        label:'Cierre',        icon:'✅', svg:'check',  cls:'bg', color:'var(--grn)'},
 ];
 const CAL_COLS = [
-  {id:'idea',      label:'Idea',      icon:'💡', cls:'bb', color:'var(--blu)',  done:false},
-  {id:'grabacion', label:'Grabación', icon:'🎥', cls:'br', color:'var(--red)',  done:false},
-  {id:'edicion',   label:'Edición',   icon:'✂️',  cls:'by', color:'var(--yel)', done:false},
-  {id:'ajuste',    label:'Ajuste',    icon:'🔧', cls:'bo', color:'var(--org)',  done:false},
-  {id:'aprobado',  label:'Aprobado',  icon:'👍', cls:'bg', color:'var(--grn)',  done:false},
-  {id:'publicado', label:'Publicado', icon:'🚀', cls:'bp', color:'var(--pur)',  done:true },
+  {id:'idea',      label:'Idea',      icon:'💡', svg:'bulb',   cls:'bb', color:'var(--blu)',  done:false},
+  {id:'grabacion', label:'Grabación', icon:'🎥', svg:'video',  cls:'br', color:'var(--red)',  done:false},
+  {id:'edicion',   label:'Edición',   icon:'✂️',  svg:'scissors',cls:'by', color:'var(--yel)', done:false},
+  {id:'ajuste',    label:'Ajuste',    icon:'🔧', svg:'wrench',  cls:'bo', color:'var(--org)',  done:false},
+  {id:'aprobado',  label:'Aprobado',  icon:'👍', svg:'thumb',   cls:'bg', color:'var(--grn)',  done:false},
+  {id:'publicado', label:'Publicado', icon:'🚀', svg:'rocket',  cls:'bp', color:'var(--pur)',  done:true },
 ];
 const TASK_STATES = [
-  {id:'pendiente',  label:'Pendiente',  icon:'⬜', cls:'bw', done:false},
-  {id:'en-proceso', label:'En proceso', icon:'🔵', cls:'bb', done:false},
-  {id:'revision',   label:'Revisión',   icon:'🟡', cls:'by', done:false},
-  {id:'completada', label:'Completada', icon:'✅', cls:'bg', done:true },
+  {id:'pendiente',  label:'Pendiente',  icon:'⬜', svg:'square',    cls:'bw', done:false},
+  {id:'en-proceso', label:'En proceso', icon:'🔵', svg:'circleHalf',cls:'bb', done:false},
+  {id:'revision',   label:'Revisión',   icon:'🟡', svg:'circle',    cls:'by', done:false},
+  {id:'completada', label:'Completada', icon:'✅', svg:'check',     cls:'bg', done:true },
 ];
 // Plataformas de publicación de CONTENIDO (multi-selección)
 const PLATFORMS = {
@@ -1887,10 +1952,10 @@ const PLATFORMS = {
 };
 // Tipos de contenido (para el conteo del planner)
 const CONTENT_TYPES = {
-  carrusel: {label:'Carrusel', icon:'🎠'},
-  post:     {label:'Post',     icon:'🖼️'},
-  reel:     {label:'Reel',     icon:'🎬'},
-  historia: {label:'Historia', icon:'📸'},
+  carrusel: {label:'Carrusel', icon:'🎠', svg:'carousel'},
+  post:     {label:'Post',     icon:'🖼️', svg:'image'},
+  reel:     {label:'Reel',     icon:'🎬', svg:'video'},
+  historia: {label:'Historia', icon:'📸', svg:'story'},
 };
 // Estados de una meta/objetivo del Pulse
 const GOAL_STATUS = {
@@ -1905,11 +1970,11 @@ function normalizeGoal(g){
 }
 function normalizeGoals(arr){ return (Array.isArray(arr)?arr:[]).map(normalizeGoal); }
 const EVENT_TYPES = [
-  {id:'partido',      label:'Partido',      icon:'⚽', cls:'br', color:'var(--red)'},
-  {id:'entrenamiento',label:'Entrenamiento',icon:'🏃', cls:'bo', color:'var(--org)'},
-  {id:'reunion',      label:'Reunión',      icon:'📋', cls:'bb', color:'var(--blu)'},
-  {id:'lanzamiento',  label:'Lanzamiento',  icon:'🚀', cls:'bp', color:'var(--pur)'},
-  {id:'otro',         label:'Otro',         icon:'📅', cls:'bw', color:'var(--tx3)'},
+  {id:'partido',      label:'Partido',      icon:'⚽', svg:'ball',    cls:'br', color:'var(--red)'},
+  {id:'entrenamiento',label:'Entrenamiento',icon:'🏃', svg:'run',     cls:'bo', color:'var(--org)'},
+  {id:'reunion',      label:'Reunión',      icon:'📋', svg:'people',  cls:'bb', color:'var(--blu)'},
+  {id:'lanzamiento',  label:'Lanzamiento',  icon:'🚀', svg:'rocket',  cls:'bp', color:'var(--pur)'},
+  {id:'otro',         label:'Otro',         icon:'📅', svg:'calendar',cls:'bw', color:'var(--tx3)'},
 ];
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAYS_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -2292,7 +2357,7 @@ function refreshAssignGrids(){
 }
 /* Reconstruye los selects de área en los formularios */
 function refreshAreaSelects(){
-  const opts=Object.entries(AREAS).map(([k,a])=>`<option value="${k}">${a.icon} ${esc(a.label)}</option>`).join('');
+  const opts=Object.entries(AREAS).map(([k,a])=>`<option value="${k}">${esc(a.label)}</option>`).join('');
   ['tf-area','mp-area'].forEach(sid=>{
     const s=document.getElementById(sid); if(s){ const v=s.value; s.innerHTML=opts; if(v&&AREAS[v]) s.value=v; }
   });
@@ -2419,12 +2484,17 @@ function renderNav(){
   }
   av.style.borderColor=rm.brd;
   const sa=isSuperAdmin();
+  const iHome='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg>';
+  const iProj='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+  const iRepo='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v2"/><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M10 12h4"/></svg>';
+  const iPulse='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 5 14 2.5-7H21"/></svg>';
+  const iRev='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.3 7.7 8 9 4.7-1.3 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>';
   document.getElementById('nav-links').innerHTML=`
-    <button class="nav-link" data-view="tasks" onclick="navigate('tasks')">Inicio</button>
-    <button class="nav-link" data-view="projs" onclick="navigate('projs')">Proyectos</button>
-    <button class="nav-link" data-view="repos" onclick="navigate('repos')">Repositorios</button>
-    ${canSeePulse()?`<button class="nav-link" data-view="gestion" onclick="navigate('gestion')">Pulse Week</button>`:''}
-    ${sa?`<button class="nav-link" data-view="revision" onclick="navigate('revision')">Revisión</button>`:''}`;
+    <button class="nav-link" data-view="tasks" onclick="navigate('tasks')">${iHome}<span>Inicio</span></button>
+    <button class="nav-link" data-view="projs" onclick="navigate('projs')">${iProj}<span>Proyectos</span></button>
+    <button class="nav-link" data-view="repos" onclick="navigate('repos')">${iRepo}<span>Repositorios</span></button>
+    ${canSeePulse()?`<button class="nav-link" data-view="gestion" onclick="navigate('gestion')">${iPulse}<span>Pulse Week</span></button>`:''}
+    ${sa?`<button class="nav-link" data-view="revision" onclick="navigate('revision')">${iRev}<span>Revisión</span></button>`:''}`;
 }
 function savePulseAreaAccess(){
   localStorage.setItem(LS.pulseAreaAccess, JSON.stringify(_pulseAreaAccess));
@@ -2615,7 +2685,7 @@ function renderDashboard(){
 
   <!-- Banner urgente -->
   ${overdue.length?`<div class="urgent-banner" onclick="openAlerts()" style="cursor:pointer;">
-    <div class="urgent-banner-ico">⚠️</div>
+    <div class="urgent-banner-ico"><svg class="lico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 9v5M12 17h.01"/></svg></div>
     <div class="urgent-banner-txt">
       <div class="urgent-banner-ttl">${overdue.length} ${overdue.length===1?'tarea vencida':'tareas vencidas'}</div>
       <div class="urgent-banner-sub">Toca para ver todas →</div>
@@ -2644,7 +2714,7 @@ function renderDashboard(){
     </div>`;
   };
   if(!hasWork){
-    h+=`<div class="hcard"><div class="hcard-body"><div class="hcard-empty">🎉 Estás al día. Sin pendientes urgentes.</div></div></div>`;
+    h+=`<div class="hcard"><div class="hcard-body"><div class="hcard-empty"><svg class="lico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m4 20 4-11 7 7z"/><path d="M14 4c1.5 0 1.5 2 3 2M18 8c1.5 0 1.5 2 3 2M13 3l.5 1.5L15 5l-1.5.5L13 7l-.5-1.5L11 5l1.5-.5z"/></svg> Estás al día. Sin pendientes urgentes.</div></div></div>`;
   } else {
     h+=`<div class="dash-grid">`;
     if(overdue.length) h+=card('VENCIDAS','var(--red)',overdue,'');
@@ -2699,7 +2769,7 @@ function projProgressHTML(p){
   const fillMap={bo:'var(--org)',bb:'var(--blu)',bg:'var(--grn)',bp:'var(--pur)',bw:'var(--tx3)'};
   const color=fillMap[am.cls]||'var(--tx3)';
   return `<div class="ppr-row" onclick="navigate('proj-detail','${p.id}')">
-    <div class="ppr-icon">${p.icon||'📁'}</div>
+    <div class="ppr-icon">${areaSvg(p.area)}</div>
     <div class="ppr-info">
       <div class="ppr-name">${esc(p.name)}</div>
       <div class="ppr-bar"><div class="ppr-fill" style="width:${pct}%;background:${color};"></div></div>
@@ -2800,7 +2870,7 @@ function refreshDetailPopup(){
   const s=tStart(t), e=tEnd(t);
 
   // project label
-  document.getElementById('tdp-proj-lbl').textContent=proj?(proj.icon||'📁')+' '+proj.name:'Sin proyecto';
+  document.getElementById('tdp-proj-lbl').innerHTML=proj?areaSvg(proj.area)+' '+esc(proj.name):'Sin proyecto';
 
   // title
   document.getElementById('tdp-title').textContent=t.name;
@@ -2824,7 +2894,7 @@ function refreshDetailPopup(){
     ? (Array.isArray(t.platforms)?t.platforms:[]).map(id=>{const p=PLATFORMS[id];return p?`<span class="bdg" style="background:${p.color}22;color:${p.color};border-color:${p.color}55;">${p.short} ${p.label}</span>`:'';}).join('')
     : `<span class="bdg ${pm.cls}">${pm.label}</span>`;
   document.getElementById('tdp-meta-chips').innerHTML=
-    `<span class="bdg ${am.cls}">${am.icon} ${am.label}</span>${platChips}`;
+    `<span class="bdg ${am.cls}">${cico(am)} ${am.label}</span>${platChips}`;
 
   // description
   const descEl=document.getElementById('tdp-desc');
@@ -2867,14 +2937,14 @@ function refreshDetailPopup(){
     statesLbl.style.display='block';
     statesEl.innerHTML=CAL_COLS.map(col=>{
       const isOn=(t.calStatus||'idea')===col.id;
-      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','contenido')">${col.icon} ${col.label}</button>`;
+      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','contenido')">${cico(col)} ${col.label}</button>`;
     }).join('');
   } else {
     // tarea — always show TASK_STATES
     statesLbl.style.display='block';
     statesEl.innerHTML=TASK_STATES.map(col=>{
       const isOn=(t.taskStatus||'pendiente')===col.id;
-      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','tarea')">${col.icon} ${col.label}</button>`;
+      return `<button class="tdp-state ${isOn?'on':''}" onclick="tdpSetState('${col.id}','tarea')">${cico(col)} ${col.label}</button>`;
     }).join('');
   }
 
@@ -3147,7 +3217,7 @@ function projCardHTML(p, _admin, draggableOn=true){
   return `<div class="proj-card" id="pcard-${p.id}" ${drag} onclick="navigate('proj-detail','${p.id}')">
     ${editBtns}
     <div class="pc-top">
-      <div class="pc-icon" style="background:${bgMap[am.cls]||'var(--bg5)'};">${p.icon||'📁'}</div>
+      <div class="pc-icon" style="background:${bgMap[am.cls]||'var(--bg5)'};">${areaSvg(p.area)}</div>
       <div class="pc-meta">
         <div class="pc-name">${esc(p.name)}</div>
         <div class="pc-desc">${esc(p.desc)||'Sin descripción'}</div>
@@ -3297,12 +3367,12 @@ function renderProjDetail(id){
   const isCeo=isAdmin();
   document.getElementById('pdh').innerHTML=`
     <div class="pdh-top">
-      <div class="pdh-icon" style="background:${bgMap[am.cls]||'var(--bg5)'};">${p.icon||'📁'}</div>
+      <div class="pdh-icon" style="background:${bgMap[am.cls]||'var(--bg5)'};">${areaSvg(p.area)}</div>
       <div class="pdh-info">
         <div class="pdh-name">${esc(p.name)}</div>
         <div class="pdh-desc">${esc(p.desc)||''}</div>
         <div class="pdh-chips">
-          <span class="bdg ${am.cls}">${am.icon} ${am.label}</span>
+          <span class="bdg ${am.cls}">${cico(am)} ${am.label}</span>
           <span class="bdg bw">${methLabel}</span>
           ${p.type==='cyclic'?`<span class="bdg bb">${({weekly:'Semanal',biweekly:'Quincenal',monthly:'Mensual'})[p.cycle]||''}</span>`:''}
           <div class="flex" style="gap:3px;">${teamDots}</div>
@@ -3374,7 +3444,7 @@ function renderKanbanHTML(projId){
         const rm=ROLES[u.role];
         return `<div class="udot" style="background:${rm.bg};color:${rm.color};">${u.name.charAt(0).toUpperCase()}</div>`;
       }).join('');
-      const mBtns=KB_COLS.filter(c=>c.id!==col.id).map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join('');
+      const mBtns=KB_COLS.filter(c=>c.id!==col.id).map(c=>`<option value="${c.id}">${c.label}</option>`).join('');
       return `<div class="kb-card ${done?'done-c':''}" id="kc-${t.id}" draggable="true"
         ondragstart="kbDragStart(event,'${t.id}')" ondragend="kbDragEnd(event)">
         <div class="flex" style="justify-content:space-between;margin-bottom:5px;">
@@ -3385,7 +3455,7 @@ function renderKanbanHTML(projId){
         </div>
         <div class="kb-name" onclick="openTaskDetail('${t.id}')">${esc(t.name)}</div>
         <div class="kb-chips">
-          <span class="bdg ${am.cls}">${am.icon}</span>
+          <span class="bdg ${am.cls}">${cico(am)}</span>
           <span class="bdg ${pm.cls}">${pm.label}</span>
           ${dateStr?`<span class="txt-xs txt-muted">${dateStr}</span>`:''}
           <div class="flex" style="gap:2px;margin-left:auto;">${dots}</div>
@@ -3396,7 +3466,7 @@ function renderKanbanHTML(projId){
       </div>`;
     }).join('');
     return `<div class="kanban-col" ondragover="kbDragOver(event)" ondragleave="kbDragLeave(event)" ondrop="kbDrop(event,'${col.id}')">
-      <div class="kb-hdr"><span class="bdg ${col.cls}">${col.icon} ${col.label}</span><span class="kb-count">${colTasks.length}</span></div>
+      <div class="kb-hdr"><span class="bdg ${col.cls}">${cico(col)} ${col.label}</span><span class="kb-count">${colTasks.length}</span></div>
       <div class="kb-body" id="kb-${col.id}">
         ${cards||`<div style="padding:14px;text-align:center;font-size:11px;color:var(--tx3);">Suelta aquí</div>`}
       </div>
@@ -3581,7 +3651,7 @@ function renderCalHTML(projId){
             <span style="margin-left:auto;">${platBadgesHTML(t.platforms)}</span>
           </div>
           <div class="cal-card-title">${esc(t.name)}</div>
-          <div class="ctype-badge">${ct.icon} ${ct.label}</div>
+          <div class="ctype-badge">${cico(ct)} ${ct.label}</div>
           <div class="cal-card-foot">
             ${datesHtml}
             <div class="cal-card-avs">${avs}</div>
@@ -3593,7 +3663,7 @@ function renderCalHTML(projId){
     const typeCount={};
     monthContent.forEach(t=>{ const id=CONTENT_TYPES[t.contentType]?t.contentType:'carrusel'; typeCount[id]=(typeCount[id]||0)+1; });
     const tallyHTML=Object.entries(CONTENT_TYPES).map(([id,ct])=>
-      `<span class="ctype-tally"><span class="ctype-ico">${ct.icon}</span>${ct.label}<b>${typeCount[id]||0}</b></span>`).join('');
+      `<span class="ctype-tally"><span class="ctype-ico">${cico(ct)}</span>${ct.label}<b>${typeCount[id]||0}</b></span>`).join('');
     h+=`<div class="cal-cards-wrap">
       <div class="cal-cards-hdr">
         <span class="cal-cards-ttl">CONTENIDO DE ${MONTHS[calMonth].toUpperCase()}</span>
@@ -3660,7 +3730,7 @@ function renderAlertList(){
           <div class="txt-xs txt-muted">${proj?esc(proj.name):''} · ${over?'Vencida':'Hoy'}: ${tEnd(t)}</div>
         </div>
       </div>`;
-    }).join('') : '<div style="text-align:center;padding:26px 10px;color:var(--tx3);font-size:12px;">🎉 No tienes tareas vencidas.</div>';
+    }).join('') : '<div style="text-align:center;padding:26px 10px;color:var(--tx3);font-size:12px;"><svg class="lico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m4 20 4-11 7 7z"/><path d="M14 4c1.5 0 1.5 2 3 2M18 8c1.5 0 1.5 2 3 2M13 3l.5 1.5L15 5l-1.5.5L13 7l-.5-1.5L11 5l1.5-.5z"/></svg> No tienes tareas vencidas.</div>';
   }
   return urgent.length;
 }
@@ -3677,7 +3747,7 @@ function openAlerts(){ renderAlertList(); openMod('m-alert'); }
 function populateGestionFilters(){
   const sel=document.getElementById('ft-proj'); if(!sel) return;
   sel.innerHTML=`<option value="all">Todos los proyectos</option>`+
-    _projects.map(p=>`<option value="${p.id}">${p.icon||'📁'} ${esc(p.name)}</option>`).join('');
+    _projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
 }
 
 function renderOpsView(){
@@ -3766,10 +3836,10 @@ function openOpsProjModal(projId){
   const prioCls={alta:'prio-alta',media:'prio-media',baja:'prio-baja'};
   const prioLbl={alta:'Alta',media:'Media',baja:'Baja'};
   // header
-  document.getElementById('opsp-icon').textContent=p.icon||'📁';
+  document.getElementById('opsp-icon').innerHTML=areaSvg(p.area);
   document.getElementById('opsp-name').textContent=p.name;
   document.getElementById('opsp-meta').innerHTML=`
-    <span class="bdg ${am.cls}">${am.icon} ${am.label}</span>
+    <span class="bdg ${am.cls}">${cico(am)} ${am.label}</span>
     <span class="${prioCls[p.priority||'media']}">${prioLbl[p.priority||'media']}</span>
     ${p.startDate?`<span style="font-size:9px;color:var(--tx3);">🟢 ${p.startDate}</span>`:''}
     ${p.endDate  ?`<span style="font-size:9px;color:var(--tx3);">🔴 ${p.endDate}</span>`  :''}`;
@@ -3854,7 +3924,7 @@ function renderGTaskList(){
   ts.forEach(t=>{ if(!byP[t.projectId]) byP[t.projectId]=[]; byP[t.projectId].push(t); });
   el.innerHTML=Object.entries(byP).map(([pid,arr])=>{
     const p=_projects.find(x=>x.id===pid);
-    return `<div class="sec-lbl">${p?(p.icon||'📁')+' '+esc(p.name):'Sin proyecto'}</div>
+    return `<div class="sec-lbl">${p?lico('folder')+' '+esc(p.name):'Sin proyecto'}</div>
     <div style="margin-bottom:8px;">
       ${arr.map(t=>`<div class="board-section" style="margin-bottom:4px;border-radius:8px;">${taskRowHTML(t)}</div>`).join('')}
     </div>`;
@@ -3881,8 +3951,8 @@ function renderRevision(){
       const am=AREAS[p.area]||AREAS.general;
       const methIcon={lista:'📋',kanban:'🗂',calendario:'📅'}[p.meth||'lista']||'📋';
       return `<tr onclick="navigate('proj-detail','${p.id}')" style="cursor:pointer;">
-        <td>${p.icon||'📁'} ${esc(p.name)}</td>
-        <td><span class="bdg ${am.cls}">${am.icon} ${am.label}</span></td>
+        <td>${lico('folder')} ${esc(p.name)}</td>
+        <td><span class="bdg ${am.cls}">${cico(am)} ${am.label}</span></td>
         <td>${methIcon}</td>
         <td>${pt.length}</td><td>${pd}</td>
         <td><div class="prog-bg" style="width:80px;display:inline-block;vertical-align:middle;"><div class="prog-fill" style="width:${pp}%"></div></div> <span class="txt-xs">${pp}%</span></td>
@@ -4012,7 +4082,7 @@ function populateCalPills(selectedId){
   const sel=selectedId||'idea';
   container.innerHTML=CAL_COLS.map(c=>
     `<button type="button" class="tdp-state ${c.id===sel?'on':''}"
-      onclick="selectCalPill(this,'${c.id}')">${c.icon} ${c.label}</button>`
+      onclick="selectCalPill(this,'${c.id}')">${cico(c)} ${c.label}</button>`
   ).join('');
   if(hidden) hidden.value=sel;
 }
@@ -4026,7 +4096,7 @@ function populateContentTypePills(selectedId){
   const c=document.getElementById('tf-ctype'); if(!c) return;
   const sel=CONTENT_TYPES[selectedId]?selectedId:'carrusel';
   c.innerHTML=Object.entries(CONTENT_TYPES).map(([id,t])=>
-    `<button type="button" class="tdp-state ${id===sel?'on':''}" onclick="selectCTypePill(this,'${id}')">${t.icon} ${t.label}</button>`
+    `<button type="button" class="tdp-state ${id===sel?'on':''}" onclick="selectCTypePill(this,'${id}')">${cico(t)} ${t.label}</button>`
   ).join('');
   document.getElementById('tf-content-type').value=sel;
 }
@@ -4093,9 +4163,9 @@ function switchTaskType(type){
 /* ── State options by methodology ── */
 function stateOptionsHTML(meth, currentVal){
   if(meth==='calendario'){
-    return CAL_COLS.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
+    return CAL_COLS.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.label}</option>`).join('');
   } else if(meth==='kanban'){
-    return KB_COLS.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
+    return KB_COLS.map(c=>`<option value="${c.id}" ${currentVal===c.id?'selected':''}>${c.label}</option>`).join('');
   }
   return ''; // lista — no state needed
 }
@@ -4107,7 +4177,7 @@ function updateTaskFormStates(projId, currentVal){
   wrap.style.display='block';
   lbl.textContent='Estado';
   const cv=currentVal||'pendiente';
-  sel.innerHTML=TASK_STATES.map(c=>`<option value="${c.id}" ${cv===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
+  sel.innerHTML=TASK_STATES.map(c=>`<option value="${c.id}" ${cv===c.id?'selected':''}>${c.label}</option>`).join('');
 }
 function updateGestionStates(){ /* no-op: gestión inline form removed */ }
 
@@ -4172,7 +4242,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     const lp=_projects.find(p=>p.id===_taskFromProjId);
     selEl.style.display='none';
     lockEl.style.display='block';
-    lockEl.textContent=(lp?.icon||'📁')+' '+(lp?.name||'Proyecto');
+    lockEl.innerHTML=lico('folder')+' '+esc(lp?.name||'Proyecto');
   } else {
     selEl.style.display='';
     lockEl.style.display='none';
@@ -4299,7 +4369,7 @@ function eventRowHTML(ev, showActions){
     <div class="event-info">
       <div class="event-title">${esc(ev.name)}</div>
       <div class="event-meta">
-        <span class="bdg ${et.cls}">${et.icon} ${et.label}</span>
+        <span class="bdg ${et.cls}">${cico(et)} ${et.label}</span>
         ${ev.time?`<span class="bdg bw">🕐 ${ev.time}</span>`:''}
         ${ev.location?`<span class="bdg bw">📍 ${esc(ev.location)}</span>`:''}
         <div class="flex" style="gap:2px;">${participants}</div>
@@ -4505,7 +4575,7 @@ function renderAdminAreaList(){
     const custom=!!_customAreas[k];
     return `<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd);">
       <span style="width:9px;height:9px;border-radius:50%;background:${a.color};flex-shrink:0;"></span>
-      <span style="flex:1;font-size:12px;">${a.icon} ${esc(a.label)}</span>
+      <span style="flex:1;font-size:12px;">${cico(a)} ${esc(a.label)}</span>
       ${custom?`<button class="btn-icon btn-del" onclick="adminDelArea('${k}')">✕</button>`:'<span style="font-size:9px;color:var(--tx3);">base</span>'}
     </div>`;
   }).join('');
@@ -4661,8 +4731,8 @@ function populateProjSels(targetId, selectedId){
   ids.forEach(sid=>{
     const sel=document.getElementById(sid); if(!sel) return;
     sel.innerHTML=projs.length
-      ?projs.map(p=>`<option value="${p.id}" ${p.id===selectedId?'selected':''}>${p.icon||'📁'} ${esc(p.name)}</option>`).join('')
-      :'<option value="">— Sin proyectos —</option>';
+      ?projs.map(p=>`<option value="${p.id}" ${p.id===selectedId?'selected':''}>${esc(p.name)}</option>`).join('')
+      :'<option value="">Sin proyectos —</option>';
   });
 }
 
@@ -4725,7 +4795,7 @@ function setTaskFormMode(simple){
     if(simple && _taskFromProjId){
       const lp=_projects.find(p=>p.id===_taskFromProjId);
       tagEl.style.display='';
-      tagEl.innerHTML=`<div class="proj-tag">${lp?.icon||'📁'} ${esc(lp?.name||'Proyecto')}</div>`;
+      tagEl.innerHTML=`<div class="proj-tag">${lico('folder')} ${esc(lp?.name||'Proyecto')}</div>`;
     } else {
       tagEl.style.display='none';
     }
@@ -5090,7 +5160,7 @@ function renderAreaDash(area){
     const pct=pt.length?Math.round(dn/pt.length*100):0;
     const drag=admin?`draggable="true" ondragstart="pwProjDragStart(event,'${p.id}')" ondragend="pwProjDragEnd(event)"`:'';
     return `<div class="pw-proj-card" id="pwproj-${p.id}" ${drag} onclick="navigate('proj-detail','${p.id}')">
-      <div class="pw-proj-name">${p.icon||'📁'} ${esc(p.name)}</div>
+      <div class="pw-proj-name">${areaSvg(p.area)} ${esc(p.name)}</div>
       <div class="pw-proj-foot"><span>${pt.length} tareas</span><span style="margin-left:auto;">${pct}%</span></div>
       <div class="pw-proj-bar"><div class="pw-proj-fill" style="width:${pct}%;background:${am.color};"></div></div>
     </div>`;
@@ -5137,7 +5207,7 @@ function renderAreaDash(area){
               ${it.done?'<svg viewBox=\"0 0 12 10\" fill=\"none\" stroke-width=\"2.5\"><polyline points=\"1,5 4.5,8.5 11,1\"/></svg>':''}
             </div>
             <span class="pw-ids-title ${it.done?'done':''}">${esc(it.title)}</span>
-            ${(()=>{ const pr=it.projectId?_projects.find(p=>p.id===it.projectId):null; return pr?`<span class="ids-proj-chip" onclick="event.stopPropagation();navigate('proj-detail','${pr.id}')" title="Proyecto responsable: ${esc(pr.name)}">${pr.icon||'📁'} ${esc(pr.name)}</span>`:''; })()}
+            ${(()=>{ const pr=it.projectId?_projects.find(p=>p.id===it.projectId):null; return pr?`<span class="ids-proj-chip" onclick="event.stopPropagation();navigate('proj-detail','${pr.id}')" title="Proyecto responsable: ${esc(pr.name)}">${lico('folder')} ${esc(pr.name)}</span>`:''; })()}
             <span class="pw-ids-cnt">${(it.comments||[]).length} 💬</span>
             ${admin?`<button class="btn-icon btn-del" style="flex-shrink:0;" onclick="event.stopPropagation();delIdsItem('${area}','${it.id}')">✕</button>`:''}
           </div>
@@ -5290,7 +5360,7 @@ function renderRepos(){
     const links=a.links||[];
     return `<div class="pw-col-card" style="margin-bottom:14px;">
       <div class="pw-col-hdr">
-        <span class="pw-col-ttl">${a.icon||'📁'} ${esc(a.name)}</span>
+        <span class="pw-col-ttl">${lico('folder')} ${esc(a.name)}</span>
         ${admin?`<span style="display:inline-flex;gap:6px;align-items:center;">
           <div class="sub-moves">
             <button class="sub-move" ${ai===0?'disabled':''} onclick="moveRepoArea('${a.id}',-1)" title="Subir área">▲</button>
@@ -5423,8 +5493,8 @@ function addIdsItem(area){
   // Poblar el selector de proyectos (los visibles para quien está viendo)
   const projs=projectsForUser(pulseViewUser());
   const sel=document.getElementById('ids-proj');
-  sel.innerHTML='<option value="">— Sin proyecto —</option>'+
-    projs.map(p=>`<option value="${p.id}">${p.icon||'📁'} ${esc(p.name)}</option>`).join('');
+  sel.innerHTML='<option value="">Sin proyecto —</option>'+
+    projs.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
   openMod('m-ids');
 }
 async function saveIdsItem(){
@@ -5508,7 +5578,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-07-13-21';
+const APP_BUILD='2026-09-17-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
