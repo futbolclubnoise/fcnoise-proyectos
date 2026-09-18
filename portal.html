@@ -466,11 +466,21 @@ body.light .rte{border-color:rgba(0,0,0,.12);}
 
 /* ── CALENDAR ── */
 .cal-wrap{overflow:hidden;}
+/* Switch de calendario FCnoise / CFL */
+.cal-switch{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.cal-seg{display:inline-flex;background:var(--bg3);border:1px solid var(--bd2);border-radius:12px;padding:3px;gap:2px;}
+.cal-seg-btn{border:none;background:transparent;color:var(--tx3);font-family:var(--font-body);font-size:12.5px;font-weight:700;letter-spacing:.02em;padding:8px 20px;border-radius:9px;cursor:pointer;transition:color .15s,background .15s;}
+.cal-seg-btn:hover{color:var(--tx);}
+.cal-seg-btn.on{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.25);}
+.cal-switch-actions{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
+.cal-switch-actions .btn{display:inline-flex;align-items:center;gap:6px;}
+.cal-switch-actions .lico{width:14px;height:14px;}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .cal-month{font-family:var(--font-display);font-size:20px;letter-spacing:.04em;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;}
 .cal-day-hdr{text-align:center;font-size:9px;font-weight:700;color:var(--tx3);padding:5px 0;text-transform:uppercase;letter-spacing:.1em;}
-.cal-cell{min-height:90px;background:var(--bg3);border-radius:8px;padding:6px;border:1px solid transparent;transition:border-color .18s;cursor:pointer;}
+.cal-cell{min-height:90px;min-width:0;background:var(--bg3);border-radius:8px;padding:6px;border:1px solid transparent;transition:border-color .18s;cursor:pointer;}
+.cal-chip{max-width:100%;}
 .cal-cell:hover{border-color:var(--bd2);}
 .cal-cell.today{border-color:var(--orange);}
 .cal-cell.empty{background:transparent;cursor:default;}
@@ -1192,6 +1202,11 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
         <div class="ml-auto" id="btn-new-event-wrap"></div>
       </div>
       <div id="eventos-list"></div>
+    </div>
+
+    <!-- ── CALENDARIO (FCnoise / CFL) ── -->
+    <div id="view-calendar" class="hidden">
+      <div id="view-calendar-body"></div>
     </div>
 
     <!-- ── REPOSITORIOS ── -->
@@ -2166,6 +2181,8 @@ let currentView   = 'tasks';
 let currentProjId = null;
 let calYear  = new Date().getFullYear();
 let calMonth = new Date().getMonth();
+let _calFilter = 'fcnoise';   // calendario activo en la vista global: 'fcnoise' | 'cfl'
+let _tfCalType = null;        // calType a asignar al guardar desde el formulario
 let _projects= [], _tasks= [], _events= [], _fbOn= false;
 let _presence= {}; // {userId: {online: bool, lastSeen: ...}}
 let dragId         = null;
@@ -2560,6 +2577,7 @@ function onDataChange(){
   if(currentView==='gestion')     { renderPulseWeek(); }
   if(currentView==='revision')    renderRevision();
   if(currentView==='eventos')     renderEventos();
+  if(currentView==='calendar')    renderCalendarView();
   // refresh open detail popup if needed
   if(_tdpId) refreshDetailPopup();
   // refresca el popup de vencidas si está abierto (para que se actualice al completar)
@@ -2637,9 +2655,11 @@ function renderNav(){
   const iRepo='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v2"/><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M10 12h4"/></svg>';
   const iPulse='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 5 14 2.5-7H21"/></svg>';
   const iRev='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.3 7.7 8 9 4.7-1.3 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>';
+  const iCal='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>';
   document.getElementById('nav-links').innerHTML=`
     <button class="nav-link" data-view="tasks" onclick="navigate('tasks')">${iHome}<span>Inicio</span></button>
     <button class="nav-link" data-view="projs" onclick="navigate('projs')">${iProj}<span>Proyectos</span></button>
+    <button class="nav-link" data-view="calendar" onclick="navigate('calendar')">${iCal}<span>Calendario</span></button>
     <button class="nav-link" data-view="repos" onclick="navigate('repos')">${iRepo}<span>Repositorios</span></button>
     ${canSeePulse()?`<button class="nav-link" data-view="gestion" onclick="navigate('gestion')">${iPulse}<span>Pulse Week</span></button>`:''}
     ${sa?`<button class="nav-link" data-view="revision" onclick="navigate('revision')">${iRev}<span>Revisión</span></button>`:''}`;
@@ -2697,7 +2717,7 @@ function renderPulseAccessModal(){
 function navigate(view, projId){
   currentView=view;
   if(projId) currentProjId=projId;
-  ['tasks','projs','proj-detail','gestion','revision','eventos','repos'].forEach(v=>
+  ['tasks','projs','proj-detail','gestion','revision','eventos','repos','calendar'].forEach(v=>
     document.getElementById('view-'+v)?.classList.add('hidden'));
   document.getElementById('view-'+view)?.classList.remove('hidden');
   // Resalta la pestaña activa por data-view (robusto ante cambios de orden)
@@ -2710,6 +2730,7 @@ function navigate(view, projId){
   if(view==='revision')    renderRevision();
   if(view==='eventos')     renderEventos();
   if(view==='repos')       renderRepos();
+  if(view==='calendar')    renderCalendarView();
 }
 function goBack(){ navigate('projs'); }
 
@@ -3887,6 +3908,162 @@ function calNav(dir, projId){
   renderMethContent(projId,'calendario');
 }
 
+/* ═══════════════════════════════════════
+   CALENDARIO GLOBAL (FCnoise / CFL)
+═══════════════════════════════════════ */
+// Calendario al que pertenece una tarea/contenido. Explícito (t.calType) o inferido del proyecto.
+function taskCalType(t){
+  if(t.calType==='cfl'||t.calType==='fcnoise') return t.calType;
+  const p=_projects.find(x=>x.id===t.projectId);
+  if(p && /\bcfl\b/i.test((p.name||'')+' '+(p.area||''))) return 'cfl';
+  return 'fcnoise';
+}
+function setCalFilter(f){ if(f===_calFilter) return; _calFilter=f; renderCalendarView(); }
+function calViewNav(dir){
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendarView();
+}
+function calAddContent(preDate){ openTaskForm(null,null,preDate||'','contenido',_calFilter); }
+function calAddTask(preDate){ openTaskForm(null,null,preDate||'','tarea',_calFilter); }
+
+function renderCalendarView(){
+  const rm=ROLES[currentUser.role];
+  document.documentElement.style.setProperty('--accent',rm.color);
+  document.documentElement.style.setProperty('--ac2',rm.bg);
+  document.documentElement.style.setProperty('--ac3',rm.brd);
+  const isCeo=isAdmin();
+  const today=todayStr();
+  const firstDay=new Date(calYear,calMonth,1);
+  const lastDay =new Date(calYear,calMonth+1,0);
+  const startWd =firstDay.getDay();
+  const mine=t=>isSuperAdmin()||(t.assignedUsers||[]).includes(currentUser.id)||isAdmin();
+  const inCal=t=>taskCalType(t)===_calFilter && mine(t);
+
+  const cfg={
+    fcnoise:{label:'FCnoise', accent:'var(--orange)'},
+    cfl:    {label:'CFL',     accent:'var(--blu)'},
+  }[_calFilter];
+
+  let h=`<div class="page-hdr">
+      <div class="page-title">Calendario</div>
+    </div>
+    <div class="cal-switch">
+      <div class="cal-seg">
+        <button class="cal-seg-btn ${_calFilter==='fcnoise'?'on':''}" onclick="setCalFilter('fcnoise')">FCnoise</button>
+        <button class="cal-seg-btn ${_calFilter==='cfl'?'on':''}" onclick="setCalFilter('cfl')">CFL</button>
+      </div>
+      ${isCeo?`<div class="cal-switch-actions">
+        <button class="btn btn-g btn-sm" onclick="calAddContent('')">${lico('image')} Contenido</button>
+        <button class="btn btn-p btn-sm" onclick="calAddTask('')">${lico('note')} Tarea</button>
+      </div>`:''}
+    </div>`;
+
+  h+=`<div class="cal-wrap">
+    <div class="cal-nav">
+      <button class="btn btn-g btn-sm" onclick="calViewNav(-1)">←</button>
+      <div class="cal-month">${MONTHS[calMonth]} ${calYear} · <span style="color:${cfg.accent};">${cfg.label}</span></div>
+      <button class="btn btn-g btn-sm" onclick="calViewNav(1)">→</button>
+    </div>
+    <div class="cal-legend">
+      <span><span class="c-ico">${lico('inbox')}</span> Fecha de entrega</span>
+      <span><span class="c-ico">${lico('rocket')}</span> Fecha de publicación</span>
+    </div>
+    <div class="cal-grid">
+    ${DAYS_SHORT.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('')}`;
+
+  for(let i=0;i<startWd;i++) h+=`<div class="cal-cell empty"></div>`;
+
+  for(let d=1;d<=lastDay.getDate();d++){
+    const dStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=dStr===today;
+    const dayTasks=_tasks.filter(t=>{
+      if(!inCal(t)) return false;
+      const s=tStart(t)||tEnd(t), e=tEnd(t)||tStart(t);
+      if(!s) return false;
+      return dStr>=s && dStr<=e;
+    });
+    const chips=dayTasks.map(t=>{
+      const calCol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
+      const color=calCol.color, title=esc(t.name);
+      const doneCls=t.status==='done'?'done-c':'';
+      const open=`onclick="event.stopPropagation();openTaskDetail('${t.id}')"`;
+      const sD=tStart(t), eD=tEnd(t);
+      const isContent=(t.taskType!=='tarea');
+      if(isContent){
+        const softStyle =`background:${color}1a;color:${color};border:1px solid ${color}33;`;
+        const solidStyle=`background:${color};color:#fff;border:1px solid ${color};`;
+        const hasBoth=sD&&eD&&sD!==eD;
+        if(hasBoth&&dStr===sD) return `<div class="cal-chip c-entrega ${doneCls}" style="${softStyle}" ${open} title="Entrega — ${title}"><span class="c-ico">${lico('inbox')}</span>${title}</div>`;
+        if(hasBoth&&dStr===eD) return `<div class="cal-chip c-publica ${doneCls}" style="${solidStyle}" ${open} title="Publicación — ${title}"><span class="c-ico">${lico('rocket')}</span>${title}</div>`;
+        if(hasBoth) return '';
+        const sameDay=sD&&eD&&sD===eD, isPub=eD&&dStr===eD;
+        const ico=sameDay?(lico('inbox')+lico('rocket')):(isPub?lico('rocket'):lico('inbox'));
+        const lbl=sameDay?'Entrega y publicación':(isPub?'Publicación':'Entrega');
+        return `<div class="cal-chip c-publica ${doneCls}" style="${solidStyle}" ${open} title="${lbl} — ${title}"><span class="c-ico">${ico}</span>${title}</div>`;
+      }
+      const baseStyle=`background:${color}22;color:${color};border:1px solid ${color}44;`;
+      const isStart=(sD||eD)===dStr;
+      return `<div class="cal-chip ${doneCls} ${isStart?'':'span-day'}" style="${baseStyle}" ${open} title="${calCol.label} — ${title}">${isStart?title:'▸'}</div>`;
+    }).join('');
+    const clickHandler=isCeo?`onclick="calAddContent('${dStr}')"`:'';
+    h+=`<div class="cal-cell ${isToday?'today':''}" ${clickHandler}>
+      <div class="cal-date ${isToday?'is-today':''}">${d}</div>
+      ${chips}
+      ${isCeo?'<div class="cal-add-hint">+ agregar</div>':''}
+    </div>`;
+  }
+  h+=`</div>`; // end grid
+
+  // Tarjetas de contenido del mes
+  const monthPrefix=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  const monthContent=_tasks.filter(t=>{
+    if(!inCal(t)) return false;
+    const dd=tEnd(t)||tStart(t);
+    return dd && dd.startsWith(monthPrefix);
+  }).sort((a,b)=>((tEnd(a)||tStart(a))||'').localeCompare((tEnd(b)||tStart(b))||''));
+
+  if(monthContent.length){
+    const fmt=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
+    const cards=monthContent.map(t=>{
+      const calCol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
+      const ct=CONTENT_TYPES[t.contentType]||CONTENT_TYPES.carrusel;
+      const done=t.status==='done';
+      const sD=tStart(t), eD=tEnd(t);
+      let datesHtml='';
+      if(sD&&eD&&sD!==eD) datesHtml=`<span class="cal-card-date">${lico('inbox')} ${fmt(sD)}</span><span class="cal-card-date">${lico('rocket')} ${fmt(eD)}</span>`;
+      else { const only=eD||sD; if(only) datesHtml=`<span class="cal-card-date">${eD?lico('rocket'):lico('inbox')} ${fmt(only)}</span>`; }
+      const avs=(t.assignedUsers||[]).slice(0,3).map(uid_=>{const u=USERS[uid_]; if(!u) return ''; const r=ROLES[u.role]; return `<div class="udot" style="background:${r.bg};color:${r.color};" title="${u.name}">${initials(u.name).charAt(0)}</div>`;}).join('');
+      const isTask=t.taskType==='tarea';
+      return `<div class="cal-card ${done?'done':''}" style="--c:${calCol.color};" onclick="openTaskDetail('${t.id}')">
+        <span style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${calCol.color};"></span>
+        <div class="cal-card-body">
+          <div class="cal-card-status" style="color:${calCol.color};display:flex;width:100%;align-items:center;gap:6px;">
+            <span>${calCol.label}</span><span style="margin-left:auto;">${platBadgesHTML(t.platforms)}</span>
+          </div>
+          <div class="cal-card-title">${esc(t.name)}</div>
+          <div class="ctype-badge">${isTask?lico('note'):cico(ct)} ${isTask?'Tarea':ct.label}</div>
+          <div class="cal-card-foot">${datesHtml}<div class="cal-card-avs">${avs}</div></div>
+        </div>
+      </div>`;
+    }).join('');
+    const typeCount={};
+    monthContent.forEach(t=>{ if(t.taskType==='tarea'){typeCount.tarea=(typeCount.tarea||0)+1;return;} const id=CONTENT_TYPES[t.contentType]?t.contentType:'carrusel'; typeCount[id]=(typeCount[id]||0)+1; });
+    const tally=Object.entries(CONTENT_TYPES).map(([id,ct])=>`<span class="ctype-tally"><span class="ctype-ico">${cico(ct)}</span>${ct.label}<b>${typeCount[id]||0}</b></span>`).join('')
+      +`<span class="ctype-tally"><span class="ctype-ico">${lico('note')}</span>Tareas<b>${typeCount.tarea||0}</b></span>`;
+    h+=`<div class="cal-cards-wrap">
+      <div class="cal-cards-hdr"><span class="cal-cards-ttl">AGENDA DE ${MONTHS[calMonth].toUpperCase()}</span><span class="bscnt">${monthContent.length}</span></div>
+      <div class="ctype-tally-row">${tally}</div>
+      <div class="cal-cards-grid">${cards}</div>
+    </div>`;
+  } else {
+    h+=`<div class="empty" style="margin-top:16px;"><div class="empty-ico">${lico('calendar')}</div><p>Sin contenido ni tareas en ${MONTHS[calMonth]} para ${cfg.label}.</p>${isCeo?`<button class="btn btn-p btn-sm" style="margin-top:10px;" onclick="calAddContent('')">${lico('image')} Agregar contenido</button>`:''}</div>`;
+  }
+  h+=`</div>`; // end cal-wrap
+  document.getElementById('view-calendar-body').innerHTML=h;
+}
+
 let _calPickDate='', _calPickProj='';
 function calDayClick(dStr, projId){
   _calPickDate=dStr; _calPickProj=projId;
@@ -4375,11 +4552,12 @@ function updateTaskFormStates(projId, currentVal){
 function updateGestionStates(){ /* no-op: gestión inline form removed */ }
 
 // openTaskForm(taskId, projId, preDate, forceType)
-function openTaskForm(taskId, projId, preDate, forceType){
+function openTaskForm(taskId, projId, preDate, forceType, calType){
   if(taskId){
     // editing — clear the from-project lock (editing is always free)
     _taskFromProjId=null;
     const t=_tasks.find(x=>x.id===taskId); if(!t) return;
+    _tfCalType = t.calType || null;
     const proj=_projects.find(p=>p.id===t.projectId);
     const meth=proj?.meth||'lista';
     const editType=t.taskType||( meth==='calendario'?'contenido':'tarea' );
@@ -4405,6 +4583,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     document.getElementById('tf-ttl').textContent='Editar Tarea';
   } else {
     // new
+    _tfCalType = calType || null;
     const lockId=_taskFromProjId||null;
     const useProjId=lockId||projId||visibleProjects()[0]?.id||'';
     const usedProj=_projects.find(x=>x.id===useProjId);
@@ -4492,6 +4671,7 @@ async function saveTaskForm(){
     contentType:  taskType==='contenido'?(document.getElementById('tf-content-type').value||'carrusel'):(existing?.contentType||null),
     subtasks:     taskType==='contenido'?(existing?.subtasks||[]):[..._tfSubs],
     photos:       [..._tfPhotos],
+    calType:      _tfCalType || existing?.calType || null,
     createdAt:existing?.createdAt||Date.now(),
   };
   await persistTask(t);
@@ -5001,7 +5181,8 @@ function setTaskFormMode(simple){
   // Modal title
   const ttl=document.getElementById('tf-ttl');
   if(ttl && !document.getElementById('tf-id').value){
-    ttl.textContent=simple?'Agregar al proyecto':'Nueva Tarea';
+    const isContent=document.getElementById('tf-type')?.value==='contenido';
+    ttl.textContent=simple?'Agregar al proyecto':(isContent?'Nuevo Contenido':'Nueva Tarea');
   }
 }
 
@@ -5729,6 +5910,7 @@ function renderWeekAnalysis(){ /* no-op */ }
 ═══════════════════════════════════════ */
 Object.assign(window,{
   rteCmd, rteSet, rteGet, initRTEs,
+  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView,
   login, logout, navigate, goBack, toggleTheme, setTheme, openAlerts,
   selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, editAreaGoodNews, delAreaGoodNews,
   createRepoArea, editRepoArea, saveRepoArea, delRepoArea, moveRepoArea,
@@ -5772,7 +5954,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-18-2';
+const APP_BUILD='2026-09-18-3';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
