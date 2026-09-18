@@ -232,6 +232,23 @@ select option{background:var(--bg3);color:var(--tx);}
 body.light select option{background:#ffffff;color:#1a1a1a;}
 body.light select{color:#1a1a1a;}
 .fi textarea{resize:vertical;min-height:64px;}
+/* Editor de texto enriquecido */
+.rte{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:var(--inp);overflow:hidden;}
+.rte:focus-within{border-color:var(--orange);box-shadow:0 0 0 4px var(--ac2);}
+body.light .rte{border-color:rgba(0,0,0,.12);}
+.rte-tb{display:flex;flex-wrap:wrap;align-items:center;gap:2px;padding:5px 6px;border-bottom:1px solid var(--bd2);background:var(--bg3);}
+.rte-b{width:26px;height:26px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--tx2);font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--font-body);transition:background .12s,color .12s;}
+.rte-b:hover{background:var(--bg5);color:var(--tx);}
+.rte-b:active{background:var(--ac2);color:var(--orange);}
+.rte-sep{width:1px;height:16px;background:var(--bd2);margin:0 3px;}
+.rte-size{height:26px;border-radius:7px;border:1px solid var(--bd2);background:var(--bg4);color:var(--tx2);font-size:11px;font-family:var(--font-body);cursor:pointer;padding:0 4px;width:auto;}
+.rte-color{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;cursor:pointer;position:relative;color:var(--tx2);font-weight:800;font-size:12px;border:1px solid transparent;}
+.rte-color:hover{background:var(--bg5);}
+.rte-color span{border-bottom:3px solid var(--orange);line-height:.9;}
+.rte-color input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none;}
+.rte-body{min-height:74px;max-height:240px;overflow-y:auto;padding:10px 13px;color:var(--tx);font-family:var(--font-body);font-size:13px;line-height:1.6;outline:none;}
+.rte-body:empty::before{content:attr(data-ph);color:var(--tx3);pointer-events:none;}
+.rte-body *{max-width:100%;}
 .login-err{font-size:11px;color:var(--red);background:var(--red2);border:1px solid var(--red3);padding:8px 12px;border-radius:8px;margin-bottom:12px;display:none;}
 .login-err.show{display:block;}
 
@@ -867,7 +884,7 @@ body.light .cbm-card{background:#fff;}
 .ppr-row{display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:9px;background:var(--card);border:1px solid var(--bd2);margin-bottom:5px;cursor:pointer;transition:all .15s;}
 .ppr-row:hover{border-color:var(--orange);}
 .ppr-row:last-child{margin-bottom:0;}
-.ppr-icon{font-size:20px;flex-shrink:0;line-height:1;display:flex;align-items:center;justify-content:center;}
+.ppr-icon{width:30px;height:30px;font-size:20px;flex-shrink:0;line-height:1;display:flex;align-items:center;justify-content:center;color:var(--tx2);}
 /* Iconos de línea reutilizables */
 .lico{width:1em;height:1em;display:inline-block;vertical-align:-.14em;flex-shrink:0;}
 .bdg .lico{width:12px;height:12px;vertical-align:-2px;margin-right:1px;}
@@ -1527,7 +1544,9 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     </div>
 
     <div class="fi"><label>Nombre</label><input type="text" id="tf-name" placeholder="Nombre"></div>
-    <div class="fi" id="tf-desc-wrap"><label>Descripción</label><textarea id="tf-desc" placeholder="Detalles, notas…"></textarea></div>
+    <div class="fi" id="tf-desc-wrap"><label>Descripción</label>
+      <div class="rte"><div class="rte-tb" data-for="tf-desc"></div><div class="rte-body" id="tf-desc" contenteditable="true" data-ph="Detalles, notas…"></div></div>
+    </div>
 
     <div class="form-row">
       <div class="fi" id="tf-proj-fi">
@@ -1580,7 +1599,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     <div id="tf-contenido-fields" style="display:none;">
       <div class="fi">
         <label>Descripción del contenido</label>
-        <textarea id="tf-content-desc" placeholder="¿De qué trata este contenido? Contexto, objetivo, formato…" style="min-height:60px;font-size:12px;"></textarea>
+        <div class="rte"><div class="rte-tb" data-for="tf-content-desc"></div><div class="rte-body" id="tf-content-desc" contenteditable="true" data-ph="¿De qué trata este contenido? Contexto, objetivo, formato…"></div></div>
       </div>
       <div class="fi">
         <label>Estado</label>
@@ -1961,6 +1980,77 @@ function lico(name){ return LINE_ICONS[name]||''; }
 function cico(item){ return (item&&item.svg&&LINE_ICONS[item.svg])?LINE_ICONS[item.svg]:(item?.icon||''); }
 // Icono de carpeta (proyectos/áreas/repos). Toma color del área si se pasa.
 function folderSvg(){ return LINE_ICONS.folder; }
+
+/* ═══ EDITOR DE TEXTO ENRIQUECIDO (negrita, subrayado, color, tamaño, alineación) ═══ */
+function rteToolbar(id){
+  return `<button type="button" class="rte-b" title="Negrita" style="font-weight:800;" onclick="rteCmd('bold','${id}')">B</button>
+    <button type="button" class="rte-b" title="Cursiva" style="font-style:italic;" onclick="rteCmd('italic','${id}')">I</button>
+    <button type="button" class="rte-b" title="Subrayar" style="text-decoration:underline;" onclick="rteCmd('underline','${id}')">U</button>
+    <span class="rte-sep"></span>
+    <select class="rte-size" title="Tamaño de texto" onchange="rteCmd('fontSize','${id}',this.value);this.selectedIndex=0;">
+      <option value="">Tamaño</option><option value="2">Pequeño</option><option value="3">Normal</option><option value="5">Grande</option><option value="6">Título</option>
+    </select>
+    <label class="rte-color" title="Color del texto"><span>A</span><input type="color" value="#ff7a00" onchange="rteCmd('foreColor','${id}',this.value)"></label>
+    <span class="rte-sep"></span>
+    <button type="button" class="rte-b" title="Alinear izquierda" onclick="rteCmd('justifyLeft','${id}')">⇤</button>
+    <button type="button" class="rte-b" title="Centrar" onclick="rteCmd('justifyCenter','${id}')">≡</button>
+    <button type="button" class="rte-b" title="Alinear derecha" onclick="rteCmd('justifyRight','${id}')">⇥</button>
+    <span class="rte-sep"></span>
+    <button type="button" class="rte-b" title="Lista" onclick="rteCmd('insertUnorderedList','${id}')">•</button>
+    <button type="button" class="rte-b" title="Quitar formato" onclick="rteCmd('removeFormat','${id}')">⨯</button>`;
+}
+function initRTEs(){
+  document.querySelectorAll('.rte-tb[data-for]').forEach(tb=>{
+    if(tb.dataset.ready) return;
+    tb.innerHTML=rteToolbar(tb.dataset.for);
+    tb.dataset.ready='1';
+    tb.addEventListener('mousedown',e=>{ if(e.target.closest('button,select,label')===null) return; if(e.target.tagName!=='INPUT'&&e.target.tagName!=='SELECT') e.preventDefault(); });
+  });
+}
+function rteCmd(cmd, id, val){
+  const ed=document.getElementById(id); if(!ed) return;
+  ed.focus();
+  try{ document.execCommand('styleWithCSS', false, true); }catch(e){}
+  try{ document.execCommand(cmd, false, val||null); }catch(e){}
+}
+function rteSet(id, html){
+  const ed=document.getElementById(id); if(!ed) return;
+  ed.innerHTML=sanitizeRich(html||'');
+}
+function rteGet(id){
+  const ed=document.getElementById(id); if(!ed) return '';
+  const clean=sanitizeRich(ed.innerHTML||'');
+  // vacío real si no hay texto ni imágenes
+  const tmp=document.createElement('div'); tmp.innerHTML=clean;
+  const txt=(tmp.textContent||'').trim();
+  return txt ? clean : '';
+}
+// Sanitiza HTML enriquecido: conserva formato básico, elimina scripts/handlers.
+function sanitizeRich(html){
+  if(!html) return '';
+  const allowed={B:1,STRONG:1,I:1,EM:1,U:1,BR:1,P:1,DIV:1,SPAN:1,FONT:1,UL:1,OL:1,LI:1};
+  const doc=new DOMParser().parseFromString('<div>'+html+'</div>','text/html');
+  const root=doc.body.firstChild;
+  const walk=(node)=>{
+    [...node.childNodes].forEach(ch=>{
+      if(ch.nodeType===1){
+        if(!allowed[ch.tagName]){ // desconocido → reemplaza por su texto
+          const t=doc.createTextNode(ch.textContent); node.replaceChild(t,ch); return;
+        }
+        // limpiar atributos peligrosos
+        [...ch.attributes].forEach(a=>{
+          const n=a.name.toLowerCase();
+          if(n==='style'){ ch.setAttribute('style', a.value.replace(/expression|javascript:|url\s*\(/gi,'')); }
+          else if(n==='color'||n==='size'||n==='face'){ /* <font> permitido */ }
+          else ch.removeAttribute(a.name);
+        });
+        walk(ch);
+      } else if(ch.nodeType===8){ node.removeChild(ch); } // comentarios
+    });
+  };
+  walk(root);
+  return root.innerHTML;
+}
 const PRIOS = {
   alta: {label:'Alta', cls:'br'},
   media:{label:'Media',cls:'by'},
@@ -2988,7 +3078,7 @@ function refreshDetailPopup(){
   const descEl=document.getElementById('tdp-desc');
   // For contenido tasks, show contentDesc as primary description
   const displayDesc=(t.taskType==='contenido'&&t.contentDesc)?t.contentDesc:(t.desc||'');
-  if(displayDesc){ descEl.textContent=displayDesc; descEl.style.display='block'; }
+  if(displayDesc){ descEl.innerHTML=sanitizeRich(displayDesc); descEl.style.display='block'; }
   else { descEl.style.display='none'; }
 
   // resources
@@ -4284,8 +4374,8 @@ function openTaskForm(taskId, projId, preDate, forceType){
     if(editType==='contenido'){ populateCalPills(currentState); populatePlatformChips(t.platforms||[]); populateContentTypePills(t.contentType||'carrusel'); }
     document.getElementById('tf-id').value            =t.id;
     document.getElementById('tf-name').value          =t.name;
-    document.getElementById('tf-desc').value          =t.desc||'';
-    document.getElementById('tf-content-desc').value  =t.contentDesc||'';
+    rteSet('tf-desc', t.desc||'');
+    rteSet('tf-content-desc', t.contentDesc||'');
     document.getElementById('tf-area').value          =t.area||'general';
     document.getElementById('tf-prio').value          =t.priority||'media';
     document.getElementById('tf-start').value         =tStart(t);
@@ -4306,7 +4396,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     populateProjSels('tf-proj', useProjId);
     document.getElementById('tf-id').value   ='';
     document.getElementById('tf-name').value ='';
-    document.getElementById('tf-desc').value ='';
+    rteSet('tf-desc','');
     // Por defecto hereda el área del proyecto donde se crea la tarea
     document.getElementById('tf-area').value =(usedProj?.area && AREAS[usedProj.area]) ? usedProj.area : 'marketing';
     document.getElementById('tf-prio').value ='media';
@@ -4314,7 +4404,7 @@ function openTaskForm(taskId, projId, preDate, forceType){
     document.getElementById('tf-end').value  =preDate||'';
     document.querySelectorAll('#tf-assign .a-chip').forEach(c=>c.classList.remove('sel'));
     document.getElementById('tf-resources').value='';
-    document.getElementById('tf-content-desc').value='';
+    rteSet('tf-content-desc','');
     _tfSubs=[];
     _tfPhotos=[]; renderTfPhotos();
     document.getElementById('tf-ttl').textContent=defaultType==='contenido'?'Nuevo Contenido':'Nueva Tarea';
@@ -4374,14 +4464,14 @@ async function saveTaskForm(){
     id: idVal||uid(),
     taskType,
     projectId:projId, name,
-    desc:     document.getElementById('tf-desc').value.trim(),
+    desc:     rteGet('tf-desc'),
     area:     document.getElementById('tf-area').value,
     priority: taskType==='contenido'?'media':(document.getElementById('tf-prio').value),
     startDate, endDate, dueDate:endDate,
     assignedUsers:assigned,
     kStatus, calStatus, taskStatus, status,
     resources:    taskType==='contenido'?(document.getElementById('tf-resources').value.trim()||null):existing?.resources||null,
-    contentDesc:  taskType==='contenido'?(document.getElementById('tf-content-desc').value.trim()||null):null,
+    contentDesc:  taskType==='contenido'?(rteGet('tf-content-desc')||null):null,
     platforms:    taskType==='contenido'?selectedPlatforms():(existing?.platforms||null),
     contentType:  taskType==='contenido'?(document.getElementById('tf-content-type').value||'carrusel'):(existing?.contentType||null),
     subtasks:     taskType==='contenido'?(existing?.subtasks||[]):[..._tfSubs],
@@ -5622,6 +5712,7 @@ function renderWeekAnalysis(){ /* no-op */ }
    WINDOW EXPORTS
 ═══════════════════════════════════════ */
 Object.assign(window,{
+  rteCmd, rteSet, rteGet, initRTEs,
   login, logout, navigate, goBack, toggleTheme, setTheme, openAlerts,
   selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, editAreaGoodNews, delAreaGoodNews,
   createRepoArea, editRepoArea, saveRepoArea, delRepoArea, moveRepoArea,
@@ -5665,7 +5756,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-17-2';
+const APP_BUILD='2026-09-17-3';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
@@ -5689,6 +5780,7 @@ async function checkForUpdate(){
   applyTheme();
   await initData();
   populateLoginUsers();
+  initRTEs(); // editores de texto enriquecido
   // Siempre pedir login al abrir el portal (no auto-entrar desde sesión guardada)
   localStorage.removeItem(LS.user);
 })();
