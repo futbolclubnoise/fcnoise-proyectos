@@ -935,18 +935,15 @@ body.light .qa-btn{background:#fff!important;border:1px solid rgba(0,0,0,.09)!im
 @media(max-width:560px){.dash-grid{grid-template-columns:1fr;}}
 /* Completadas por ciclo (mes) — tarjetas desplegables + evolución */
 .cbm-wrap{display:flex;flex-direction:column;gap:8px;}
-.cbm-card{background:linear-gradient(170deg,rgba(28,32,40,0.7),rgba(20,24,31,0.55));border:1px solid var(--glass-bd);border-radius:14px;overflow:hidden;}
-.cbm-sum{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;user-select:none;}
-.cbm-sum::-webkit-details-marker{display:none;}
-.cbm-sum::before{content:'⌄';color:var(--tx3);font-size:15px;line-height:1;transition:transform .2s;width:12px;flex-shrink:0;}
-.cbm-card[open] .cbm-sum::before{transform:rotate(180deg);}
+.cbm-card{width:100%;text-align:left;background:linear-gradient(170deg,rgba(28,32,40,0.7),rgba(20,24,31,0.55));border:1px solid var(--glass-bd);border-radius:14px;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;font-family:var(--font-body);transition:border-color .16s,transform .16s;}
+.cbm-card:hover{border-color:rgba(255,255,255,.16);transform:translateY(-1px);}
 .cbm-mon{font-family:var(--font-display);font-size:14px;letter-spacing:.04em;color:var(--tx);min-width:118px;text-transform:uppercase;}
-.cbm-bar{flex:1;height:6px;background:var(--bg5);border-radius:6px;overflow:hidden;min-width:60px;}
+.cbm-bar{flex:1;height:6px;background:var(--bg5);border-radius:6px;overflow:hidden;min-width:50px;}
 .cbm-fill{height:100%;background:var(--grn);border-radius:6px;}
 .cbm-cnt{font-family:var(--font-display);font-size:16px;color:var(--grn);min-width:30px;text-align:right;}
 .cbm-delta{font-size:10px;font-weight:700;min-width:52px;text-align:right;}
 .cbm-delta.up{color:var(--grn);}.cbm-delta.down{color:var(--red);}.cbm-delta.flat{color:var(--tx3);}
-.cbm-body{padding:2px 10px 10px;border-top:1px solid var(--bd2);}
+.cbm-arrow{width:15px;height:15px;color:var(--tx3);flex-shrink:0;}
 body.light .cbm-card{background:#fff;}
 @media(max-width:520px){.cbm-mon{min-width:0;font-size:12px;}.cbm-delta{min-width:0;}}
 .hcard-more{display:block;text-align:center;font-size:10px;font-weight:600;color:var(--tx3);padding:8px 0 2px;cursor:pointer;letter-spacing:.04em;border-top:1px solid var(--bd);margin-top:4px;transition:color .15s;}
@@ -1992,6 +1989,17 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
       <button class="btn btn-g btn-sm" onclick="closeMod('m-ops-proj')">Cerrar</button>
       <button class="btn btn-p btn-sm" id="opsp-goto-btn">Ver proyecto →</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL REVISIÓN COMPLETADAS ═══ -->
+<div class="mov" id="m-done-review">
+  <div class="modal" style="max-width:560px;">
+    <div class="mhdr">
+      <span class="mttl" id="donerev-ttl"></span>
+      <button class="mclose" onclick="closeMod('m-done-review')">✕</button>
+    </div>
+    <div id="donerev-list" class="crev-list"></div>
   </div>
 </div>
 
@@ -3119,30 +3127,48 @@ function completedByMonthHTML(done){
   const maxV=Math.max(1,...Object.keys(groups).map(k=>groups[k].length));
   const desc=[...dated].reverse();               // meses recientes primero
   if(groups['nofecha']) desc.push('nofecha');    // "Sin fecha" siempre al final
-  const CAPM=12;
-  const cards=desc.map((k,idx)=>{
-    const arr=groups[k].sort((a,b)=>(tEnd(b)||'').localeCompare(tEnd(a)||''));
-    const cnt=arr.length;
+  const cards=desc.map((k)=>{
+    const cnt=groups[k].length;
     const ascIdx=keys.indexOf(k);
     const prev=ascIdx>0?groups[keys[ascIdx-1]].length:null;
     let delta='';
     if(prev!=null){ const d=cnt-prev; const pct=prev?Math.round(d/prev*100):(cnt?100:0);
       const cls=d>0?'up':d<0?'down':'flat'; const arrw=d>0?'▲':d<0?'▼':'—';
       delta=`<span class="cbm-delta ${cls}">${arrw} ${Math.abs(pct)}%</span>`; }
-    const shown=arr.slice(0,CAPM);
-    const more=arr.length>CAPM?`<div class="hcard-more">+${arr.length-CAPM} más</div>`:'';
-    return `<details class="cbm-card"${idx===0?' open':''}>
-      <summary class="cbm-sum">
-        <span class="cbm-mon">${monthKeyLabel(k)}</span>
-        <span class="cbm-bar"><span class="cbm-fill" style="width:${Math.round(cnt/maxV*100)}%;"></span></span>
-        <span class="cbm-cnt">${cnt}</span>
-        ${delta}
-      </summary>
-      <div class="cbm-body">${shown.map(t=>taskTicketHTML(t)).join('')}${more}</div>
-    </details>`;
+    return `<button type="button" class="cbm-card" onclick="openCompletedReview('${k}')">
+      <span class="cbm-mon">${monthKeyLabel(k)}</span>
+      <span class="cbm-bar"><span class="cbm-fill" style="width:${Math.round(cnt/maxV*100)}%;"></span></span>
+      <span class="cbm-cnt">${cnt}</span>
+      ${delta}
+      <svg class="lico cbm-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </button>`;
   }).join('');
-  return `<div class="section-title">COMPLETADAS · POR CICLO <span class="bscnt">${done.length}</span></div>
+  return `<div class="section-title">COMPLETADAS · POR MES <span class="bscnt">${done.length}</span></div>
     <div class="cbm-wrap">${cards}</div>`;
+}
+// Popup de revisión de completadas de un mes
+function openCompletedReview(key){
+  const done=homeTasks().filter(t=>t.status==='done');
+  const items=done.filter(t=>{ const d=tEnd(t)||t.startDate||''; const k=d?d.slice(0,7):'nofecha'; return k===key; })
+    .sort((a,b)=>(tEnd(b)||'').localeCompare(tEnd(a)||''));
+  document.getElementById('donerev-ttl').textContent=`Completadas · ${monthKeyLabel(key)}`;
+  const fmt=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
+  const rows=items.map(t=>{
+    const proj=_projects.find(p=>p.id===t.projectId);
+    const am=AREAS[t.area]||AREAS.general;
+    const isCalItem=t.calType==='cfl'||t.calType==='fcnoise'||t.taskType==='contenido';
+    const src=isCalItem?(taskCalType(t)==='cfl'?'CFL':'FCN'):(proj?esc(proj.name):am.label);
+    const dd=tEnd(t)||t.startDate||'';
+    return `<div class="crev-row" onclick="openTaskDetail('${t.id}')">
+      <span class="crev-ico" style="color:var(--grn);">${lico('check')}</span>
+      <div class="crev-main">
+        <div class="crev-title done">${esc(t.name)}</div>
+        <div class="crev-sub"><span class="crev-status" style="color:${am.color};">${src}</span>${dd?`<span class="crev-date">${fmt(dd)}</span>`:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('donerev-list').innerHTML=rows||`<div class="empty">Sin tareas completadas.</div>`;
+  openMod('m-done-review');
 }
 
 function boardSection(label, cls, tasks){
@@ -6092,7 +6118,7 @@ function renderWeekAnalysis(){ /* no-op */ }
 ═══════════════════════════════════════ */
 Object.assign(window,{
   rteCmd, rteSet, rteGet, initRTEs, rteToggleColorPop, rteApplyHex,
-  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView, updatePlatformSummary, selectFmt, selectSt, openCalReview,
+  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView, updatePlatformSummary, selectFmt, selectSt, openCalReview, openCompletedReview,
   login, logout, navigate, goBack, toggleTheme, setTheme, openAlerts,
   selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, editAreaGoodNews, delAreaGoodNews,
   createRepoArea, editRepoArea, saveRepoArea, delRepoArea, moveRepoArea,
@@ -6136,7 +6162,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-22-1';
+const APP_BUILD='2026-09-22-2';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
