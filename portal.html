@@ -264,12 +264,15 @@ body.light .rte{border-color:rgba(0,0,0,.12);}
 .rte-sw:hover{transform:scale(1.15);}
 body.light .rte-sw{border-color:rgba(0,0,0,.18);}
 .rte-sw-custom{display:inline-flex;align-items:center;justify-content:center;overflow:hidden;background:conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);}
-.rte-colorbox{position:relative;display:inline-flex;}
-.rte-colorpop{position:absolute;top:calc(100% + 6px);right:0;z-index:60;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:8px;box-shadow:0 14px 40px rgba(0,0,0,.5);display:flex;align-items:center;gap:6px;}
-.rte-cp-native{width:32px;height:32px;padding:0;border:1px solid var(--bd2);border-radius:8px;background:none;cursor:pointer;flex-shrink:0;}
-.rte-cp-hex{width:92px;padding:7px 9px;border:1px solid var(--bd2);border-radius:8px;background:var(--inp);color:var(--tx);font-size:12px;font-family:var(--font-body);outline:none;text-transform:uppercase;}
-.rte-cp-hex:focus{border-color:var(--orange);}
-.rte-cp-save{padding:7px 13px;border:none;border-radius:8px;background:var(--orange);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);white-space:nowrap;}
+.rte-tb{position:relative;}
+.rte-colorbox{position:static;display:inline-flex;}
+.rte-colorpop{position:absolute;top:calc(100% + 8px);right:8px;z-index:60;background:var(--bg2);border:1px solid var(--bd2);border-radius:12px;padding:9px;box-shadow:0 18px 48px rgba(0,0,0,.55);display:flex;align-items:center;gap:7px;}
+body.light .rte-colorpop{background:#fff;}
+.rte-cp-native{flex:0 0 34px;width:34px;height:34px;padding:2px;border:1px solid var(--bd2);border-radius:9px;background:var(--inp);cursor:pointer;}
+.rte-cp-hex{flex:0 0 96px;width:96px;height:34px;box-sizing:border-box;padding:0 10px;border:1px solid var(--bd2);border-radius:9px;background:var(--inp);color:var(--tx);font-size:13px;font-weight:600;font-family:var(--font-body);outline:none;text-transform:uppercase;letter-spacing:.02em;}
+.rte-cp-hex:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--ac2);}
+.rte-cp-save{flex:0 0 auto;height:34px;padding:0 14px;border:none;border-radius:9px;background:var(--orange);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);white-space:nowrap;}
+.rte-cp-save:hover{filter:brightness(1.05);}
 .login-err{font-size:11px;color:var(--red);background:var(--red2);border:1px solid var(--red3);padding:8px 12px;border-radius:8px;margin-bottom:12px;display:none;}
 .login-err.show{display:block;}
 
@@ -570,6 +573,27 @@ body.light .rte-sw{border-color:rgba(0,0,0,.18);}
 .cal-no-date{margin-top:14px;padding:14px;background:var(--bg3);border-radius:var(--r);}
 
 /* ── CALENDAR CONTENT CARDS (vista tarjeta del contenido) ── */
+/* Resumen del mes (una tarjeta clicable → popup de revisión) */
+.cal-summary{margin-top:18px;background:linear-gradient(170deg,rgba(28,32,40,0.7),rgba(20,24,31,0.55));border:1px solid var(--glass-bd);border-radius:16px;padding:16px 16px 14px;cursor:pointer;transition:border-color .18s,transform .18s;}
+.cal-summary:hover{border-color:rgba(255,255,255,.16);transform:translateY(-2px);}
+body.light .cal-summary{background:#fff;}
+.cal-summary-top{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.cal-summary-cta{display:flex;align-items:center;gap:6px;justify-content:flex-end;font-size:12px;font-weight:700;color:var(--accent);}
+.cal-summary-cta .lico{width:15px;height:15px;}
+.ctype-tally-row{margin-bottom:0;}
+/* Popup de revisión */
+.crev-list{display:flex;flex-direction:column;gap:4px;max-height:62vh;overflow-y:auto;}
+.crev-row{display:flex;align-items:flex-start;gap:11px;padding:11px 10px;border-radius:11px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--bd2);}
+.crev-row:last-child{border-bottom:none;}
+.crev-row:hover{background:var(--bg4);}
+.crev-ico{flex-shrink:0;display:inline-flex;align-items:center;margin-top:1px;}
+.crev-ico .lico{width:18px;height:18px;}
+.crev-main{flex:1;min-width:0;}
+.crev-title{font-size:13px;font-weight:600;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.crev-title.done{text-decoration:line-through;color:var(--tx3);}
+.crev-sub{display:flex;align-items:center;flex-wrap:wrap;gap:5px 9px;margin-top:3px;font-size:10.5px;color:var(--tx3);}
+.crev-status{font-weight:700;letter-spacing:.02em;}
+.crev-date{font-variant-numeric:tabular-nums;}
 .cal-cards-wrap{margin-top:20px;}
 .cal-cards-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd2);}
 .cal-cards-ttl{font-family:var(--font-display);font-size:13px;letter-spacing:.08em;color:var(--tx2);flex:1;}
@@ -1971,6 +1995,21 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
   </div>
 </div>
 
+<!-- ═══ MODAL REVISIÓN CALENDARIO ═══ -->
+<div class="mov" id="m-cal-review">
+  <div class="modal" style="max-width:560px;">
+    <div class="mhdr">
+      <span class="mttl" id="calrev-ttl"></span>
+      <button class="mclose" onclick="closeMod('m-cal-review')">✕</button>
+    </div>
+    <div id="calrev-add" style="display:flex;gap:8px;margin-bottom:12px;">
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-cal-review');calAddContent('')">+ Contenido</button>
+      <button class="btn btn-g btn-sm" onclick="closeMod('m-cal-review');calAddTask('')">+ Tarea</button>
+    </div>
+    <div id="calrev-list" class="crev-list"></div>
+  </div>
+</div>
+
 <script src="seed-data.js"></script>
 <script type="module">
 import { firebaseInit, isConnected, ensureAuth,
@@ -3179,8 +3218,15 @@ function refreshDetailPopup(){
   const done=t.status==='done';
   const s=tStart(t), e=tEnd(t);
 
-  // project label
-  document.getElementById('tdp-proj-lbl').innerHTML=proj?areaSvg(proj.area)+' '+esc(proj.name):'Sin proyecto';
+  // Etiqueta superior: los ítems del calendario (contenido o clasificados) muestran la MARCA (FCN/CFL), no el proyecto
+  const isCalItem=t.calType==='cfl'||t.calType==='fcnoise'||t.taskType==='contenido';
+  if(isCalItem){
+    const brand=taskCalType(t)==='cfl'?'CFL':'FCN';
+    const bc=taskCalType(t)==='cfl'?'var(--blu)':'var(--orange)';
+    document.getElementById('tdp-proj-lbl').innerHTML=`${lico('calendar')} <span style="color:${bc};font-weight:700;">${brand}</span> · Calendario`;
+  } else {
+    document.getElementById('tdp-proj-lbl').innerHTML=proj?areaSvg(proj.area)+' '+esc(proj.name):'Sin proyecto';
+  }
 
   // title
   document.getElementById('tdp-title').textContent=t.name;
@@ -4125,46 +4171,56 @@ function renderCalendarView(){
   }).sort((a,b)=>((tEnd(a)||tStart(a))||'').localeCompare((tEnd(b)||tStart(b))||''));
 
   if(monthContent.length){
-    const fmt=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
-    const cards=monthContent.map(t=>{
-      const calCol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
-      const ct=CONTENT_TYPES[t.contentType]||CONTENT_TYPES.carrusel;
-      const done=t.status==='done';
-      const sD=tStart(t), eD=tEnd(t);
-      let datesHtml='';
-      if(sD&&eD&&sD!==eD) datesHtml=`<span class="cal-card-date">${lico('inbox')} ${fmt(sD)}</span><span class="cal-card-date">${lico('rocket')} ${fmt(eD)}</span>`;
-      else { const only=eD||sD; if(only) datesHtml=`<span class="cal-card-date">${eD?lico('rocket'):lico('inbox')} ${fmt(only)}</span>`; }
-      const avs=(t.assignedUsers||[]).slice(0,3).map(uid_=>{const u=USERS[uid_]; if(!u) return ''; const r=ROLES[u.role]; return `<div class="udot" style="background:${r.bg};color:${r.color};" title="${u.name}">${initials(u.name).charAt(0)}</div>`;}).join('');
-      const isTask=t.taskType==='tarea';
-      return `<div class="cal-card cc ${done?'done':''}" style="--c:${calCol.color};" onclick="openTaskDetail('${t.id}')">
-        <div class="cc-body">
-          <div class="cc-top">
-            <span class="cc-type">${isTask?lico('note'):cico(ct)}${isTask?'Tarea':ct.label}</span>
-            <span class="cc-status">${calCol.label}</span>
-          </div>
-          <div class="cc-title">${esc(t.name)}</div>
-          <div class="cc-foot">
-            <span class="cc-dates">${datesHtml||''}</span>
-            ${platBadgesHTML(t.platforms)?`<span class="cc-plats">${platBadgesHTML(t.platforms)}</span>`:''}
-            <span class="cal-card-avs">${avs}</span>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
     const typeCount={};
     monthContent.forEach(t=>{ if(t.taskType==='tarea'){typeCount.tarea=(typeCount.tarea||0)+1;return;} const id=CONTENT_TYPES[t.contentType]?t.contentType:'carrusel'; typeCount[id]=(typeCount[id]||0)+1; });
     const tally=Object.entries(CONTENT_TYPES).map(([id,ct])=>`<span class="ctype-tally"><span class="ctype-ico">${cico(ct)}</span>${ct.label}<b>${typeCount[id]||0}</b></span>`).join('')
       +`<span class="ctype-tally"><span class="ctype-ico">${lico('note')}</span>Tareas<b>${typeCount.tarea||0}</b></span>`;
-    h+=`<div class="cal-cards-wrap">
-      <div class="cal-cards-hdr"><span class="cal-cards-ttl">AGENDA DE ${MONTHS[calMonth].toUpperCase()}</span><span class="bscnt">${monthContent.length}</span></div>
+    h+=`<div class="cal-summary" onclick="openCalReview()">
+      <div class="cal-summary-top">
+        <span class="cal-cards-ttl">RESUMEN DE ${MONTHS[calMonth].toUpperCase()}</span>
+        <span class="bscnt">${monthContent.length}</span>
+      </div>
       <div class="ctype-tally-row">${tally}</div>
-      <div class="cal-cards-grid">${cards}</div>
+      <div class="cal-summary-cta">Revisar contenido del mes <svg class="lico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
     </div>`;
   } else {
     h+=`<div class="empty" style="margin-top:16px;"><div class="empty-ico">${lico('calendar')}</div><p>Sin contenido ni tareas en ${MONTHS[calMonth]} para ${cfg.label}.</p>${isCeo?`<button class="btn btn-p btn-sm" style="margin-top:10px;" onclick="calAddContent('')">${lico('image')} Agregar contenido</button>`:''}</div>`;
   }
   h+=`</div>`; // end cal-wrap
   document.getElementById('view-calendar-body').innerHTML=h;
+}
+
+// Popup de revisión del contenido del mes (lista compacta)
+function openCalReview(){
+  const isCeo=isAdmin();
+  const mine=t=>isSuperAdmin()||(t.assignedUsers||[]).includes(currentUser.id)||isAdmin();
+  const monthPrefix=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  const items=_tasks.filter(t=>{
+    if(!(taskCalType(t)===_calFilter && mine(t))) return false;
+    const dd=tEnd(t)||tStart(t); return dd && dd.startsWith(monthPrefix);
+  }).sort((a,b)=>((tEnd(a)||tStart(a))||'').localeCompare((tEnd(b)||tStart(b))||''));
+  const cfgLbl=_calFilter==='cfl'?'CFL':'FCN';
+  document.getElementById('calrev-ttl').textContent=`${MONTHS[calMonth]} ${calYear} · ${cfgLbl}`;
+  const fmt=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
+  const rows=items.map(t=>{
+    const calCol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
+    const isTask=t.taskType==='tarea';
+    const ct=CONTENT_TYPES[t.contentType]||CONTENT_TYPES.carrusel;
+    const eD=tEnd(t), sD=tStart(t);
+    const dstr = (sD&&eD&&sD!==eD) ? `${fmt(sD)}→${fmt(eD)}` : fmt(eD||sD);
+    const plats=platBadgesHTML(t.platforms)||'';
+    return `<div class="crev-row" onclick="openTaskDetail('${t.id}')">
+      <span class="crev-ico" style="color:${calCol.color};">${isTask?lico('note'):cico(ct)}</span>
+      <div class="crev-main">
+        <div class="crev-title ${t.status==='done'?'done':''}">${esc(t.name)}</div>
+        <div class="crev-sub"><span class="crev-status" style="color:${calCol.color};">${calCol.label}</span>${dstr?`<span class="crev-date">${dstr}</span>`:''}${plats}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('calrev-list').innerHTML=rows||`<div class="empty">Sin contenido este mes.</div>`;
+  const addBtns=document.getElementById('calrev-add');
+  if(addBtns) addBtns.style.display=isCeo?'':'none';
+  openMod('m-cal-review');
 }
 
 let _calPickDate='', _calPickProj='';
@@ -6036,7 +6092,7 @@ function renderWeekAnalysis(){ /* no-op */ }
 ═══════════════════════════════════════ */
 Object.assign(window,{
   rteCmd, rteSet, rteGet, initRTEs, rteToggleColorPop, rteApplyHex,
-  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView, updatePlatformSummary, selectFmt, selectSt,
+  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView, updatePlatformSummary, selectFmt, selectSt, openCalReview,
   login, logout, navigate, goBack, toggleTheme, setTheme, openAlerts,
   selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, editAreaGoodNews, delAreaGoodNews,
   createRepoArea, editRepoArea, saveRepoArea, delRepoArea, moveRepoArea,
@@ -6080,7 +6136,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-18-7';
+const APP_BUILD='2026-09-22-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
