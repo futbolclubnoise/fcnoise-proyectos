@@ -3926,6 +3926,29 @@ async function calDrop(e, dStr, projId){
   renderMethContent(projId,'calendario');
 }
 
+/* ── Drag & drop en el CALENDARIO GLOBAL (cambia la fecha) ── */
+function calvDragStart(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; try{e.dataTransfer.setData('text/plain',id);}catch(_){}
+  const el=e.currentTarget; if(el) setTimeout(()=>el.classList.add('dragging'),0); }
+async function calvDrop(e, dStr){
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.remove('cal-drop');
+  const id=dragId||(e.dataTransfer&&e.dataTransfer.getData('text/plain'));
+  const t=_tasks.find(x=>x.id===id);
+  dragId=null;
+  if(!t) return;
+  const s=tStart(t), en=tEnd(t);
+  if(s&&en&&s!==en){ // preserva la duración (entrega→publicación)
+    const span=Math.round((new Date(en)-new Date(s))/86400000);
+    t.startDate=dStr;
+    const nd=new Date(dStr+'T00:00:00'); nd.setDate(nd.getDate()+span);
+    t.endDate=nd.toISOString().split('T')[0]; t.dueDate=t.endDate;
+  } else {
+    t.startDate=dStr; t.endDate=dStr; t.dueDate=dStr;
+  }
+  await persistTask(t);
+  renderCalendarView();
+}
+
 /* ── Calendar ── */
 function renderCalHTML(projId){
   const today=todayStr();
@@ -4172,26 +4195,27 @@ function renderCalendarView(){
       const color=calCol.color, title=esc(t.name);
       const doneCls=t.status==='done'?'done-c':'';
       const open=`onclick="event.stopPropagation();openTaskDetail('${t.id}')"`;
+      const drag=isCeo?`draggable="true" ondragstart="calvDragStart(event,'${t.id}')" ondragend="calDragEnd(event)"`:'';
       const sD=tStart(t), eD=tEnd(t);
       const isContent=(t.taskType!=='tarea');
       if(isContent){
         const softStyle =`background:${color}1a;color:${color};border:1px solid ${color}33;`;
         const solidStyle=`background:${color};color:#fff;border:1px solid ${color};`;
         const hasBoth=sD&&eD&&sD!==eD;
-        if(hasBoth&&dStr===sD) return `<div class="cal-chip c-entrega ${doneCls}" style="${softStyle}" ${open} title="Entrega — ${title}"><span class="c-ico">${lico('inbox')}</span>${title}</div>`;
-        if(hasBoth&&dStr===eD) return `<div class="cal-chip c-publica ${doneCls}" style="${solidStyle}" ${open} title="Publicación — ${title}"><span class="c-ico">${lico('rocket')}</span>${title}</div>`;
+        if(hasBoth&&dStr===sD) return `<div class="cal-chip c-entrega ${doneCls}" ${drag} style="${softStyle}" ${open} title="Entrega — ${title}"><span class="c-ico">${lico('inbox')}</span>${title}</div>`;
+        if(hasBoth&&dStr===eD) return `<div class="cal-chip c-publica ${doneCls}" ${drag} style="${solidStyle}" ${open} title="Publicación — ${title}"><span class="c-ico">${lico('rocket')}</span>${title}</div>`;
         if(hasBoth) return '';
         const sameDay=sD&&eD&&sD===eD, isPub=eD&&dStr===eD;
         const ico=sameDay?(lico('inbox')+lico('rocket')):(isPub?lico('rocket'):lico('inbox'));
         const lbl=sameDay?'Entrega y publicación':(isPub?'Publicación':'Entrega');
-        return `<div class="cal-chip c-publica ${doneCls}" style="${solidStyle}" ${open} title="${lbl} — ${title}"><span class="c-ico">${ico}</span>${title}</div>`;
+        return `<div class="cal-chip c-publica ${doneCls}" ${drag} style="${solidStyle}" ${open} title="${lbl} — ${title}"><span class="c-ico">${ico}</span>${title}</div>`;
       }
       const baseStyle=`background:${color}22;color:${color};border:1px solid ${color}44;`;
       const isStart=(sD||eD)===dStr;
-      return `<div class="cal-chip ${doneCls} ${isStart?'':'span-day'}" style="${baseStyle}" ${open} title="${calCol.label} — ${title}">${isStart?title:'▸'}</div>`;
+      return `<div class="cal-chip ${doneCls} ${isStart?'':'span-day'}" ${drag} style="${baseStyle}" ${open} title="${calCol.label} — ${title}">${isStart?title:'▸'}</div>`;
     }).join('');
-    const clickHandler=isCeo?`onclick="calAddContent('${dStr}')"`:'';
-    h+=`<div class="cal-cell ${isToday?'today':''}" ${clickHandler}>
+    const cellHandlers=isCeo?`onclick="calAddContent('${dStr}')" ondragover="calDragOver(event)" ondragleave="calDragLeave(event)" ondrop="calvDrop(event,'${dStr}')"`:'';
+    h+=`<div class="cal-cell ${isToday?'today':''}" ${cellHandlers}>
       <div class="cal-date ${isToday?'is-today':''}">${d}</div>
       ${chips}
       ${isCeo?'<div class="cal-add-hint">+ agregar</div>':''}
@@ -6149,7 +6173,7 @@ Object.assign(window,{
   tfAddPhotos, tfRemovePhoto, tdpAddPhotos, tdpDelPhoto, openLightbox,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
-  calDragStart, calDragEnd, calDragOver, calDragLeave, calDrop,
+  calDragStart, calDragEnd, calDragOver, calDragLeave, calDrop, calvDragStart, calvDrop,
   toggleChip,
   updateTaskFormStates, updateGestionStates, syncTaskAreaToProj,
   switchTaskType,
@@ -6173,7 +6197,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-28-1';
+const APP_BUILD='2026-09-28-2';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
