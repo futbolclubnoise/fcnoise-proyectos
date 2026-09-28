@@ -401,7 +401,7 @@ body.light .rte-colorpop{background:#fff;}
 .tdp-dd summary::after{content:'⌄';color:var(--tx3);font-size:14px;line-height:1;margin-top:-4px;}
 .tdp-dd[open] summary::after{transform:rotate(180deg);margin-top:2px;}
 .tdp-dd summary.empty{color:var(--tx3);font-weight:500;}
-.tdp-dd-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20;background:var(--bg3);border:1px solid var(--bd2);border-radius:11px;padding:5px;box-shadow:0 14px 40px rgba(0,0,0,.5);max-height:230px;overflow-y:auto;}
+.tdp-dd-menu{margin-top:5px;background:var(--bg3);border:1px solid var(--bd2);border-radius:11px;padding:5px;max-height:230px;overflow-y:auto;}
 .tdp-urow{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .12s;}
 .tdp-urow:hover{background:var(--bg5);}
 .tdp-urow.on{background:var(--ac2);}
@@ -528,7 +528,7 @@ body.light .rte-colorpop{background:#fff;}
 .tf-dd summary::after{content:'⌄';color:var(--tx3);font-size:15px;line-height:1;margin-top:-4px;}
 .tf-dd[open] summary::after{transform:rotate(180deg);margin-top:2px;}
 .tf-dd summary.empty{color:var(--tx3);}
-.tf-dd-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;background:var(--bg3);border:1px solid var(--bd2);border-radius:12px;padding:5px;box-shadow:0 16px 44px rgba(0,0,0,.5);max-height:240px;overflow-y:auto;}
+.tf-dd-menu{margin-top:5px;background:var(--bg3);border:1px solid var(--bd2);border-radius:12px;padding:5px;max-height:240px;overflow-y:auto;}
 .tf-dd-row{display:flex;align-items:center;gap:9px;padding:8px 8px;border-radius:9px;cursor:pointer;transition:background .12s;}
 .tf-dd-row:hover{background:var(--bg5);}
 .tf-dd-row.on{background:var(--ac2);}
@@ -1771,16 +1771,16 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
     </div>
 
     <div class="tdp-fields">
+      <div class="tdp-field" id="tdp-states-field">
+        <div class="tdp-slbl" id="tdp-states-lbl">Estado</div>
+        <select class="tdp-select" id="tdp-states" onchange="tdpSetStateSel(this.value)"></select>
+      </div>
       <div class="tdp-field">
         <div class="tdp-slbl">Responsables</div>
         <details class="tdp-dd" id="tdp-users-dd">
           <summary id="tdp-users-sum">Asignar…</summary>
           <div class="tdp-dd-menu" id="tdp-users"></div>
         </details>
-      </div>
-      <div class="tdp-field" id="tdp-states-field">
-        <div class="tdp-slbl" id="tdp-states-lbl">Estado</div>
-        <select class="tdp-select" id="tdp-states" onchange="tdpSetStateSel(this.value)"></select>
       </div>
     </div>
 
@@ -2149,6 +2149,17 @@ function initRTEs(){
     tb.dataset.ready='1';
     tb.addEventListener('mousedown',e=>{ if(e.target.closest('button,select,label')===null) return; if(e.target.tagName!=='INPUT'&&e.target.tagName!=='SELECT') e.preventDefault(); });
   });
+}
+// Cierra cualquier desplegable <details> (responsables, plataformas, formato, estado) al hacer clic fuera de él
+let _ddAutoCloseReady=false;
+function initDropdownAutoClose(){
+  if(_ddAutoCloseReady) return; _ddAutoCloseReady=true;
+  document.addEventListener('mousedown',e=>{
+    document.querySelectorAll('details.tdp-dd[open], details.tf-dd[open]').forEach(d=>{
+      if(!d.contains(e.target)) d.open=false;
+    });
+    document.querySelectorAll('.rte-colorpop').forEach(p=>{ if(!p.hidden && !p.parentNode.contains(e.target)) p.hidden=true; });
+  }, true);
 }
 function rteCmd(cmd, id, val){
   const ed=document.getElementById(id); if(!ed) return;
@@ -6162,7 +6173,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-22-2';
+const APP_BUILD='2026-09-28-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
@@ -6187,6 +6198,7 @@ async function checkForUpdate(){
   await initData();
   populateLoginUsers();
   initRTEs(); // editores de texto enriquecido
+  initDropdownAutoClose(); // cerrar desplegables al hacer clic fuera
   // Siempre pedir login al abrir el portal (no auto-entrar desde sesión guardada)
   localStorage.removeItem(LS.user);
 })();
