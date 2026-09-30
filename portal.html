@@ -401,7 +401,7 @@ body.light .rte-colorpop{background:#fff;}
 .tdp-dd summary::after{content:'⌄';color:var(--tx3);font-size:14px;line-height:1;margin-top:-4px;}
 .tdp-dd[open] summary::after{transform:rotate(180deg);margin-top:2px;}
 .tdp-dd summary.empty{color:var(--tx3);font-weight:500;}
-.tdp-dd-menu{margin-top:5px;background:var(--bg3);border:1px solid var(--bd2);border-radius:11px;padding:5px;max-height:230px;overflow-y:auto;}
+.tdp-dd-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20;background:var(--bg3);border:1px solid var(--bd2);border-radius:11px;padding:5px;box-shadow:0 14px 40px rgba(0,0,0,.5);max-height:230px;overflow-y:auto;}
 .tdp-urow{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .12s;}
 .tdp-urow:hover{background:var(--bg5);}
 .tdp-urow.on{background:var(--ac2);}
@@ -528,7 +528,7 @@ body.light .rte-colorpop{background:#fff;}
 .tf-dd summary::after{content:'⌄';color:var(--tx3);font-size:15px;line-height:1;margin-top:-4px;}
 .tf-dd[open] summary::after{transform:rotate(180deg);margin-top:2px;}
 .tf-dd summary.empty{color:var(--tx3);}
-.tf-dd-menu{margin-top:5px;background:var(--bg3);border:1px solid var(--bd2);border-radius:12px;padding:5px;max-height:240px;overflow-y:auto;}
+.tf-dd-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;background:var(--bg3);border:1px solid var(--bd2);border-radius:12px;padding:5px;box-shadow:0 16px 44px rgba(0,0,0,.5);max-height:240px;overflow-y:auto;}
 .tf-dd-row{display:flex;align-items:center;gap:9px;padding:8px 8px;border-radius:9px;cursor:pointer;transition:background .12s;}
 .tf-dd-row:hover{background:var(--bg5);}
 .tf-dd-row.on{background:var(--ac2);}
@@ -633,7 +633,13 @@ body.light .cal-card.cc{background:#fff!important;}
 /* drag-over en celdas del calendario */
 .cal-cell.cal-drop{border-color:var(--orange)!important;background:var(--ac2)!important;box-shadow:inset 0 0 0 2px var(--orange);}
 .cal-chip[draggable]{cursor:grab;}
-.cal-chip.dragging{opacity:.4;}
+.cal-chip[data-tid]{cursor:grab;touch-action:none;}
+.cal-chip.dragging{opacity:.45;transform:scale(.97);}
+.cal-chip .c-chk{display:inline-flex;align-items:center;margin-right:3px;}
+.cal-chip .c-chk .lico{width:11px;height:11px;}
+.cal-chip.is-pub{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55);}
+.cal-tally{margin-top:16px;padding:12px 14px;border:1px solid var(--glass-bd);border-radius:14px;background:linear-gradient(170deg,rgba(28,32,40,0.6),rgba(20,24,31,0.45));}
+body.light .cal-tally{background:#fff;}
 
 /* ── PANEL ── */
 .panel{background:linear-gradient(170deg,rgba(28,32,40,0.6) 0%,rgba(20,24,31,0.5) 100%);border:1px solid var(--glass-bd);border-top-color:rgba(255,255,255,.08);border-radius:16px;padding:18px;margin-bottom:14px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--card-shadow);}
@@ -2003,20 +2009,6 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
   </div>
 </div>
 
-<!-- ═══ MODAL REVISIÓN CALENDARIO ═══ -->
-<div class="mov" id="m-cal-review">
-  <div class="modal" style="max-width:560px;">
-    <div class="mhdr">
-      <span class="mttl" id="calrev-ttl"></span>
-      <button class="mclose" onclick="closeMod('m-cal-review')">✕</button>
-    </div>
-    <div id="calrev-add" style="display:flex;gap:8px;margin-bottom:12px;">
-      <button class="btn btn-g btn-sm" onclick="closeMod('m-cal-review');calAddContent('')">+ Contenido</button>
-      <button class="btn btn-g btn-sm" onclick="closeMod('m-cal-review');calAddTask('')">+ Tarea</button>
-    </div>
-    <div id="calrev-list" class="crev-list"></div>
-  </div>
-</div>
 
 <script src="seed-data.js"></script>
 <script type="module">
@@ -2137,7 +2129,7 @@ function rteToolbar(id){
       <div class="rte-colorpop" hidden>
         <input type="color" class="rte-cp-native" value="#ff7a00" oninput="this.parentNode.querySelector('.rte-cp-hex').value=this.value;">
         <input type="text" class="rte-cp-hex" value="#ff7a00" maxlength="7" placeholder="#RRGGBB" onkeydown="if(event.key==='Enter'){event.preventDefault();rteApplyHex('${id}',this);}">
-        <button type="button" class="rte-cp-save" onclick="rteApplyHex('${id}',this)">Guardar</button>
+        <button type="button" class="rte-cp-save" onclick="rteApplyHex('${id}',this)">Aceptar</button>
       </div>
     </span></span>
     <button type="button" class="rte-b" title="Quitar formato" onclick="rteCmd('removeFormat','${id}')">⨯</button>`;
@@ -3132,7 +3124,7 @@ function monthKeyLabel(key){
 function completedByMonthHTML(done){
   if(!done.length) return '';
   const groups={};
-  done.forEach(t=>{ const d=tEnd(t)||t.startDate||''; const k=d?d.slice(0,7):'nofecha'; (groups[k]=groups[k]||[]).push(t); });
+  done.forEach(t=>{ const d=t.completedAt||tEnd(t)||t.startDate||''; const k=d?d.slice(0,7):'nofecha'; (groups[k]=groups[k]||[]).push(t); });
   const dated=Object.keys(groups).filter(k=>k!=='nofecha').sort(); // asc (evolución)
   const keys=dated.slice();
   const maxV=Math.max(1,...Object.keys(groups).map(k=>groups[k].length));
@@ -3160,8 +3152,8 @@ function completedByMonthHTML(done){
 // Popup de revisión de completadas de un mes
 function openCompletedReview(key){
   const done=homeTasks().filter(t=>t.status==='done');
-  const items=done.filter(t=>{ const d=tEnd(t)||t.startDate||''; const k=d?d.slice(0,7):'nofecha'; return k===key; })
-    .sort((a,b)=>(tEnd(b)||'').localeCompare(tEnd(a)||''));
+  const items=done.filter(t=>{ const d=t.completedAt||tEnd(t)||t.startDate||''; const k=d?d.slice(0,7):'nofecha'; return k===key; })
+    .sort((a,b)=>((b.completedAt||tEnd(b)||'')).localeCompare(a.completedAt||tEnd(a)||''));
   document.getElementById('donerev-ttl').textContent=`Completadas · ${monthKeyLabel(key)}`;
   const fmt=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
   const rows=items.map(t=>{
@@ -3169,7 +3161,7 @@ function openCompletedReview(key){
     const am=AREAS[t.area]||AREAS.general;
     const isCalItem=t.calType==='cfl'||t.calType==='fcnoise'||t.taskType==='contenido';
     const src=isCalItem?(taskCalType(t)==='cfl'?'CFL':'FCN'):(proj?esc(proj.name):am.label);
-    const dd=tEnd(t)||t.startDate||'';
+    const dd=t.completedAt||tEnd(t)||t.startDate||'';
     return `<div class="crev-row" onclick="openTaskDetail('${t.id}')">
       <span class="crev-ico" style="color:var(--grn);">${lico('check')}</span>
       <div class="crev-main">
@@ -3529,6 +3521,7 @@ function applyDoneState(t, done){
   const meth=proj?.meth||'lista';
   const ttype=t.taskType||(meth==='calendario'?'contenido':'tarea');
   t.status=done?'done':'pending';
+  t.completedAt=done?(t.completedAt||todayStr()):null; // fecha en que se completó (para agrupar)
   if(ttype==='contenido'){
     if(done) t.calStatus='publicado';
     else if(t.calStatus==='publicado') t.calStatus='aprobado';
@@ -3555,6 +3548,7 @@ async function tdpSetState(colId, type){
     t.kStatus=colId; done=colId==='cierre';
   }
   t.status=done?'done':'pending';
+  t.completedAt=done?(t.completedAt||todayStr()):null;
   await persistTask(t); // SOLO esta tarjeta (cada contenido es independiente)
   refreshDetailPopup(); onDataChange();
 }
@@ -3926,16 +3920,9 @@ async function calDrop(e, dStr, projId){
   renderMethContent(projId,'calendario');
 }
 
-/* ── Drag & drop en el CALENDARIO GLOBAL (cambia la fecha) ── */
-function calvDragStart(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; try{e.dataTransfer.setData('text/plain',id);}catch(_){}
-  const el=e.currentTarget; if(el) setTimeout(()=>el.classList.add('dragging'),0); }
-async function calvDrop(e, dStr){
-  e.preventDefault(); e.stopPropagation();
-  e.currentTarget.classList.remove('cal-drop');
-  const id=dragId||(e.dataTransfer&&e.dataTransfer.getData('text/plain'));
-  const t=_tasks.find(x=>x.id===id);
-  dragId=null;
-  if(!t) return;
+/* ── Arrastre del CALENDARIO GLOBAL con pointer events (mouse + táctil) ── */
+async function calvMoveTask(id, dStr){
+  const t=_tasks.find(x=>x.id===id); if(!t) return;
   const s=tStart(t), en=tEnd(t);
   if(s&&en&&s!==en){ // preserva la duración (entrega→publicación)
     const span=Math.round((new Date(en)-new Date(s))/86400000);
@@ -3947,6 +3934,42 @@ async function calvDrop(e, dStr){
   }
   await persistTask(t);
   renderCalendarView();
+}
+let _cdrag=null, _cdragInit=false;
+function initCalDrag(){
+  if(_cdragInit) return; _cdragInit=true;
+  document.addEventListener('pointerdown', e=>{
+    if(!isAdmin()) return;
+    const chip=e.target.closest && e.target.closest('#view-calendar .cal-chip[data-tid]');
+    if(!chip) return;
+    _cdrag={tid:chip.getAttribute('data-tid'), x0:e.clientX, y0:e.clientY, moved:false, chip};
+  });
+  document.addEventListener('pointermove', e=>{
+    if(!_cdrag) return;
+    if(!_cdrag.moved && Math.hypot(e.clientX-_cdrag.x0, e.clientY-_cdrag.y0)<6) return;
+    if(!_cdrag.moved){ _cdrag.moved=true; _cdrag.chip.classList.add('dragging'); document.body.style.userSelect='none'; }
+    e.preventDefault();
+    const el=document.elementFromPoint(e.clientX,e.clientY);
+    const cell=el&&el.closest?el.closest('#view-calendar .cal-cell[data-date]'):null;
+    document.querySelectorAll('#view-calendar .cal-cell.cal-drop').forEach(c=>c.classList.remove('cal-drop'));
+    if(cell) cell.classList.add('cal-drop');
+  }, {passive:false});
+  const end=async e=>{
+    if(!_cdrag) return;
+    const d=_cdrag; _cdrag=null; document.body.style.userSelect='';
+    document.querySelectorAll('#view-calendar .cal-cell.cal-drop').forEach(c=>c.classList.remove('cal-drop'));
+    if(d.chip) d.chip.classList.remove('dragging');
+    if(!d.moved) return; // fue un toque → deja abrir el detalle
+    // evita que el "click" posterior abra el detalle
+    const kill=ev=>{ ev.stopPropagation(); ev.preventDefault(); document.removeEventListener('click',kill,true); };
+    document.addEventListener('click',kill,true);
+    setTimeout(()=>document.removeEventListener('click',kill,true),350);
+    const el=document.elementFromPoint(e.clientX,e.clientY);
+    const cell=el&&el.closest?el.closest('#view-calendar .cal-cell[data-date]'):null;
+    if(cell){ const dStr=cell.getAttribute('data-date'); if(dStr) await calvMoveTask(d.tid, dStr); }
+  };
+  document.addEventListener('pointerup', end);
+  document.addEventListener('pointercancel', ()=>{ if(_cdrag){ _cdrag.chip.classList.remove('dragging'); _cdrag=null; document.body.style.userSelect=''; document.querySelectorAll('#view-calendar .cal-cell.cal-drop').forEach(c=>c.classList.remove('cal-drop')); } });
 }
 
 /* ── Calendar ── */
@@ -4131,7 +4154,7 @@ function marketingProjId(){
   const ps=visibleProjects().filter(x=>(x.area||'')==='marketing');
   return (ps.find(x=>/marketing/i.test(x.name||''))||ps[0])?.id||'';
 }
-function calAddContent(preDate){ openTaskForm(null, marketingProjId()||null, preDate||'','contenido',_calFilter); }
+function calAddContent(preDate){ openTaskForm(null, null, preDate||'','contenido',_calFilter); }
 function calAddTask(preDate){ openTaskForm(null, marketingProjId()||null, preDate||'','tarea',_calFilter); }
 
 function renderCalendarView(){
@@ -4195,7 +4218,9 @@ function renderCalendarView(){
       const color=calCol.color, title=esc(t.name);
       const doneCls=t.status==='done'?'done-c':'';
       const open=`onclick="event.stopPropagation();openTaskDetail('${t.id}')"`;
-      const drag=isCeo?`draggable="true" ondragstart="calvDragStart(event,'${t.id}')" ondragend="calDragEnd(event)"`:'';
+      const drag=isCeo?`data-tid="${t.id}"`:'';
+      const pub=t.calStatus==='publicado'?'is-pub':'';
+      const chk=t.calStatus==='publicado'?`<span class="c-chk">${lico('check')}</span>`:'';
       const sD=tStart(t), eD=tEnd(t);
       const isContent=(t.taskType!=='tarea');
       if(isContent){
@@ -4203,18 +4228,18 @@ function renderCalendarView(){
         const solidStyle=`background:${color};color:#fff;border:1px solid ${color};`;
         const hasBoth=sD&&eD&&sD!==eD;
         if(hasBoth&&dStr===sD) return `<div class="cal-chip c-entrega ${doneCls}" ${drag} style="${softStyle}" ${open} title="Entrega — ${title}"><span class="c-ico">${lico('inbox')}</span>${title}</div>`;
-        if(hasBoth&&dStr===eD) return `<div class="cal-chip c-publica ${doneCls}" ${drag} style="${solidStyle}" ${open} title="Publicación — ${title}"><span class="c-ico">${lico('rocket')}</span>${title}</div>`;
+        if(hasBoth&&dStr===eD) return `<div class="cal-chip c-publica ${doneCls} ${pub}" ${drag} style="${solidStyle}" ${open} title="Publicación — ${title}">${chk||`<span class="c-ico">${lico('rocket')}</span>`}${title}</div>`;
         if(hasBoth) return '';
         const sameDay=sD&&eD&&sD===eD, isPub=eD&&dStr===eD;
         const ico=sameDay?(lico('inbox')+lico('rocket')):(isPub?lico('rocket'):lico('inbox'));
         const lbl=sameDay?'Entrega y publicación':(isPub?'Publicación':'Entrega');
-        return `<div class="cal-chip c-publica ${doneCls}" ${drag} style="${solidStyle}" ${open} title="${lbl} — ${title}"><span class="c-ico">${ico}</span>${title}</div>`;
+        return `<div class="cal-chip c-publica ${doneCls} ${pub}" ${drag} style="${solidStyle}" ${open} title="${lbl} — ${title}">${chk||`<span class="c-ico">${ico}</span>`}${title}</div>`;
       }
       const baseStyle=`background:${color}22;color:${color};border:1px solid ${color}44;`;
       const isStart=(sD||eD)===dStr;
       return `<div class="cal-chip ${doneCls} ${isStart?'':'span-day'}" ${drag} style="${baseStyle}" ${open} title="${calCol.label} — ${title}">${isStart?title:'▸'}</div>`;
     }).join('');
-    const cellHandlers=isCeo?`onclick="calAddContent('${dStr}')" ondragover="calDragOver(event)" ondragleave="calDragLeave(event)" ondrop="calvDrop(event,'${dStr}')"`:'';
+    const cellHandlers=`data-date="${dStr}" ${isCeo?`onclick="calAddContent('${dStr}')"`:''}`;
     h+=`<div class="cal-cell ${isToday?'today':''}" ${cellHandlers}>
       <div class="cal-date ${isToday?'is-today':''}">${d}</div>
       ${chips}
@@ -4236,52 +4261,15 @@ function renderCalendarView(){
     monthContent.forEach(t=>{ if(t.taskType==='tarea'){typeCount.tarea=(typeCount.tarea||0)+1;return;} const id=CONTENT_TYPES[t.contentType]?t.contentType:'carrusel'; typeCount[id]=(typeCount[id]||0)+1; });
     const tally=Object.entries(CONTENT_TYPES).map(([id,ct])=>`<span class="ctype-tally"><span class="ctype-ico">${cico(ct)}</span>${ct.label}<b>${typeCount[id]||0}</b></span>`).join('')
       +`<span class="ctype-tally"><span class="ctype-ico">${lico('note')}</span>Tareas<b>${typeCount.tarea||0}</b></span>`;
-    h+=`<div class="cal-summary" onclick="openCalReview()">
-      <div class="cal-summary-top">
-        <span class="cal-cards-ttl">RESUMEN DE ${MONTHS[calMonth].toUpperCase()}</span>
-        <span class="bscnt">${monthContent.length}</span>
-      </div>
+    h+=`<div class="cal-tally">
+      <div class="cal-summary-top"><span class="cal-cards-ttl">${MONTHS[calMonth].toUpperCase()}</span><span class="bscnt">${monthContent.length}</span></div>
       <div class="ctype-tally-row">${tally}</div>
-      <div class="cal-summary-cta">Revisar contenido del mes <svg class="lico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
     </div>`;
   } else {
     h+=`<div class="empty" style="margin-top:16px;"><div class="empty-ico">${lico('calendar')}</div><p>Sin contenido ni tareas en ${MONTHS[calMonth]} para ${cfg.label}.</p>${isCeo?`<button class="btn btn-p btn-sm" style="margin-top:10px;" onclick="calAddContent('')">${lico('image')} Agregar contenido</button>`:''}</div>`;
   }
   h+=`</div>`; // end cal-wrap
   document.getElementById('view-calendar-body').innerHTML=h;
-}
-
-// Popup de revisión del contenido del mes (lista compacta)
-function openCalReview(){
-  const isCeo=isAdmin();
-  const mine=t=>isSuperAdmin()||(t.assignedUsers||[]).includes(currentUser.id)||isAdmin();
-  const monthPrefix=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
-  const items=_tasks.filter(t=>{
-    if(!(taskCalType(t)===_calFilter && mine(t))) return false;
-    const dd=tEnd(t)||tStart(t); return dd && dd.startsWith(monthPrefix);
-  }).sort((a,b)=>((tEnd(a)||tStart(a))||'').localeCompare((tEnd(b)||tStart(b))||''));
-  const cfgLbl=_calFilter==='cfl'?'CFL':'FCN';
-  document.getElementById('calrev-ttl').textContent=`${MONTHS[calMonth]} ${calYear} · ${cfgLbl}`;
-  const fmt=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
-  const rows=items.map(t=>{
-    const calCol=CAL_COLS.find(c=>c.id===(t.calStatus||'idea'))||CAL_COLS[0];
-    const isTask=t.taskType==='tarea';
-    const ct=CONTENT_TYPES[t.contentType]||CONTENT_TYPES.carrusel;
-    const eD=tEnd(t), sD=tStart(t);
-    const dstr = (sD&&eD&&sD!==eD) ? `${fmt(sD)}→${fmt(eD)}` : fmt(eD||sD);
-    const plats=platBadgesHTML(t.platforms)||'';
-    return `<div class="crev-row" onclick="openTaskDetail('${t.id}')">
-      <span class="crev-ico" style="color:${calCol.color};">${isTask?lico('note'):cico(ct)}</span>
-      <div class="crev-main">
-        <div class="crev-title ${t.status==='done'?'done':''}">${esc(t.name)}</div>
-        <div class="crev-sub"><span class="crev-status" style="color:${calCol.color};">${calCol.label}</span>${dstr?`<span class="crev-date">${dstr}</span>`:''}${plats}</div>
-      </div>
-    </div>`;
-  }).join('');
-  document.getElementById('calrev-list').innerHTML=rows||`<div class="empty">Sin contenido este mes.</div>`;
-  const addBtns=document.getElementById('calrev-add');
-  if(addBtns) addBtns.style.display=isCeo?'':'none';
-  openMod('m-cal-review');
 }
 
 let _calPickDate='', _calPickProj='';
@@ -4871,11 +4859,13 @@ async function saveTaskForm(){
   const idVal=document.getElementById('tf-id').value;
   const name=document.getElementById('tf-name').value.trim();
   if(!name) return alert('Nombre requerido.');
-  const projId=_taskFromProjId||document.getElementById('tf-proj').value;
-  if(!projId) return alert('Selecciona un proyecto.');
-  const proj=_projects.find(p=>p.id===projId);
-  const meth=proj?.meth||'lista';
   const taskType=document.getElementById('tf-type').value||'tarea';
+  // El contenido NO va en un proyecto (los proyectos son solo para tareas). Vive en el calendario por marca (calType).
+  const projId=taskType==='contenido' ? (_taskFromProjId||null)
+             : (_taskFromProjId||document.getElementById('tf-proj').value);
+  if(taskType!=='contenido' && !projId) return alert('Selecciona un proyecto.');
+  const proj=projId?_projects.find(p=>p.id===projId):null;
+  const meth=proj?.meth||'lista';
   const assigned=[...document.querySelectorAll('#tf-assign .a-chip.sel')].map(c=>c.dataset.value);
   const startDate=document.getElementById('tf-start').value;
   const endDate  =document.getElementById('tf-end').value;
@@ -6153,7 +6143,7 @@ function renderWeekAnalysis(){ /* no-op */ }
 ═══════════════════════════════════════ */
 Object.assign(window,{
   rteCmd, rteSet, rteGet, initRTEs, rteToggleColorPop, rteApplyHex,
-  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView, updatePlatformSummary, selectFmt, selectSt, openCalReview, openCompletedReview,
+  setCalFilter, calViewNav, calAddContent, calAddTask, renderCalendarView, updatePlatformSummary, selectFmt, selectSt, openCompletedReview,
   login, logout, navigate, goBack, toggleTheme, setTheme, openAlerts,
   selectPulseArea, selectPulsePerson, editAreaGoals, saveAreaGoals, addGoalDraft, removeGoalDraft, updateGoalDraftText, setGoalDraftStatus, addAreaGoodNews, editAreaGoodNews, delAreaGoodNews,
   createRepoArea, editRepoArea, saveRepoArea, delRepoArea, moveRepoArea,
@@ -6173,7 +6163,7 @@ Object.assign(window,{
   tfAddPhotos, tfRemovePhoto, tdpAddPhotos, tdpDelPhoto, openLightbox,
   calNav, calDayClick,
   kbDragStart, kbDragEnd, kbDragOver, kbDragLeave, kbDrop, moveKbTask,
-  calDragStart, calDragEnd, calDragOver, calDragLeave, calDrop, calvDragStart, calvDrop,
+  calDragStart, calDragEnd, calDragOver, calDragLeave, calDrop,
   toggleChip,
   updateTaskFormStates, updateGestionStates, syncTaskAreaToProj,
   switchTaskType,
@@ -6197,7 +6187,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-09-28-2';
+const APP_BUILD='2026-09-30-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
@@ -6223,6 +6213,7 @@ async function checkForUpdate(){
   populateLoginUsers();
   initRTEs(); // editores de texto enriquecido
   initDropdownAutoClose(); // cerrar desplegables al hacer clic fuera
+  initCalDrag(); // arrastre del calendario (mouse + tactil)
   // Siempre pedir login al abrir el portal (no auto-entrar desde sesión guardada)
   localStorage.removeItem(LS.user);
 })();
