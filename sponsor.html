@@ -402,36 +402,41 @@ function renderAdmin(){
   if(selSponsor&&_sponsors[selSponsor]) h+=renderDash(selSponsor,true);
   return h;
 }
-// ── Gráfico semanal (SVG): barras con degradado, grilla, promedio y máximo ──
-function niceMax(v){ v=Math.max(1,v); const p=Math.pow(10,Math.floor(Math.log10(v))); const n=v/p; let m; if(n<=1)m=1;else if(n<=2)m=2;else if(n<=2.5)m=2.5;else if(n<=5)m=5;else m=10; return m*p; }
+// ── Gráfico semanal (SVG): línea + área con puntos y último destacado ──
 function wkChartSVG(weeks, vals, hex){
   const n=weeks.length;
-  const colW=48, padT=22, padB=22, chartH=128, padL=6, padR=8;
-  const w=padL+padR+n*colW, H=padT+chartH+padB;
-  const max=niceMax(Math.max(...vals,0));
-  const peak=Math.max(...vals,0);
-  const sum=vals.reduce((a,b)=>a+b,0), avg=n?sum/n:0;
-  const cx=i=>padL+i*colW+colW/2;
-  const barW=Math.min(24,colW*0.5);
-  const base=padT+chartH;
+  const padT=20, padB=24, chartH=130, padL=36, padR=18;
+  const gap = n>1 ? Math.max(46, Math.min(86, Math.round(300/(n-1)))) : 0;
+  const innerW = n>1 ? gap*(n-1) : 150;
+  const w=padL+padR+innerW, H=padT+chartH+padB, base=padT+chartH;
+  // escala con holgura arriba/abajo para que la variación se vea (como línea de tendencia)
+  let lo=Math.min(...vals), hi=Math.max(...vals);
+  if(!isFinite(lo)) lo=0; if(!isFinite(hi)) hi=0;
+  if(hi===lo){ hi=lo+(lo?lo*0.1:1); }
+  const padv=(hi-lo)*0.14; let yMax=hi+padv, yMin=Math.max(0,lo-padv);
+  if(yMax===yMin) yMax=yMin+1;
   const uid=hex.replace('#','');
-  let grid='';
-  [0,.25,.5,.75,1].forEach(f=>{ const gy=padT+chartH*(1-f); grid+=`<line x1="${padL}" y1="${gy}" x2="${w-padR}" y2="${gy}" class="wkc-grid"/>`; if(f>0) grid+=`<text x="${padL}" y="${gy-3}" class="wkc-gtxt">${nfmt(Math.round(max*f))}</text>`; });
-  const ay=padT+chartH*(1-avg/max);
-  const avgLine = (n>1 && avg>0) ? `<line x1="${padL}" y1="${ay}" x2="${w-padR}" y2="${ay}" class="wkc-avg"/><text x="${w-padR}" y="${ay-4}" class="wkc-avgtxt" text-anchor="end">${t('avg')} ${nfmt(Math.round(avg))}</text>` : '';
-  let bars='';
+  const cx=i=> n>1 ? padL+i*gap : padL+innerW/2;
+  const cy=v=> padT+chartH*(1-(v-yMin)/(yMax-yMin));
+  // grilla + etiquetas Y (omite etiqueta repetida en rangos enteros pequeños)
+  let grid='', lastLbl=null;
+  for(let i=0;i<=4;i++){ const gy=padT+chartH*(1-i/4), gv=yMin+(yMax-yMin)*i/4; grid+=`<line x1="${padL}" y1="${gy}" x2="${w-padR}" y2="${gy}" class="wkc-grid"/>`; const lbl=nfmt(Math.round(gv)); if(lbl!==lastLbl){ grid+=`<text x="${padL-6}" y="${gy+3}" class="wkc-gtxt" text-anchor="end">${lbl}</text>`; lastLbl=lbl; } }
+  const pts=vals.map((v,i)=>[cx(i),cy(v)]);
+  const linePath = pts.map((p,i)=>`${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const areaPath = n>1 ? `${linePath} L${(w-padR).toFixed(1)},${base} L${padL.toFixed(1)},${base} Z` : '';
+  let dots='', labels='', xlbls='';
   weeks.forEach((wd,i)=>{
-    const v=vals[i], bh=max>0?chartH*(v/max):0, bx=cx(i)-barW/2, by=base-bh;
-    const r=Math.max(0,Math.min(6,barW/2,bh)), isPk=v===peak&&peak>0;
-    const path=bh<=0 ? `M${bx},${base} h${barW}` :
-      `M${bx},${base} L${bx},${by+r} Q${bx},${by} ${bx+r},${by} L${bx+barW-r},${by} Q${bx+barW},${by} ${bx+barW},${by+r} L${bx+barW},${base} Z`;
-    bars+=`<path d="${path}" fill="url(#wg_${uid})" opacity="${isPk?1:.68}"/>`;
-    if(v>0) bars+=`<text x="${cx(i)}" y="${by-6}" class="wkc-val${isPk?' pk':''}" text-anchor="middle">${nfmt(v)}</text>`;
+    const [x,y]=pts[i], isLast=i===n-1;
+    if(isLast) dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="11" fill="${hex}" opacity=".16"/>`;
+    dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${isLast?6:4}" fill="${hex}" stroke="#fff" stroke-width="${isLast?2.4:2}"/>`;
+    labels+=`<text x="${x.toFixed(1)}" y="${(y-(isLast?13:10)).toFixed(1)}" class="wkc-val${isLast?' pk':''}" text-anchor="middle">${nfmt(vals[i])}</text>`;
     const [,mm,dd]=wd.split('-');
-    bars+=`<text x="${cx(i)}" y="${base+15}" class="wkc-x" text-anchor="middle">${dd}/${mm}</text>`;
+    xlbls+=`<text x="${x.toFixed(1)}" y="${base+16}" class="wkc-x" text-anchor="middle">${dd}/${mm}</text>`;
   });
-  const grad=`<linearGradient id="wg_${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${hex}"/><stop offset="1" stop-color="${hex}" stop-opacity=".35"/></linearGradient>`;
-  return `<svg class="wkc-svg" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}"><defs>${grad}</defs>${grid}${avgLine}${bars}</svg>`;
+  const grad=`<linearGradient id="wa_${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${hex}" stop-opacity=".26"/><stop offset="1" stop-color="${hex}" stop-opacity=".02"/></linearGradient>`;
+  const area = areaPath ? `<path d="${areaPath}" fill="url(#wa_${uid})"/>` : '';
+  const line = n>1 ? `<path d="${linePath}" fill="none" stroke="${hex}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>` : '';
+  return `<svg class="wkc-svg" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}"><defs>${grad}</defs>${grid}${area}${line}${dots}${labels}${xlbls}</svg>`;
 }
 function wkMetricBlock(weeks, vals, label, hex){
   const total=vals.reduce((a,b)=>a+b,0);
