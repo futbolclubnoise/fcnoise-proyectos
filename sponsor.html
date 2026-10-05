@@ -129,17 +129,27 @@ option{background:#fff;color:var(--tx);}
 .cmp-pills{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
 .cmp-pill{padding:7px 13px;border-radius:20px;background:var(--inp);border:1px solid var(--bd);color:var(--tx2);font-size:12px;font-weight:700;}
 .cmp-pill.on{background:var(--tx);border-color:var(--tx);color:#fff;}
-/* Gráfico comparativo semana a semana (small multiples) */
-.wc-metric{margin-bottom:18px;}
-.wc-metric:last-child{margin-bottom:0;}
-.wc-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:10px;letter-spacing:.02em;}
-.wc-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
-.wc-bars{display:flex;align-items:flex-end;gap:8px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
-.wc-col{flex:1 0 34px;min-width:34px;display:flex;flex-direction:column;align-items:center;gap:5px;}
-.wc-cap{font-size:10px;font-weight:700;color:var(--tx2);font-variant-numeric:tabular-nums;white-space:nowrap;}
-.wc-bwrap{width:100%;height:90px;display:flex;align-items:flex-end;justify-content:center;}
-.wc-bar{width:70%;max-width:26px;border-radius:6px 6px 3px 3px;min-height:2px;transition:height .3s cubic-bezier(.2,.7,.2,1);}
-.wc-wk{font-size:9.5px;color:var(--tx3);font-weight:600;white-space:nowrap;}
+/* Gráfico comparativo semana a semana (SVG) */
+.wkc-range{margin-left:auto;font-size:11px;font-weight:700;color:var(--tx3);background:var(--inp);border:1px solid var(--bd2);padding:3px 9px;border-radius:20px;}
+.wkc{margin-bottom:20px;}
+.wkc:last-child{margin-bottom:0;}
+.wkc-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.wkc-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.wkc-lbl{font-size:12px;font-weight:700;color:var(--tx2);letter-spacing:.02em;}
+.wkc-total{font-family:var(--font-display);font-size:19px;line-height:1;letter-spacing:.02em;}
+.wkc-delta{margin-left:auto;font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.wkc-delta.up{color:var(--grn);background:rgba(31,170,85,.12);}
+.wkc-delta.down{color:var(--red);background:rgba(229,72,77,.12);}
+.wkc-delta.flat{color:var(--tx3);background:var(--inp);}
+.wkc-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
+.wkc-svg{display:block;}
+.wkc-grid{stroke:var(--bd2);stroke-width:1;}
+.wkc-gtxt{fill:var(--tx3);font-size:8px;font-weight:600;font-family:var(--font-body);}
+.wkc-avg{stroke:var(--tx3);stroke-width:1;stroke-dasharray:3 3;opacity:.55;}
+.wkc-avgtxt{fill:var(--tx3);font-size:8.5px;font-weight:700;font-family:var(--font-body);}
+.wkc-val{fill:var(--tx2);font-size:9.5px;font-weight:700;font-family:var(--font-body);font-variant-numeric:tabular-nums;}
+.wkc-val.pk{fill:var(--tx);font-weight:800;}
+.wkc-x{fill:var(--tx3);font-size:9px;font-weight:600;font-family:var(--font-body);}
 
 .mov{position:fixed;inset:0;background:rgba(20,25,40,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(5px);}
 .mov.open{opacity:1;pointer-events:all;}
@@ -160,8 +170,9 @@ option{background:#fff;color:var(--tx);}
   .bgfx,.langsw,.back-hub,.tb-back,.sync,.tb-role,.no-print,.btn-o,.btn-p,.icobtn,.btn-del,.pub-actions,.pub-link,.card-hdr .btn,.cyc-hdr .btn{display:none!important;}
   .topbar{position:static!important;background:#fff!important;border-bottom:1px solid var(--bd)!important;padding:6px 0!important;}
   .wrap{max-width:100%!important;padding:0!important;}
-  .card,.cyc,.pub,.wc-metric,.stats{break-inside:avoid;}
-  .wc-bars{overflow:visible!important;flex-wrap:wrap;}
+  .card,.cyc,.pub,.wkc,.stats{break-inside:avoid;}
+  .wkc-scroll{overflow:visible!important;}
+  .wkc-svg{max-width:100%;height:auto;}
   .sp-item{display:none!important;} /* la lista de selección del admin no se imprime */
 }
 </style>
@@ -283,7 +294,7 @@ const T={
     totalViews:'Visualizaciones totales',totalLikes:'Me gusta totales',totalPubs:'Publicaciones',
     createCycle:'+ Crear ciclo',noCycles:'Sin ciclos. Crea el primero (un mes).',addPub:'+ Publicación',
     reachTile:'Alcance de la cuenta',viewsTile:'Visualizaciones',likesTile:'Me gusta',creativesTile:'Creativos',noPubsCycle:'Sin publicaciones en este ciclo.',
-    growth:'Crecimiento mensual · Alcance de la cuenta',report:'Reporte comparativo por ciclo',weekReport:'Comparativo semana a semana',week:'Semana',podate:'Fecha',pdf:'Descargar PDF',noData:'Sin datos.',notitle:'(sin título)',
+    growth:'Crecimiento mensual · Alcance de la cuenta',report:'Reporte comparativo por ciclo',weekReport:'Comparativo semana a semana',week:'Semana',weeks:'semanas',podate:'Fecha',pdf:'Descargar PDF',noData:'Sin datos.',notitle:'(sin título)',avg:'Prom.',peak:'Máx.',total:'Total',
     newSp:'Nuevo Sponsor',editSp:'Editar Sponsor',spName:'Nombre del sponsor',spPass:'Contraseña',cancel:'Cancelar',save:'Guardar',
     newCy:'Nuevo Ciclo',editCy:'Editar Ciclo',month:'Mes',reachField:'Alcance de la cuenta (impacto a la marca)',
     newPo:'Nueva Publicación',editPo:'Editar Publicación',ctype:'Tipo de contenido',title:'Título',views:'Visualizaciones',likes:'Me gusta',link:'Link',
@@ -295,7 +306,7 @@ const T={
     totalViews:'Total views',totalLikes:'Total likes',totalPubs:'Posts',
     createCycle:'+ New cycle',noCycles:'No cycles yet. Create the first one (a month).',addPub:'+ New post',
     reachTile:'Account reach',viewsTile:'Views',likesTile:'Likes',creativesTile:'Creatives',noPubsCycle:'No posts in this cycle.',
-    growth:'Monthly growth · Account reach',report:'Comparative report · by cycle',weekReport:'Week-by-week comparison',week:'Week',podate:'Date',pdf:'Download PDF',noData:'No data.',notitle:'(untitled)',
+    growth:'Monthly growth · Account reach',report:'Comparative report · by cycle',weekReport:'Week-by-week comparison',week:'Week',weeks:'weeks',podate:'Date',pdf:'Download PDF',noData:'No data.',notitle:'(untitled)',avg:'Avg.',peak:'Peak',total:'Total',
     newSp:'New Sponsor',editSp:'Edit Sponsor',spName:'Sponsor name',spPass:'Password',cancel:'Cancel',save:'Save',
     newCy:'New Cycle',editCy:'Edit Cycle',month:'Month',reachField:'Account reach (brand impact)',
     newPo:'New Post',editPo:'Edit Post',ctype:'Content type',title:'Title',views:'Views',likes:'Likes',link:'Link',
@@ -391,6 +402,51 @@ function renderAdmin(){
   if(selSponsor&&_sponsors[selSponsor]) h+=renderDash(selSponsor,true);
   return h;
 }
+// ── Gráfico semanal (SVG): barras con degradado, grilla, promedio y máximo ──
+function niceMax(v){ v=Math.max(1,v); const p=Math.pow(10,Math.floor(Math.log10(v))); const n=v/p; let m; if(n<=1)m=1;else if(n<=2)m=2;else if(n<=2.5)m=2.5;else if(n<=5)m=5;else m=10; return m*p; }
+function wkChartSVG(weeks, vals, hex){
+  const n=weeks.length;
+  const colW=48, padT=22, padB=22, chartH=128, padL=6, padR=8;
+  const w=padL+padR+n*colW, H=padT+chartH+padB;
+  const max=niceMax(Math.max(...vals,0));
+  const peak=Math.max(...vals,0);
+  const sum=vals.reduce((a,b)=>a+b,0), avg=n?sum/n:0;
+  const cx=i=>padL+i*colW+colW/2;
+  const barW=Math.min(24,colW*0.5);
+  const base=padT+chartH;
+  const uid=hex.replace('#','');
+  let grid='';
+  [0,.25,.5,.75,1].forEach(f=>{ const gy=padT+chartH*(1-f); grid+=`<line x1="${padL}" y1="${gy}" x2="${w-padR}" y2="${gy}" class="wkc-grid"/>`; if(f>0) grid+=`<text x="${padL}" y="${gy-3}" class="wkc-gtxt">${nfmt(Math.round(max*f))}</text>`; });
+  const ay=padT+chartH*(1-avg/max);
+  const avgLine = (n>1 && avg>0) ? `<line x1="${padL}" y1="${ay}" x2="${w-padR}" y2="${ay}" class="wkc-avg"/><text x="${w-padR}" y="${ay-4}" class="wkc-avgtxt" text-anchor="end">${t('avg')} ${nfmt(Math.round(avg))}</text>` : '';
+  let bars='';
+  weeks.forEach((wd,i)=>{
+    const v=vals[i], bh=max>0?chartH*(v/max):0, bx=cx(i)-barW/2, by=base-bh;
+    const r=Math.max(0,Math.min(6,barW/2,bh)), isPk=v===peak&&peak>0;
+    const path=bh<=0 ? `M${bx},${base} h${barW}` :
+      `M${bx},${base} L${bx},${by+r} Q${bx},${by} ${bx+r},${by} L${bx+barW-r},${by} Q${bx+barW},${by} ${bx+barW},${by+r} L${bx+barW},${base} Z`;
+    bars+=`<path d="${path}" fill="url(#wg_${uid})" opacity="${isPk?1:.68}"/>`;
+    if(v>0) bars+=`<text x="${cx(i)}" y="${by-6}" class="wkc-val${isPk?' pk':''}" text-anchor="middle">${nfmt(v)}</text>`;
+    const [,mm,dd]=wd.split('-');
+    bars+=`<text x="${cx(i)}" y="${base+15}" class="wkc-x" text-anchor="middle">${dd}/${mm}</text>`;
+  });
+  const grad=`<linearGradient id="wg_${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${hex}"/><stop offset="1" stop-color="${hex}" stop-opacity=".35"/></linearGradient>`;
+  return `<svg class="wkc-svg" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}"><defs>${grad}</defs>${grid}${avgLine}${bars}</svg>`;
+}
+function wkMetricBlock(weeks, vals, label, hex){
+  const total=vals.reduce((a,b)=>a+b,0);
+  const first=vals[0], last=vals[vals.length-1];
+  let delta='';
+  if(weeks.length>1){
+    let d=0; if(first>0) d=Math.round((last-first)/first*100); else if(last>0) d=100;
+    const cls=d>0?'up':d<0?'down':'flat', sym=d>0?'▲':d<0?'▼':'•';
+    delta=`<span class="wkc-delta ${cls}">${sym} ${Math.abs(d)}%</span>`;
+  }
+  return `<div class="wkc">
+    <div class="wkc-head"><span class="wkc-dot" style="background:${hex};"></span><span class="wkc-lbl">${label}</span><span class="wkc-total" style="color:${hex};">${nfmt(total)}</span>${delta}</div>
+    <div class="wkc-scroll">${wkChartSVG(weeks, vals, hex)}</div>
+  </div>`;
+}
 function renderDash(sid,admin){
   const s=_sponsors[sid];
   if(!s) return `<div class="empty">${admin?t('pickSp'):''}</div>`;
@@ -415,31 +471,15 @@ function renderDash(sid,admin){
   const wk={};
   allPosts.forEach(p=>{ const d=p.date||((postMonth(p)||thisMonth())+'-01'); const w=weekStart(d); if(!w) return; (wk[w]=wk[w]||{v:0,l:0,c:0}); wk[w].v+=Number(p.views||0); wk[w].l+=Number(p.likes||0); wk[w].c+=1; });
   const weeks=Object.keys(wk).sort();
-  h+=`<div class="card"><div class="card-hdr"><span class="card-ttl">${t('weekReport').toUpperCase()}</span></div>`;
+  h+=`<div class="card"><div class="card-hdr"><span class="card-ttl">${t('weekReport').toUpperCase()}</span>${weeks.length?`<span class="wkc-range">${weeks.length} ${t('weeks')}</span>`:''}</div>`;
   if(!weeks.length){ h+=`<div class="empty">${t('noData')}</div>`; }
   else {
     const series=[
-      {key:'v',lbl:t('viewsTile'),color:'var(--blu)'},
-      {key:'l',lbl:t('likesTile'),color:'var(--red)'},
-      {key:'c',lbl:t('creativesTile'),color:'var(--orange)'},
+      {key:'v',lbl:t('viewsTile'),hex:'#2f74e6'},
+      {key:'l',lbl:t('likesTile'),hex:'#e5484d'},
+      {key:'c',lbl:t('creativesTile'),hex:'#ff7a00'},
     ];
-    h+=series.map(s=>{
-      const vals=weeks.map(w=>wk[w][s.key]);
-      const max=Math.max(1,...vals);
-      const bars=weeks.map((w,i)=>{
-        const val=vals[i]; const hp=Math.max(val>0?6:0,Math.round(val/max*100));
-        const [yy,mm,dd]=w.split('-');
-        return `<div class="wc-col" title="${t('week')} ${dd}/${mm}: ${nfmt(val)}">
-          <div class="wc-cap">${nfmt(val)}</div>
-          <div class="wc-bwrap"><div class="wc-bar" style="height:${hp}%;background:${s.color};"></div></div>
-          <div class="wc-wk">${dd}/${mm}</div>
-        </div>`;
-      }).join('');
-      return `<div class="wc-metric">
-        <div class="wc-title"><span class="wc-dot" style="background:${s.color};"></span>${s.lbl}</div>
-        <div class="wc-bars">${bars}</div>
-      </div>`;
-    }).join('');
+    h+=series.map(s=>wkMetricBlock(weeks, weeks.map(w=>wk[w][s.key]), s.lbl, s.hex)).join('');
   }
   h+=`</div>`;
 
