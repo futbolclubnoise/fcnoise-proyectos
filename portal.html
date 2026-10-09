@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0a0a">
+<script>/* Ajusta el lienzo al tema guardado ANTES del primer pintado (en <head>) para que Chrome no muestre un fotograma blanco (ni oscuro para usuarios en claro) al cargar/navegar. */try{var _L=localStorage.getItem('fcn_theme')==='light',_D=document.documentElement;_D.style.colorScheme=_L?'light':'dark';_D.style.background=_L?'#f2f2f7':'#0a0a0a';}catch(e){}</script>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -167,6 +170,7 @@ body.light .pdh-chips .bdg{border-color:rgba(0,0,0,.1)!important;}
 body.light .section-sep{background:rgba(0,0,0,.08)!important;}
 
 *{box-sizing:border-box;margin:0;padding:0;}
+html{background:var(--black);}
 body{font-family:var(--font-body);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;transition:background .25s,color .25s;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,122,0,.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
 #screen-login{position:relative;z-index:1;}
@@ -1166,7 +1170,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
 </style>
 </head>
 <body>
-<script>/* Aplica el tema guardado ANTES del primer pintado para evitar el parpadeo oscuro→claro (notorio en Chrome). */try{if(localStorage.getItem('fcn_theme')==='light')document.body.classList.add('light');}catch(e){}</script>
+<script>/* Tema guardado + fondo del lienzo ANTES del primer pintado: elimina el flash BLANCO de Chrome al cargar/navegar. */try{var _l=localStorage.getItem('fcn_theme')==='light';if(_l)document.body.classList.add('light');var de=document.documentElement;de.style.background=_l?'#f2f2f7':'#0a0a0a';de.style.colorScheme=_l?'light':'dark';}catch(e){}</script>
 
 <!-- ═══ LOGIN ═══ -->
 <div id="screen-login">
@@ -6190,7 +6194,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-10-09-1';
+const APP_BUILD='2026-10-09-2';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
