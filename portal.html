@@ -172,12 +172,12 @@ body.light .section-sep{background:rgba(0,0,0,.08)!important;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html{background:var(--black);}
 body{font-family:var(--font-body);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;transition:background .25s,color .25s;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,122,0,.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,122,0,.04) 0%,transparent 70%);pointer-events:none;z-index:0;transform:translateZ(0);will-change:transform;}
 #screen-login{position:relative;z-index:1;}
 #screen-app{position:relative;z-index:1;display:flex;align-items:flex-start;}
 
 /* ── NAV (panel lateral izquierdo) ── */
-.nav{width:214px;flex-shrink:0;min-height:100dvh;height:100dvh;background:rgba(8,10,16,0.92);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:stretch;padding:16px 12px;gap:6px;position:sticky;top:0;z-index:100;overflow-y:auto;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);}
+.nav{width:214px;flex-shrink:0;min-height:100dvh;height:100dvh;background:rgba(8,10,16,0.97);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:stretch;padding:16px 12px;gap:6px;position:sticky;top:0;z-index:100;overflow-y:auto;}
 .nav-back{flex-shrink:0;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--tx2);text-decoration:none;background:var(--bg3);border:1px solid var(--bd2);transition:background .15s,color .15s;}
 .nav-back:hover{background:var(--bg4);color:var(--accent);}
 .nav-brand{flex-shrink:0;line-height:1;padding:2px 4px 8px;display:flex;align-items:center;}
@@ -509,6 +509,8 @@ body.light .rte-colorpop{background:#fff;}
 .cal-cell.today{border-color:var(--orange);}
 .cal-cell.empty{background:transparent;cursor:default;}
 .cal-cell.empty:hover{border-color:transparent;}
+/* Mientras se hace scroll, desactiva hover del calendario: evita repintados por :hover frame a frame (scroll a tirones en Chrome) */
+body.is-scrolling .cal-cell,body.is-scrolling .cal-chip,body.is-scrolling .cal-card{pointer-events:none;}
 .cal-date{font-size:10px;font-weight:700;color:var(--tx3);margin-bottom:4px;}
 .cal-date.is-today{background:var(--orange);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
 .cal-chip{font-size:9px;font-weight:600;padding:2px 6px;border-radius:5px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;transition:opacity .18s;}
@@ -6194,7 +6196,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-10-09-2';
+const APP_BUILD='2026-10-09-3';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
@@ -6224,6 +6226,9 @@ async function checkForUpdate(){
   // Siempre pedir login al abrir el portal (no auto-entrar desde sesión guardada)
   localStorage.removeItem(LS.user);
 })();
+/* Pausa el hover durante el scroll (clase body.is-scrolling) para un scroll fluido en Chrome */
+(()=>{ let t; const on=()=>{ const b=document.body; if(!b) return; b.classList.add('is-scrolling'); clearTimeout(t); t=setTimeout(()=>b.classList.remove('is-scrolling'),140); };
+  addEventListener('scroll', on, {passive:true}); addEventListener('wheel', on, {passive:true}); addEventListener('touchmove', on, {passive:true}); })();
 </script>
 </body>
 </html>
