@@ -1166,6 +1166,7 @@ body.light .pw-ids-hdr:hover{background:rgba(0,0,0,.02);}
 </style>
 </head>
 <body>
+<script>/* Aplica el tema guardado ANTES del primer pintado para evitar el parpadeo oscuro→claro (notorio en Chrome). */try{if(localStorage.getItem('fcn_theme')==='light')document.body.classList.add('light');}catch(e){}</script>
 
 <!-- ═══ LOGIN ═══ -->
 <div id="screen-login">
@@ -6189,7 +6190,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-10-05-1';
+const APP_BUILD='2026-10-09-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
