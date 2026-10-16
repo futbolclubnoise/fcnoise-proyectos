@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FCNOISE">
+<link rel="apple-touch-icon" href="./assets/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
 <script>/* Ajusta el lienzo al tema guardado ANTES del primer pintado (en <head>) para que Chrome no muestre un fotograma blanco (ni oscuro para usuarios en claro) al cargar/navegar. */try{var _L=localStorage.getItem('fcn_theme')==='light',_D=document.documentElement;_D.style.colorScheme=_L?'light':'dark';_D.style.background=_L?'#f2f2f7':'#0a0a0a';}catch(e){}</script>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -6207,7 +6214,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-10-16-3';
+const APP_BUILD='2026-10-16-4';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
@@ -6265,9 +6272,13 @@ function forceUpdate(){
   // Siempre pedir login al abrir el portal (no auto-entrar desde sesión guardada)
   localStorage.removeItem(LS.user);
 })();
-/* Pausa el hover durante el scroll (clase body.is-scrolling) para un scroll fluido en Chrome */
+/* Pausa el hover durante el scroll (clase body.is-scrolling) para un scroll fluido en Chrome.
+   Escucha en window y en el contenedor de scroll del contenido (.app-body). */
 (()=>{ let t; const on=()=>{ const b=document.body; if(!b) return; b.classList.add('is-scrolling'); clearTimeout(t); t=setTimeout(()=>b.classList.remove('is-scrolling'),140); };
-  addEventListener('scroll', on, {passive:true}); addEventListener('wheel', on, {passive:true}); addEventListener('touchmove', on, {passive:true}); })();
+  addEventListener('scroll', on, {passive:true}); addEventListener('wheel', on, {passive:true}); addEventListener('touchmove', on, {passive:true});
+  const sc=document.querySelector('.app-body'); if(sc) sc.addEventListener('scroll', on, {passive:true}); })();
+/* PWA: registra el service worker (passthrough, sin caché → no interfiere con build.txt) */
+if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }); }
 </script>
 </body>
 </html>
