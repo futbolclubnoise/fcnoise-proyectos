@@ -173,10 +173,10 @@ body.light .section-sep{background:rgba(0,0,0,.08)!important;}
 html{background:var(--black);}
 body{font-family:var(--font-body);background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,122,0,.04) 0%,transparent 70%) no-repeat,var(--bg);color:var(--tx);min-height:100vh;font-size:14px;transition:background .25s,color .25s;}
 #screen-login{position:relative;z-index:1;}
-#screen-app{position:relative;z-index:1;display:flex;align-items:flex-start;}
+#screen-app{position:relative;z-index:1;display:flex;align-items:stretch;height:100vh;overflow:hidden;}
 
 /* ── NAV (panel lateral izquierdo) ── */
-.nav{width:214px;flex-shrink:0;min-height:100dvh;height:100dvh;background:rgba(8,10,16,0.97);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:stretch;padding:16px 12px;gap:6px;position:sticky;top:0;z-index:100;overflow-y:auto;}
+.nav{width:214px;flex-shrink:0;height:100%;background:rgba(8,10,16,0.97);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:stretch;padding:16px 12px;gap:6px;z-index:100;overflow-y:auto;}
 .nav-back{flex-shrink:0;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--tx2);text-decoration:none;background:var(--bg3);border:1px solid var(--bd2);transition:background .15s,color .15s;}
 .nav-back:hover{background:var(--bg4);color:var(--accent);}
 .nav-brand{flex-shrink:0;line-height:1;padding:2px 4px 8px;display:flex;align-items:center;}
@@ -303,7 +303,7 @@ body.light .rte-colorpop{background:#fff;}
 .w-full{width:100%;}
 
 /* ── APP BODY ── */
-.app-body{flex:1;min-width:0;padding:22px 26px;max-width:1180px;margin:0 auto;}
+.app-body{flex:1;min-width:0;padding:22px 26px;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
 
 /* ── PAGE HEADER ── */
 .page-hdr{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
@@ -854,8 +854,8 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
 /* ── MOBILE RESPONSIVE ── */
 @media(max-width:820px){
   /* En móvil/tablet el panel lateral vuelve a barra superior horizontal */
-  #screen-app{display:block;}
-  .nav{width:auto;min-height:0;height:48px;flex-direction:row;align-items:center;padding:0 12px;gap:4px;border-right:none;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;overflow-y:hidden;}
+  #screen-app{display:block;height:auto;overflow:visible;}
+  .nav{width:auto;height:48px;flex-direction:row;align-items:center;padding:0 12px;gap:4px;border-right:none;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;overflow-y:hidden;position:sticky;top:0;}
   body.light .nav{border-right:none!important;border-bottom:1px solid rgba(0,0,0,.1)!important;}
   .nav-brand{font-size:18px;padding:0;margin-right:4px;}
   .nav-logo{height:32px;}
@@ -868,8 +868,8 @@ body.light .pulse-card-foot{border-top-color:rgba(0,0,0,.07)!important;}
   .nav-logout{display:none;} /* hidden on mobile — logout via settings */
   .user-av{width:28px;height:28px;}
 
-  /* App body padding */
-  .app-body{padding:12px;}
+  /* App body padding + en móvil el scroll vuelve al body (barra superior sticky) */
+  .app-body{padding:12px;height:auto;overflow:visible;}
 
   /* Page headers */
   .page-hdr{margin-bottom:12px;}
@@ -6207,7 +6207,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-10-16-2';
+const APP_BUILD='2026-10-16-3';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
