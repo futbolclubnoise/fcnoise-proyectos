@@ -180,28 +180,28 @@ body.light .section-sep{background:rgba(0,0,0,.08)!important;}
 html{background:var(--black);}
 body{font-family:var(--font-body);background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,122,0,.04) 0%,transparent 70%) no-repeat,var(--bg);color:var(--tx);min-height:100vh;font-size:14px;transition:background .25s,color .25s;}
 #screen-login{position:relative;z-index:1;}
-#screen-app{position:relative;z-index:1;display:flex;align-items:stretch;height:100vh;overflow:hidden;}
+#screen-app{position:relative;z-index:1;display:block;}
 
-/* ── NAV (panel lateral izquierdo) ── */
-.nav{width:214px;flex-shrink:0;height:100%;background:rgba(8,10,16,0.97);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:stretch;padding:16px 12px;gap:6px;z-index:100;overflow-y:auto;}
+/* ── NAV (barra superior sticky; scroll normal del documento → sin capas compuestas que glitchean en Chrome) ── */
+.nav{width:100%;height:56px;background:rgba(8,10,16,0.97);border-bottom:1px solid rgba(255,255,255,.06);display:flex;flex-direction:row;align-items:center;padding:0 18px;gap:12px;z-index:100;position:sticky;top:0;overflow-x:auto;overflow-y:hidden;}
 .nav-back{flex-shrink:0;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--tx2);text-decoration:none;background:var(--bg3);border:1px solid var(--bd2);transition:background .15s,color .15s;}
 .nav-back:hover{background:var(--bg4);color:var(--accent);}
-.nav-brand{flex-shrink:0;line-height:1;padding:2px 4px 8px;display:flex;align-items:center;}
+.nav-brand{flex-shrink:0;line-height:1;padding:0;display:flex;align-items:center;}
 .nav-brand em{color:var(--accent);font-style:normal;}
-.nav-logo{height:46px;width:auto;display:block;}
+.nav-logo{height:34px;width:auto;display:block;}
 .nav-logo-light{display:none;}
 body.light .nav-logo-dark{display:none;}
 body.light .nav-logo-light{display:block;}
-.nav-top{display:flex;align-items:center;gap:8px;}
-.nav-links{display:flex;flex-direction:column;gap:2px;margin-top:6px;}
-.nav-link{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 11px;border-radius:10px;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;transition:color .15s,background .15s;border:none;background:transparent;font-family:var(--font-body);white-space:nowrap;letter-spacing:.01em;}
+.nav-top{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nav-links{display:flex;flex-direction:row;gap:4px;margin:0;}
+.nav-link{display:flex;align-items:center;gap:8px;width:auto;text-align:left;padding:8px 13px;border-radius:10px;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;transition:color .15s,background .15s;border:none;background:transparent;font-family:var(--font-body);white-space:nowrap;letter-spacing:.01em;}
 .nav-link svg{width:16px;height:16px;flex-shrink:0;stroke-width:1.7;opacity:.8;}
 .nav-link:hover{color:rgba(255,255,255,.85);background:var(--bg3);}
 .nav-link.on{color:var(--tx);background:var(--ac2);}
 .nav-link.on svg{opacity:1;color:var(--accent);}
-.nav-right{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid var(--bd2);}
+.nav-right{display:flex;flex-direction:row;align-items:center;gap:10px;margin:0 0 0 auto;padding:0;border-top:none;flex-shrink:0;}
 /* Indicador de versión + botón Actualizar */
-.ver-chip{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--tx3);padding:2px 2px;flex-wrap:wrap;}
+.ver-chip{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--tx3);padding:2px 2px;flex-wrap:nowrap;white-space:nowrap;}
 .ver-dot{width:7px;height:7px;border-radius:50%;background:var(--tx3);flex-shrink:0;}
 .ver-chip.uptodate .ver-dot{background:#28c76f;}
 .ver-chip.outdated .ver-dot{background:var(--orange);box-shadow:0 0 0 3px rgba(255,122,0,.18);}
@@ -209,7 +209,7 @@ body.light .nav-logo-light{display:block;}
 .ver-upd{border:none;background:var(--orange);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:7px;cursor:pointer;font-family:var(--font-body);white-space:nowrap;}
 .ver-upd:hover{filter:brightness(1.06);}
 .nav-right .sync-status{padding:2px 6px;}
-body.light .nav{background:rgba(242,242,247,.94)!important;border-right:1px solid rgba(0,0,0,.1)!important;border-bottom:none!important;}
+body.light .nav{background:rgba(242,242,247,.94)!important;border-right:none!important;border-bottom:1px solid rgba(0,0,0,.1)!important;}
 body.light .nav-link{color:rgba(0,0,0,.5)!important;}
 body.light .nav-link:hover{color:rgba(0,0,0,.8)!important;}
 body.light .nav-link.on{color:var(--tx)!important;}
@@ -310,7 +310,7 @@ body.light .rte-colorpop{background:#fff;}
 .w-full{width:100%;}
 
 /* ── APP BODY ── */
-.app-body{flex:1;min-width:0;padding:22px 26px;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.app-body{padding:22px 26px;max-width:1600px;margin:0 auto;}
 
 /* ── PAGE HEADER ── */
 .page-hdr{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
@@ -516,6 +516,10 @@ body.light .rte-colorpop{background:#fff;}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .cal-month{font-family:var(--font-display);font-size:20px;letter-spacing:.04em;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;}
+/* Calendario por filas de semana (bloques pequeños e independientes → evita el glitch de tiling de Chrome) */
+.cal-head7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;margin-bottom:3px;}
+.cal-weeks{display:flex;flex-direction:column;gap:3px;}
+.cal-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;}
 .cal-day-hdr{text-align:center;font-size:9px;font-weight:700;color:var(--tx3);padding:5px 0;text-transform:uppercase;letter-spacing:.1em;}
 .cal-cell{min-height:90px;min-width:0;background:var(--bg3);border-radius:8px;padding:6px;border:1px solid transparent;transition:border-color .18s;cursor:pointer;}
 .cal-chip{max-width:100%;}
@@ -4226,10 +4230,11 @@ function renderCalendarView(){
       <span><span class="c-ico">${lico('inbox')}</span> Fecha de entrega</span>
       <span><span class="c-ico">${lico('rocket')}</span> Fecha de publicación</span>
     </div>
-    <div class="cal-grid">
-    ${DAYS_SHORT.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('')}`;
+    <div class="cal-head7">${DAYS_SHORT.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('')}</div>
+    <div class="cal-weeks">`;
 
-  for(let i=0;i<startWd;i++) h+=`<div class="cal-cell empty"></div>`;
+  const cells=[];
+  for(let i=0;i<startWd;i++) cells.push(`<div class="cal-cell empty"></div>`);
 
   for(let d=1;d<=lastDay.getDate();d++){
     const dStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -4267,13 +4272,15 @@ function renderCalendarView(){
       return `<div class="cal-chip ${doneCls} ${isStart?'':'span-day'}" ${drag} style="${baseStyle}" ${open} title="${calCol.label} — ${title}">${isStart?title:'▸'}</div>`;
     }).join('');
     const cellHandlers=`data-date="${dStr}" ${isCeo?`onclick="calAddContent('${dStr}')"`:''}`;
-    h+=`<div class="cal-cell ${isToday?'today':''}" ${cellHandlers}>
+    cells.push(`<div class="cal-cell ${isToday?'today':''}" ${cellHandlers}>
       <div class="cal-date ${isToday?'is-today':''}">${d}</div>
       ${chips}
       ${isCeo?'<div class="cal-add-hint">+ agregar</div>':''}
-    </div>`;
+    </div>`);
   }
-  h+=`</div>`; // end grid
+  while(cells.length%7!==0) cells.push(`<div class="cal-cell empty"></div>`);
+  for(let i=0;i<cells.length;i+=7){ h+=`<div class="cal-week">${cells.slice(i,i+7).join('')}</div>`; }
+  h+=`</div>`; // end cal-weeks
 
   // Tarjetas de contenido del mes
   const monthPrefix=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
@@ -6214,7 +6221,7 @@ Object.assign(window,{
    Si el navegador tiene un index.html viejo (APP_BUILD anterior),
    detecta el build nuevo y recarga forzando descarga fresca.
 ═══════════════════════════════════════ */
-const APP_BUILD='2026-10-16-4';
+const APP_BUILD='2026-10-17-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('./build.txt?_='+Date.now(),{cache:'no-store'});
