@@ -264,8 +264,12 @@ import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/1
 const CFG={apiKey:"AIzaSyAMgsbJ2rOqLDofRMl6porBY7yczcJgZTA",authDomain:"fcnoise-proyectos.firebaseapp.com",databaseURL:"https://fcnoise-proyectos-default-rtdb.firebaseio.com",projectId:"fcnoise-proyectos",storageBucket:"fcnoise-proyectos.firebasestorage.app",messagingSenderId:"996777317756",appId:"1:996777317756:web:bdc555f3c288903b07c0f9"};
 const P_SP="fcn_sponsors", P_PO="fcn_sponsor_posts", P_CY="fcn_sponsor_cycles";
 const ADMIN_PASS="123456";
-let db=null;
-try{ const app=initializeApp(CFG,"fcnoise-sponsor"); db=getDatabase(app); try{ signInAnonymously(getAuth(app)).catch(()=>{}); }catch(e){} }catch(e){}
+let db=null, authReady=Promise.resolve();
+try{ const app=initializeApp(CFG,"fcnoise-sponsor"); db=getDatabase(app); authReady=signInAnonymously(getAuth(app)).then(()=>true).catch(e=>{console.warn('auth',e);return false;}); }catch(e){}
+// Mensaje de error claro (detecta permisos denegados por reglas de Firebase)
+function fbErr(e){ const m=(e&&(e.message||e.code))||String(e);
+  if(/permission|denied|PERMISSION/i.test(m)) return 'No se pudo guardar: Firebase denegó el permiso. Hay que actualizar las REGLAS de la Realtime Database (Firebase → Realtime Database → Reglas).';
+  return 'No se pudo guardar: '+m; }
 
 // Iconos de línea sutiles (sin emoji)
 const _sv=(p)=>`<svg class="lico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
@@ -337,11 +341,11 @@ function sponsorMonths(sid){
 }
 const postsInMonth=(sid,m)=>sponsorPosts(sid).filter(p=>postMonth(p)===m);
 
-async function saveSponsor(s){ if(db) try{ await set(ref(db,`${P_SP}/${s.id}`),s); }catch(e){alert('Error');} }
+async function saveSponsor(s){ if(!db) return; try{ await authReady; await set(ref(db,`${P_SP}/${s.id}`),s); }catch(e){alert(fbErr(e));} }
 async function delSponsorFb(id){ if(db) try{ await remove(ref(db,`${P_SP}/${id}`)); }catch(e){} }
-async function savePost(p){ if(db) try{ await set(ref(db,`${P_PO}/${p.id}`),p); }catch(e){alert('Error');} }
+async function savePost(p){ if(!db) return; try{ await authReady; await set(ref(db,`${P_PO}/${p.id}`),p); }catch(e){alert(fbErr(e));} }
 async function delPostFb(id){ if(db) try{ await remove(ref(db,`${P_PO}/${id}`)); }catch(e){} }
-async function saveCycle(c){ if(db) try{ await set(ref(db,`${P_CY}/${c.id}`),c); }catch(e){alert('Error');} }
+async function saveCycle(c){ if(!db) return; try{ await authReady; await set(ref(db,`${P_CY}/${c.id}`),c); }catch(e){alert(fbErr(e));} }
 async function delCycleFb(id){ if(db) try{ await remove(ref(db,`${P_CY}/${id}`)); }catch(e){} }
 
 function startListening(){
