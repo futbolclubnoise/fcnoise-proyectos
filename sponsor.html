@@ -154,15 +154,13 @@ option{background:#fff;color:var(--tx);}
 .wkc-delta.up{color:var(--grn);background:rgba(31,170,85,.12);}
 .wkc-delta.down{color:var(--red);background:rgba(229,72,77,.12);}
 .wkc-delta.flat{color:var(--tx3);background:var(--inp);}
-.wkc-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
-.wkc-svg{display:block;}
+.wkc-plot{margin-top:4px;}
+.wkc-svg{display:block;width:100%;height:auto;}
 .wkc-grid{stroke:var(--bd2);stroke-width:1;}
-.wkc-gtxt{fill:var(--tx3);font-size:8px;font-weight:600;font-family:var(--font-body);}
-.wkc-avg{stroke:var(--tx3);stroke-width:1;stroke-dasharray:3 3;opacity:.55;}
-.wkc-avgtxt{fill:var(--tx3);font-size:8.5px;font-weight:700;font-family:var(--font-body);}
-.wkc-val{fill:var(--tx2);font-size:9.5px;font-weight:700;font-family:var(--font-body);font-variant-numeric:tabular-nums;}
-.wkc-val.pk{fill:var(--tx);font-weight:800;}
-.wkc-x{fill:var(--tx3);font-size:9px;font-weight:600;font-family:var(--font-body);}
+.wkc-gtxt{fill:var(--tx3);font-size:13px;font-weight:600;font-family:var(--font-body);font-variant-numeric:tabular-nums;}
+.wkc-val{fill:var(--tx2);font-size:14.5px;font-weight:700;font-family:var(--font-body);font-variant-numeric:tabular-nums;}
+.wkc-val.pk{fill:var(--tx);font-weight:800;font-size:16px;}
+.wkc-x{fill:var(--tx3);font-size:13.5px;font-weight:600;font-family:var(--font-body);}
 
 .mov{position:fixed;inset:0;background:rgba(20,25,40,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(5px);}
 .mov.open{opacity:1;pointer-events:all;}
@@ -433,41 +431,50 @@ function renderAdmin(){
   if(selSponsor&&_sponsors[selSponsor]) h+=renderDash(selSponsor,true);
   return h;
 }
-// ── Gráfico (SVG): línea + área con puntos y período actual destacado en rojo ──
+// Curva suave (Catmull-Rom → Bézier) a través de los puntos
+function smoothPath(pts){
+  if(pts.length<2) return pts.length?`M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`:'';
+  const T=0.16; let d=`M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2;
+    const c1x=p1[0]+(p2[0]-p0[0])*T, c1y=p1[1]+(p2[1]-p0[1])*T;
+    const c2x=p2[0]-(p3[0]-p1[0])*T, c2y=p2[1]-(p3[1]-p1[1])*T;
+    d+=` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+// ── Gráfico (SVG responsive): línea+área suave, ancho completo, período actual en rojo ──
 function chartSVG(xLabels, vals, hex){
   const n=xLabels.length;
-  const padT=20, padB=24, chartH=130, padL=36, padR=18;
-  const gap = n>1 ? Math.max(46, Math.min(86, Math.round(300/(n-1)))) : 0;
-  const innerW = n>1 ? gap*(n-1) : 150;
-  const w=padL+padR+innerW, H=padT+chartH+padB, base=padT+chartH;
-  // escala con holgura arriba/abajo para que la variación se vea (como línea de tendencia)
+  const W=940, H=300, padL=58, padR=30, padT=34, padB=40;
+  const base=H-padB, innerW=W-padL-padR, chartH=H-padT-padB;
   let lo=Math.min(...vals), hi=Math.max(...vals);
   if(!isFinite(lo)) lo=0; if(!isFinite(hi)) hi=0;
-  if(hi===lo){ hi=lo+(lo?lo*0.1:1); }
-  const padv=(hi-lo)*0.14; let yMax=hi+padv, yMin=Math.max(0,lo-padv);
+  if(hi===lo){ hi=lo+(lo?lo*0.12:1); }
+  const padv=(hi-lo)*0.16; let yMax=hi+padv, yMin=Math.max(0,lo-padv);
   if(yMax===yMin) yMax=yMin+1;
   const uid=hex.replace('#','');
-  const cx=i=> n>1 ? padL+i*gap : padL+innerW/2;
+  const cx=i=> n>1 ? padL+innerW*i/(n-1) : padL+innerW/2;
   const cy=v=> padT+chartH*(1-(v-yMin)/(yMax-yMin));
-  // grilla + etiquetas Y (omite etiqueta repetida en rangos enteros pequeños)
+  // grilla + etiquetas Y (omite etiqueta repetida)
   let grid='', lastLbl=null;
-  for(let i=0;i<=4;i++){ const gy=padT+chartH*(1-i/4), gv=yMin+(yMax-yMin)*i/4; grid+=`<line x1="${padL}" y1="${gy}" x2="${w-padR}" y2="${gy}" class="wkc-grid"/>`; const lbl=nfmt(Math.round(gv)); if(lbl!==lastLbl){ grid+=`<text x="${padL-6}" y="${gy+3}" class="wkc-gtxt" text-anchor="end">${lbl}</text>`; lastLbl=lbl; } }
+  for(let i=0;i<=4;i++){ const gy=padT+chartH*(1-i/4), gv=yMin+(yMax-yMin)*i/4; grid+=`<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${W-padR}" y2="${gy.toFixed(1)}" class="wkc-grid"/>`; const lbl=nfmt(Math.round(gv)); if(lbl!==lastLbl){ grid+=`<text x="${padL-11}" y="${(gy+5).toFixed(1)}" class="wkc-gtxt" text-anchor="end">${lbl}</text>`; lastLbl=lbl; } }
   const pts=vals.map((v,i)=>[cx(i),cy(v)]);
-  const linePath = pts.map((p,i)=>`${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
-  const areaPath = n>1 ? `${linePath} L${(w-padR).toFixed(1)},${base} L${padL.toFixed(1)},${base} Z` : '';
+  const linePath=smoothPath(pts);
+  const areaPath = n>1 ? `${linePath} L${(W-padR).toFixed(1)},${base} L${padL.toFixed(1)},${base} Z` : '';
   let dots='', labels='', xlbls='';
   const HL='#e5484d'; // período actual (último) en rojo, como la guía
-  xLabels.forEach((xl,i)=>{
-    const [x,y]=pts[i], isLast=i===n-1, dc=isLast?HL:hex;
-    if(isLast) dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="11" fill="${HL}" opacity=".18"/>`;
-    dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${isLast?6:4}" fill="${dc}" stroke="#fff" stroke-width="${isLast?2.4:2}"/>`;
-    labels+=`<text x="${x.toFixed(1)}" y="${(y-(isLast?13:10)).toFixed(1)}" class="wkc-val${isLast?' pk':''}" text-anchor="middle">${nfmt(vals[i])}</text>`;
-    xlbls+=`<text x="${x.toFixed(1)}" y="${base+16}" class="wkc-x" text-anchor="middle">${esc(xl)}</text>`;
+  pts.forEach((p,i)=>{
+    const [x,y]=p, isLast=i===n-1, dc=isLast?HL:hex;
+    if(isLast) dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="16" fill="${HL}" opacity=".15"/>`;
+    dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${isLast?7.5:5.5}" fill="${dc}" stroke="#fff" stroke-width="3"/>`;
+    labels+=`<text x="${x.toFixed(1)}" y="${(y-(isLast?20:16)).toFixed(1)}" class="wkc-val${isLast?' pk':''}" text-anchor="middle">${nfmt(vals[i])}</text>`;
+    xlbls+=`<text x="${x.toFixed(1)}" y="${(base+26).toFixed(1)}" class="wkc-x" text-anchor="middle">${esc(xLabels[i])}</text>`;
   });
-  const grad=`<linearGradient id="wa_${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${hex}" stop-opacity=".26"/><stop offset="1" stop-color="${hex}" stop-opacity=".02"/></linearGradient>`;
+  const grad=`<linearGradient id="wa_${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${hex}" stop-opacity=".24"/><stop offset="1" stop-color="${hex}" stop-opacity="0"/></linearGradient>`;
   const area = areaPath ? `<path d="${areaPath}" fill="url(#wa_${uid})"/>` : '';
-  const line = n>1 ? `<path d="${linePath}" fill="none" stroke="${hex}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>` : '';
-  return `<svg class="wkc-svg" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}"><defs>${grad}</defs>${grid}${area}${line}${dots}${labels}${xlbls}</svg>`;
+  const line = n>1 ? `<path d="${linePath}" fill="none" stroke="${hex}" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>` : '';
+  return `<svg class="wkc-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><defs>${grad}</defs>${grid}${area}${line}${dots}${labels}${xlbls}</svg>`;
 }
 function metricBlock(xLabels, vals, label, hex){
   const total=vals.reduce((a,b)=>a+b,0);
@@ -480,7 +487,7 @@ function metricBlock(xLabels, vals, label, hex){
   }
   return `<div class="wkc">
     <div class="wkc-head"><span class="wkc-dot" style="background:${hex};"></span><span class="wkc-lbl">${label}</span><span class="wkc-total" style="color:${hex};">${nfmt(total)}</span>${delta}</div>
-    <div class="wkc-scroll">${chartSVG(xLabels, vals, hex)}</div>
+    <div class="wkc-plot">${chartSVG(xLabels, vals, hex)}</div>
   </div>`;
 }
 function renderDash(sid,admin){
@@ -532,7 +539,6 @@ function renderDash(sid,admin){
     const series=[
       {key:'v',lbl:t('viewsTile'),hex:'#2f74e6'},
       {key:'l',lbl:t('likesTile'),hex:'#e5484d'},
-      {key:'c',lbl:t('creativesTile'),hex:'#ff7a00'},
     ];
     h+=`<div class="card"><div class="card-hdr" style="display:block;margin-bottom:16px;">
       <div class="chart-ttl">${t('weekReport')}</div><div class="chart-sub">${weeks.length} ${t('weeks')} · ${t('weekReportSub')}</div></div>
